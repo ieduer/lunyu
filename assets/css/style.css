@@ -10,7 +10,7 @@
 /* 全局樣式 */
 body {
   font-family: 'HuWenMingChaoTi', "Noto Serif TC", serif;
-  background: #f9f5e7;  /* 淡雅背景色 */
+  background: #f9f5e7; /* 淡雅背景色 */
   color: #333;
   margin: 0;
   padding: 0 10px;
@@ -27,14 +27,14 @@ h1 {
   margin-bottom: 0.5em;
 }
 
-
-/* 顯示目錄的背景與間距 */
+/* 章節目錄 (移除白底和邊距) */
 #chapter-menu {
-  margin: 1rem 0;
-  background-color: #f9f9f9;
-  padding: 0.5rem;
+  margin: 0; /* 若要完全貼近上下區塊，可改為 0 */
+  /* background-color: #f9f9f9; */ /* 移除白色背景 */
+  /* padding: 0.5rem; */ /* 移除邊距 */
 }
 
+/* 目錄連結 */
 #chapter-menu a {
   margin-right: 1rem;
   text-decoration: none;
@@ -52,7 +52,6 @@ main {
   max-width: 800px;
   margin: 0 auto;
 }
-
 
 /* 對話窗口樣式 */
 #dialogue-box {
@@ -82,7 +81,7 @@ main {
   background: #cce4ff;
 }
 
-/* 針對小螢幕的響應式設計 */
+/* 響應式設計：小螢幕 */
 @media (max-width: 768px) {
   body {
     padding: 0 5px;
@@ -96,21 +95,24 @@ main {
   }
 }
 
-/* ===== 新增：自由提問輸入框優化 ===== */
+/* ===== 自由提問輸入框優化 ===== */
 #custom-input {
   display: none;
   margin-top: 1rem;
 }
 
+/* 放大輸入框：增加寬度與高度 */
 #custom-input input[type="text"] {
-  width: 80%;
+  width: 90%;        /* 調整寬度 */
+  height: 2.5rem;    /* 增加高度 */
   padding: 0.5rem;
-  font-size: 1rem;
-  box-sizing: border-box; /* 確保寬度計算包含內邊距 */
+  font-size: 1.1rem; /* 字體更大一些 */
+  box-sizing: border-box;
 }
 
+/* 放大送出按鈕 */
 #custom-input button {
   margin-left: 0.5rem;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
+  padding: 0.7rem 1.2rem;
+  font-size: 1.1rem;
 }
