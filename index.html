@@ -7,40 +7,146 @@
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
-  <header>
-    <h1>論語2025 · 地支瀏覽</h1>
-    <!-- 這裡可以放一些簡介或導航 -->
-  </header>
+  <!-- 將整體頁面劃分為左右兩欄 -->
+  <div id="container">
+    <!-- 左側：側邊欄 -->
+    <aside id="sidebar">
+      <!-- 切換顯示/隱藏目錄按鈕 -->
+      <button id="toggle-menu-btn">顯示目錄</button>
+      <!-- 兩級目錄：第一級目錄 -->
+      <nav id="chapter-menu" style="display: none;"></nav>
+    </aside>
 
-  <main>
-    <!-- 容器：顯示 12 地支按鈕 -->
-    <section id="zodiac-menu"></section>
+    <!-- 右側：主要內容 -->
+    <div id="main-content">
+      <header>
+        <h1>論語2025</h1>
+      </header>
 
-    <!-- 容器：顯示二級清單（點擊某地支後顯示的章節列表） -->
-    <section id="chapter-list" style="display: none;"></section>
+      <!-- 用於顯示選中論語章節內容 -->
+      <section id="chapter-content"></section>
 
-    <!-- 容器：顯示最終選定條目的內容 -->
-    <section id="chapter-content" style="display: none;"></section>
-
-    <!-- 互動對話窗口 (選擇性) -->
-    <section id="dialogue-box">
-      <div id="messages"></div>
-      <div id="input-area">
-        <button onclick="sendChoice(1)">孔子：我該如何解釋這句？</button>
-        <button onclick="sendChoice(2)">Gemini AI：請給我現代解讀</button>
-        <button onclick="showInput()">自由提問</button>
-        <div id="custom-input" style="display:none;">
-          <input type="text" id="userQuestion" placeholder="請輸入你的問題" />
-          <button onclick="sendCustomQuestion()">送出</button>
+      <!-- 互動對話窗口 -->
+      <section id="dialogue-box">
+        <div id="messages"></div>
+        <div id="input-area">
+          <!-- 三個互動入口 -->
+          <button onclick="sendChoice(1)">孔子：我該如何解釋這句？</button>
+          <button onclick="sendChoice(2)">Gemini AI：請給我現代解讀</button>
+          <button onclick="showInput()">自由提問</button>
+          <div id="custom-input" style="display:none;">
+            <input type="text" id="userQuestion" placeholder="請輸入你的問題" />
+            <button onclick="sendCustomQuestion()">送出</button>
+          </div>
         </div>
-      </div>
-    </section>
-  </main>
+      </section>
+    </div>
+  </div>
 
   <footer style="text-align:center; margin-top:20px;">
     <p>© bdfz suen</p>
   </footer>
 
   <script src="assets/js/app.js"></script>
+  <script>
+    /********************************************
+     * 目錄折疊/展開 + 兩級目錄邏輯
+     ********************************************/
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggleMenuBtn = document.getElementById("toggle-menu-btn");
+      const chapterMenu = document.getElementById("chapter-menu");
+
+      // 切換顯示/隱藏目錄
+      toggleMenuBtn.addEventListener("click", () => {
+        if (chapterMenu.style.display === "none") {
+          chapterMenu.style.display = "block";
+          toggleMenuBtn.textContent = "隱藏目錄";
+        } else {
+          chapterMenu.style.display = "none";
+          toggleMenuBtn.textContent = "顯示目錄";
+        }
+      });
+    });
+
+    /**
+     * 建立兩級目錄:
+     *   1. 第 1~20 章(以 title 解析, 例如 "學而 1.x" => 1; "為政 2.x" => 2; ...)
+     *   2. 點擊展開對應子節 (該章下所有 items)
+     *   3. 連結文字改用 ID 數字, 避免太長
+     */
+    function renderChapterMenu(data) {
+      const menu = document.getElementById("chapter-menu");
+      if (!menu) return;
+
+      // 先按 "章" 分組 (1~20)
+      const grouped = {};
+      data.forEach(item => {
+        const match = item.title.match(/(\d+)\.(\d+)/);
+        if (!match) return;
+        const major = parseInt(match[1], 10);
+        if (major < 1 || major > 20) return;
+        if (!grouped[major]) grouped[major] = [];
+        grouped[major].push(item);
+      });
+
+      // 生成第一級目錄，以 CSS Grid 呈現 4 行 5 列
+      const gridContainer = document.createElement("div");
+      gridContainer.style.display = "grid";
+      gridContainer.style.gridTemplateColumns = "repeat(5, 1fr)";
+      gridContainer.style.gridAutoRows = "auto";
+      gridContainer.style.gap = "0.5rem";
+
+      for (let i = 1; i <= 20; i++) {
+        if (!grouped[i] || grouped[i].length === 0) continue;
+        const btn = document.createElement("button");
+        btn.textContent = `第 ${i} 章`;
+        btn.style.width = "100%";
+        btn.onclick = () => {
+          renderSubChapterMenu(i);
+          return false;
+        };
+        gridContainer.appendChild(btn);
+      }
+      menu.appendChild(gridContainer);
+    }
+
+    function renderSubChapterMenu(major) {
+      let subMenuContainer = document.getElementById("sub-chapter-menu");
+      if (!subMenuContainer) {
+        subMenuContainer = document.createElement("div");
+        subMenuContainer.id = "sub-chapter-menu";
+        subMenuContainer.style.marginTop = "1rem";
+        // 將子目錄放在側邊欄底部
+        document.getElementById("chapter-menu").appendChild(subMenuContainer);
+      }
+      subMenuContainer.innerHTML = "";
+      const subChapters = groupedChapters[major];
+      if (!subChapters || subChapters.length === 0) return;
+      // 每列最多 5 個，採用 grid 佈局
+      subMenuContainer.style.display = "grid";
+      subMenuContainer.style.gridTemplateColumns = "repeat(5, 1fr)";
+      subMenuContainer.style.gap = "0.5rem";
+
+      subChapters.forEach(item => {
+        const a = document.createElement("a");
+        a.href = "#";
+        a.textContent = `ID: ${item.id}`;
+        a.style.display = "block";
+        a.style.textAlign = "center";
+        a.style.padding = "0.3rem";
+        a.style.border = "1px solid #ddd";
+        a.style.borderRadius = "3px";
+        a.style.textDecoration = "none";
+        a.style.color = "#0077cc";
+        a.onclick = () => {
+          displayChapter(item.id);
+          return false;
+        };
+        subMenuContainer.appendChild(a);
+      });
+    }
+    // 將 renderChapterMenu 函式暴露到全域
+    window.renderChapterMenu = renderChapterMenu;
+  </script>
 </body>
 </html>
