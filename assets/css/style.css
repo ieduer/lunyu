@@ -37,80 +37,168 @@ h1 {
 main {
   max-width: 800px;
   margin: 0 auto;
+  padding: 0 1rem;
 }
 
 /* 對話窗口樣式 */
 #dialogue-box {
-  padding: 1rem;
+  padding: 1.5rem;
   background: #fff;
   border: 1px solid #ddd;
-  border-radius: 5px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
 }
 
 #messages {
-  min-height: 100px;
-  margin-bottom: 1rem;
+  min-height: 150px;
+  margin-bottom: 1.5rem;
 }
 
-/* 按鈕樣式 */
-#input-area button {
-  margin: 0.5rem 0.2rem;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
+/* 按鈕共同樣式 */
+button {
+  padding: 0.7rem 1.2rem;
+  font-size: 1.1rem;
   border: 1px solid #0077cc;
-  border-radius: 3px;
+  border-radius: 5px;
   background: #e0f0ff;
   cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
 }
 
-#input-area button:hover {
+button:hover {
   background: #cce4ff;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+/* 選項按鈕樣式 */
+#input-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+#input-area button {
+  flex-grow: 1;
+  min-width: 150px;
+  max-width: 100%;
 }
 
 /* ===== 自由提問輸入框優化 ===== */
 #custom-input {
-  display: none;
-  margin-top: 1rem;
-  /* 為了能讓按鈕換行，可改用彈性佈局或直接讓兩者分開 block */
-  display: flex;       /* 彈性佈局 */
-  flex-direction: row; /* 預設同一行：輸入框 + 按鈕 */
-  gap: 0.5rem;         /* 輸入框與按鈕之間的間距 */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
 }
 
 /* 放大輸入框：增加寬度與高度 */
 #custom-input input[type="text"] {
-  flex: 1;           /* 在同一行時，輸入框自動撐滿剩餘空間 */
-  height: 3rem;      /* 調整高度 */
-  padding: 0.5rem;
-  font-size: 1.1rem; /* 字體更大一些 */
+  width: 100%;
+  height: 3.5rem;
+  padding: 0.8rem;
+  font-size: 1.1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
   box-sizing: border-box;
 }
 
-/* 放大送出按鈕 */
-#custom-input button {
-  padding: 0.7rem 1.2rem;
-  font-size: 1.1rem;
+#custom-input input[type="text"]:focus {
+  border-color: #0077cc;
+  outline: none;
+  box-shadow: 0 0 3px rgba(0, 119, 204, 0.3);
 }
 
-/* 響應式設計：小螢幕 */
+/* 送出按鈕樣式 */
+#custom-input button {
+  width: 100%;
+  background-color: #0077cc;
+  color: white;
+  border: none;
+}
+
+#custom-input button:hover {
+  background-color: #005fa3;
+}
+
+/* 響應式設計 */
 @media (max-width: 768px) {
   body {
-    padding: 0 5px;
+    padding: 0;
   }
+  
+  main {
+    padding: 0 0.5rem;
+  }
+  
   h1 {
     font-size: 1.5em;
   }
+  
+  #dialogue-box {
+    padding: 1rem;
+  }
+  
+  #input-area {
+    gap: 0.5rem;
+  }
+  
   #input-area button {
-    font-size: 0.9rem;
-    padding: 0.5rem;
+    padding: 0.6rem;
+    font-size: 0.95rem;
+    min-width: 120px;
   }
-  /* 在小螢幕時，輸入框與按鈕分兩行 */
-  #custom-input {
-    flex-direction: column; 
+  
+  #custom-input input[type="text"] {
+    height: 3rem;
+    padding: 0.6rem;
   }
-  #custom-input button {
-    margin-left: 0;   /* 取消左邊距 */
-    margin-top: 0.5rem;
-    width: auto;
+}
+
+/* 高分辨率設備優化 */
+@media (min-width: 1440px) {
+  main {
+    max-width: 1000px;
+  }
+  
+  #dialogue-box {
+    padding: 2rem;
+  }
+  
+  #messages {
+    min-height: 200px;
+  }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #1a1a1a;
+    color: #f0f0f0;
+  }
+  
+  #dialogue-box {
+    background: #2a2a2a;
+    border-color: #444;
+  }
+  
+  button {
+    background: #1a3d66;
+    border-color: #2a5a8a;
+    color: #f0f0f0;
+  }
+  
+  button:hover {
+    background: #2a5a8a;
+  }
+  
+  #custom-input input[type="text"] {
+    background: #333;
+    color: #f0f0f0;
+    border-color: #555;
   }
 }
