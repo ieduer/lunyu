@@ -1,7 +1,8 @@
-// assets/js/app.js
-
 // 請改成你自己的 Cloudflare Worker 網址
 const CLOUD_FLARE_WORKER_URL = "https://lunyu.bdfz.workers.dev/";
+
+// 用於存放「目前隨機抽到」的那條論語內容
+let currentAnalect = null;
 
 // ========== 隨機顯示一條論語 ========== //
 function loadRandomAnalect() {
@@ -15,6 +16,9 @@ function loadRandomAnalect() {
       // 隨機挑一條
       const randomIndex = Math.floor(Math.random() * data.length);
       const item = data[randomIndex];
+      // 記錄在全域變數 currentAnalect
+      currentAnalect = item;
+
       // 顯示在網頁上
       const randomTextEl = document.getElementById("random-text");
       if (randomTextEl) {
@@ -49,7 +53,7 @@ function askGemini(prompt, callback) {
     });
 }
 
-// 這裡維持你原本的對話/互動函式即可
+// ========== 對話顯示相關函式 ========== //
 function addMessage(message, sender = "system") {
   const messagesEl = document.getElementById("messages");
   if (!messagesEl) return;
@@ -59,19 +63,29 @@ function addMessage(message, sender = "system") {
   messagesEl.appendChild(div);
 }
 
+// ========== 按鈕點擊行為 ========== //
 function sendChoice(choice) {
+  // 若尚未載入任何論語，提示用戶
+  if (!currentAnalect) {
+    addMessage("尚未載入任何論語內容，請稍後再試。", "system");
+    return;
+  }
+
   if (choice === 1) {
-    addMessage("孔子：善哉！學而時習之，不亦說乎？", "孔子");
+    // 「孔子：我該如何解釋這句？」 => 顯示譯文與注釋
+    const explanation = `譯文：${currentAnalect.translation || "（無譯文）"}\n\n注釋：${currentAnalect.annotations || "（無注釋）"}`;
+    addMessage(explanation, "孔子");
   } else if (choice === 2) {
+    // 「Gemini AI：請給我現代解讀」 => 呼叫 AI，並把正文帶入 Prompt
     addMessage("Gemini AI：正在生成現代解讀……", "ai");
-    // 這裡可帶上對應論語文本做 prompt
-    const prompt = "請用現代語言解讀以下論語內容：...（自行拼接）";
+    const prompt = `請用現代語言解讀以下論語內容：\n${currentAnalect.text}`;
     askGemini(prompt, function(aiAnswer) {
       addMessage("Gemini AI：" + aiAnswer, "ai");
     });
   }
 }
 
+// 自由提問：將用戶問題 + 當前論語正文一併傳給 AI
 function showInput() {
   const customInputEl = document.getElementById("custom-input");
   if (customInputEl) {
@@ -85,7 +99,9 @@ function sendCustomQuestion() {
   const question = input.value.trim();
 
   addMessage("你：" + question, "user");
-  askGemini(question, function(aiAnswer) {
+  // 將當前論語正文也加入 Prompt
+  const prompt = `當前論語：${currentAnalect.text}\n用戶問題：${question}`;
+  askGemini(prompt, function(aiAnswer) {
     addMessage("Gemini AI：" + aiAnswer, "ai");
   });
 
