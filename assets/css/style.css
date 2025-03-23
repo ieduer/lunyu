@@ -27,12 +27,14 @@ h1 {
   margin-bottom: 0.5em;
 }
 
+/* 章節目錄區域 */
 nav#chapter-menu {
   margin-bottom: 1rem;
   overflow-x: auto;
   white-space: nowrap;
 }
 
+/* 章節目錄連結樣式 */
 nav#chapter-menu a {
   display: inline-block;
   margin: 0 0.5rem;
@@ -41,16 +43,32 @@ nav#chapter-menu a {
   font-size: 1rem;
 }
 
+/* 顯示目錄的背景與間距 */
+#chapter-menu {
+  margin: 1rem 0;
+  background-color: #f9f9f9;
+  padding: 0.5rem;
+}
+
+#chapter-menu a {
+  margin-right: 1rem;
+  text-decoration: none;
+  color: #0077cc;
+}
+
+/* 進度文字樣式 */
 #progress {
   margin-bottom: 1rem;
   font-size: 1rem;
 }
 
+/* 主要內容區域寬度限制 */
 main {
   max-width: 800px;
   margin: 0 auto;
 }
 
+/* 章節內容區塊 */
 #chapter-content {
   padding: 1rem;
   background: #fff;
@@ -72,6 +90,7 @@ main {
   margin-bottom: 1rem;
 }
 
+/* 按鈕樣式 */
 #input-area button {
   margin: 0.5rem 0.2rem;
   padding: 0.5rem 1rem;
@@ -86,7 +105,7 @@ main {
   background: #cce4ff;
 }
 
-/* 響應式設計 */
+/* 針對小螢幕的響應式設計 */
 @media (max-width: 768px) {
   body {
     padding: 0 5px;
@@ -98,4 +117,23 @@ main {
     font-size: 0.9rem;
     padding: 0.5rem;
   }
+}
+
+/* ===== 新增：自由提問輸入框優化 ===== */
+#custom-input {
+  display: none;
+  margin-top: 1rem;
+}
+
+#custom-input input[type="text"] {
+  width: 80%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  box-sizing: border-box; /* 確保寬度計算包含內邊距 */
+}
+
+#custom-input button {
+  margin-left: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
 }
