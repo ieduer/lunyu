@@ -58,6 +58,14 @@ main {
   padding: 1rem;     /* 增加內部間距 */
 }
 
+ /* 章節內容區塊 */
+ #chapter-content {
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  margin-bottom: 1rem;
+  border-radius: 5px;
+}
 
 /* 對話窗口樣式 */
 #dialogue-box {
