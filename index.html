@@ -3,25 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>《論語2025》</title>
+  <title>論語2025</title>
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
   <header>
-    <h1>《論語2025》</h1>
-    <nav id="chapter-menu"></nav>
+    <h1>論語2025</h1>
+    <!-- 進度顯示，可自行決定是否保留 -->
     <div id="progress">進度：0%</div>
   </header>
 
   <main>
-    <section id="chapter-content">
-      <!-- 隨機顯示的章節正文與譯註 -->
+    <!-- 隨機顯示一條論語 -->
+    <section id="random-analect">
+      <p id="random-text"></p>
     </section>
+
+    <!-- 互動對話窗口 -->
     <section id="dialogue-box">
       <div id="messages"></div>
       <div id="input-area">
-        <button onclick="sendChoice(1)">子曰：我該如何解釋這句？</button>
-        <button onclick="sendChoice(2)">AI曰：請給我現代解讀</button>
+        <!-- 三個互動入口 -->
+        <button onclick="sendChoice(1)">孔子：我該如何解釋這句？</button>
+        <button onclick="sendChoice(2)">Gemini AI：請給我現代解讀</button>
         <button onclick="showInput()">自由提問</button>
         <div id="custom-input" style="display:none;">
           <input type="text" id="userQuestion" placeholder="請輸入你的問題" />
@@ -31,8 +35,8 @@
     </section>
   </main>
 
-  <footer>
-    <p>@Bdfz-Suen</p>
+  <footer style="text-align:center; margin-top:20px;">
+    <p>©bdfz suen</p>
   </footer>
 
   <script src="assets/js/app.js"></script>
