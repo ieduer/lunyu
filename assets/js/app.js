@@ -14,19 +14,26 @@ const dialogues = {
   }
 };
 
-// 將論語原文顯示於頁面上
-document.getElementById('analects-text').innerHTML = `<p>${dialogues.text}</p>`;
+// 1. 顯示論語原文
+const analectsTextEl = document.getElementById('analects-text');
+if (analectsTextEl) {
+  analectsTextEl.innerHTML = `<p>${dialogues.text}</p>`;
+}
 
-// 輔助函數：在訊息區添加訊息
+// 2. 在訊息區添加訊息的輔助函式
 function addMessage(message, sender = 'system') {
+  const messagesContainer = document.getElementById('messages');
+  if (!messagesContainer) return;
   const messageDiv = document.createElement('div');
   messageDiv.className = sender;
   messageDiv.textContent = message;
-  document.getElementById('messages').appendChild(messageDiv);
+  messagesContainer.appendChild(messageDiv);
 }
 
-// 根據玩家選項處理回應
-function sendChoice(choice) {
+// 3. 將原本的函式掛到 window，以便 HTML inline onclick 能呼叫
+
+// (a) 根據玩家選項處理回應
+window.sendChoice = function(choice) {
   if (choice === 1) {
     // 顯示孔子的預設回答
     addMessage(dialogues.responses[choice], '孔子');
@@ -37,28 +44,37 @@ function sendChoice(choice) {
       addMessage("Gemini AI：" + aiAnswer, 'ai');
     });
   }
-}
+};
 
-// 顯示自訂提問輸入區
-function showInput() {
-  document.getElementById('custom-input').style.display = 'block';
-}
+// (b) 顯示自訂提問輸入區
+window.showInput = function() {
+  const customInputEl = document.getElementById('custom-input');
+  if (customInputEl) {
+    customInputEl.style.display = 'block';
+  }
+};
 
-// 處理玩家自訂提問
-function sendCustomQuestion() {
-  const question = document.getElementById('userQuestion').value;
+// (c) 處理玩家自訂提問
+window.sendCustomQuestion = function() {
+  const questionInput = document.getElementById('userQuestion');
+  if (!questionInput) return;
+
+  const question = questionInput.value.trim();
   if (!question) return;
+
   addMessage("你：" + question, 'user');
   askGemini(question, function(aiAnswer) {
     addMessage("Gemini AI：" + aiAnswer, 'ai');
   });
-  document.getElementById('custom-input').style.display = 'none';
-  document.getElementById('userQuestion').value = "";
-}
 
-// 調用 Cloudflare Worker 代理 Gemini AI API
+  const customInputEl = document.getElementById('custom-input');
+  if (customInputEl) customInputEl.style.display = 'none';
+  questionInput.value = "";
+};
+
+// 4. 調用 Cloudflare Worker 代理 Gemini AI API
 function askGemini(prompt, callback) {
-    fetch(CLOUD_FLARE_WORKER_URL, {
+  fetch(CLOUD_FLARE_WORKER_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
