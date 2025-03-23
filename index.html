@@ -4,13 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>論語2025</title>
+  <!-- 引入外部樣式表 -->
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
   <header>
     <h1>論語2025</h1>
-    <!-- 章節目錄 -->
-    <nav id="chapter-menu"></nav>
+    <!-- 目錄顯示/隱藏按鈕 -->
+    <button id="toggle-menu-btn">顯示目錄</button>
+    <!-- 章節目錄（預設隱藏，透過 JS 切換顯示） -->
+    <nav id="chapter-menu" style="display: none;"></nav>
   </header>
 
   <main>
@@ -37,6 +40,24 @@
     <p>© bdfz suen</p>
   </footer>
 
+  <!-- 主程式 -->
   <script src="assets/js/app.js"></script>
+  <script>
+    // 監聽「顯示目錄」按鈕，切換目錄顯示/隱藏
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggleMenuBtn = document.getElementById("toggle-menu-btn");
+      const chapterMenu = document.getElementById("chapter-menu");
+
+      toggleMenuBtn.addEventListener("click", () => {
+        if (chapterMenu.style.display === "none") {
+          chapterMenu.style.display = "flex";
+          toggleMenuBtn.textContent = "隱藏目錄";
+        } else {
+          chapterMenu.style.display = "none";
+          toggleMenuBtn.textContent = "顯示目錄";
+        }
+      });
+    });
+  </script>
 </body>
 </html>

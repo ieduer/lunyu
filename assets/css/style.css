@@ -27,18 +27,12 @@ h1 {
   margin-bottom: 0.5em;
 }
 
- /* 章節目錄 (移除白底和邊距) */
- #chapter-menu {
-  margin: 0; /* 若要完全貼近上下區塊，可改為 0 */
-  /* background-color: #f9f9f9; */ /* 移除白色背景 */
-  /* padding: 0.5rem; */ /* 移除邊距 */
-}
-
-/* 目錄連結 */
-#chapter-menu a {
-  margin-right: 1rem;
-  text-decoration: none;
-  color: #0077cc;
+/* 按鈕：顯示/隱藏目錄 */
+#toggle-menu-btn {
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
 }
 
 /* 主要內容區域寬度限制 */
@@ -48,23 +42,36 @@ main {
   padding: 0 1rem;
 }
 
-/* 論語正文樣式 */
-#random-text {
-  font-size: 1.6rem; /* 顯著增加字體大小 */
-  line-height: 1.8;  /* 增加行高提高可讀性 */
-  margin: 1.5rem 0;  /* 增加上下間距 */
-  text-align: center; /* 居中顯示 */
-  font-weight: 500;   /* 稍微加粗 */
-  padding: 1rem;     /* 增加內部間距 */
+/* 章節目錄：使用 flex-wrap 讓連結自動換行 */
+#chapter-menu {
+  display: flex;       /* 由 JS 切換為 flex 或 none */
+  flex-wrap: wrap;     /* 允許換行 */
+  gap: 0.5rem;         /* 連結之間的間距 */
+  margin-bottom: 1rem;
 }
 
- /* 章節內容區塊 */
- #chapter-content {
+#chapter-menu a {
+  text-decoration: none;
+  color: #0077cc;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.9rem;
+  white-space: nowrap; /* 每個連結不會拆字 */
+}
+
+#chapter-menu a:hover {
+  background: #f0f0f0;
+}
+
+/* 章節內容區塊 */
+#chapter-content {
   padding: 1rem;
   background: #fff;
   border: 1px solid #ddd;
-  margin-bottom: 1rem;
   border-radius: 5px;
+  margin-bottom: 1rem;
 }
 
 /* 對話窗口樣式 */
@@ -73,7 +80,6 @@ main {
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   margin-bottom: 1.5rem;
 }
 
@@ -84,8 +90,7 @@ main {
 
 /* 按鈕共同樣式 */
 button {
-  padding: 0.7rem 1.2rem;
-  font-size: 1.1rem;
+  font-size: 1rem;
   border: 1px solid #0077cc;
   border-radius: 5px;
   background: #e0f0ff;
@@ -126,9 +131,9 @@ button:active {
 /* 放大輸入框：增加寬度與高度 */
 #custom-input input[type="text"] {
   width: 100%;
-  height: 3.5rem;
+  height: 3rem;
   padding: 0.8rem;
-  font-size: 1.1rem;
+  font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 5px;
   box-sizing: border-box;
@@ -143,9 +148,12 @@ button:active {
 /* 送出按鈕樣式 */
 #custom-input button {
   width: 100%;
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
   background-color: #0077cc;
   color: white;
   border: none;
+  border-radius: 5px;
 }
 
 #custom-input button:hover {
@@ -181,28 +189,10 @@ button:active {
   }
   
   #custom-input input[type="text"] {
-    height: 3rem;
+    height: 2.5rem;
     padding: 0.6rem;
   }
 }
-
-/* 確保在移動設備上明確設置可見性 */
-@media (max-width: 768px) {
-  #random-text {
-    display: block;
-    font-size: 1.8rem;
-    min-height: 3rem; /* 確保有足夠空間顯示文字 */
-    overflow: visible;
-  }
-}
-
-/* 大屏幕上增大論語正文字體 */
-@media (min-width: 768px) {
-  #random-text {
-    font-size: 2rem; /* 在大屏幕上更大的字體 */
-  }
-}
-
 
 /* 高分辨率設備優化 */
 @media (min-width: 1440px) {
@@ -238,7 +228,7 @@ button:active {
   }
   
   button:hover {
-    background: #2a5a8a;
+    background-color: #2a5a8a;
   }
   
   #custom-input input[type="text"] {
