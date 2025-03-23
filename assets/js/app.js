@@ -3,39 +3,148 @@ const CLOUD_FLARE_WORKER_URL = "https://lunyu.bdfz.workers.dev/";
 
 // 用於存放「目前隨機抽到」的那條論語內容
 let currentAnalect = null;
+// 全部數據存放
+let allChapters = [];
+// 分組後的第一級目錄：key 為大章號 (1~20)，值為對應的子節陣列
+let groupedChapters = {};
 
-// ========== 隨機顯示一條論語 ========== //
-function loadRandomAnalect() {
+/* ========== 數據載入與目錄生成 ========== */
+function loadDialogues() {
   fetch("data/dialogues.json")
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
       if (!Array.isArray(data) || data.length === 0) {
-        console.error("dialogues.json 資料格式有誤，或是空的。");
+        console.error("dialogues.json 資料格式有誤或為空");
         return;
       }
-      // 隨機挑一條
+      allChapters = data;
+      groupChapters();
+      renderChapterMenu();
+      // 預設顯示隨機一個子節
       const randomIndex = Math.floor(Math.random() * data.length);
-      const item = data[randomIndex];
-      // 記錄在全域變數 currentAnalect
-      currentAnalect = item;
-
-      // 顯示在網頁上 (初始隨機論語)
-      const randomTextEl = document.getElementById("random-text");
-      if (randomTextEl) {
-        randomTextEl.textContent = item.text || "（本條論語無正文）";
-      }
+      displayChapter(data[randomIndex].id);
     })
-    .catch(err => {
-      console.error("讀取 dialogues.json 發生錯誤：", err);
-    });
+    .catch(err => console.error("讀取 dialogues.json 出錯：", err));
 }
 
-// ========== 啟動程式 ========== //
-document.addEventListener("DOMContentLoaded", () => {
-  loadDialogues();
-});
+// 根據每個項目的 title 解析大章號並分組
+function groupChapters() {
+  groupedChapters = {};
+  allChapters.forEach(item => {
+    // 假設 title 格式含有 "x.y"，例如 "學而 1.1" 或 "20.3"
+    const match = item.title.match(/(\d+)\.(\d+)/);
+    if (!match) return;
+    const major = parseInt(match[1], 10);
+    // 只取 1~20 章
+    if (major < 1 || major > 20) return;
+    if (!groupedChapters[major]) groupedChapters[major] = [];
+    groupedChapters[major].push(item);
+  });
+}
 
-// ========== AI 互動邏輯 ========== //
+// 渲染第一級目錄 (1~20 章) 以 CSS Grid 呈現（由 style.css 控制網格）
+function renderChapterMenu() {
+  const menu = document.getElementById("chapter-menu");
+  if (!menu) return;
+  menu.innerHTML = ""; // 清空目錄
+
+  // 創建第一級目錄容器，使用 grid 排列
+  const gridContainer = document.createElement("div");
+  gridContainer.style.display = "grid";
+  gridContainer.style.gridTemplateColumns = "repeat(5, 1fr)";
+  gridContainer.style.gridAutoRows = "auto";
+  gridContainer.style.gap = "0.5rem";
+
+  for (let i = 1; i <= 20; i++) {
+    if (!groupedChapters[i] || groupedChapters[i].length === 0) continue;
+    const btn = document.createElement("button");
+    btn.textContent = `第 ${i} 章`;
+    btn.style.width = "100%";
+    // 點擊後展開對應的第二級目錄
+    btn.onclick = () => {
+      renderSubChapterMenu(i);
+      return false;
+    };
+    gridContainer.appendChild(btn);
+  }
+  menu.appendChild(gridContainer);
+}
+
+// 渲染第二級目錄：點選某一章後，顯示該章所有子節
+function renderSubChapterMenu(major) {
+  let subMenuContainer = document.getElementById("sub-chapter-menu");
+  if (!subMenuContainer) {
+    // 若不存在，動態創建並附加到 chapter-menu 之後
+    subMenuContainer = document.createElement("div");
+    subMenuContainer.id = "sub-chapter-menu";
+    subMenuContainer.style.marginTop = "1rem";
+    document.getElementById("chapter-menu").appendChild(subMenuContainer);
+  }
+  subMenuContainer.innerHTML = ""; // 清空現有子目錄
+
+  const subChapters = groupedChapters[major];
+  if (!subChapters || subChapters.length === 0) return;
+
+  // 每列最多 5 個，計算需要的列數由 CSS Grid 自動控制
+  subMenuContainer.style.display = "grid";
+  subMenuContainer.style.gridTemplateColumns = "repeat(5, 1fr)";
+  subMenuContainer.style.gap = "0.5rem";
+
+  subChapters.forEach(item => {
+    const a = document.createElement("a");
+    a.href = "#";
+    a.textContent = `ID: ${item.id}`;
+    a.style.display = "block";
+    a.style.textAlign = "center";
+    a.style.padding = "0.3rem";
+    a.style.border = "1px solid #ddd";
+    a.style.borderRadius = "3px";
+    a.style.textDecoration = "none";
+    a.style.color = "#0077cc";
+    a.onclick = () => {
+      displayChapter(item.id);
+      return false;
+    };
+    subMenuContainer.appendChild(a);
+  });
+}
+
+// 將指定 id 的論語內容顯示到章節內容區 (#chapter-content)
+function displayChapter(id) {
+  const chapter = allChapters.find(ch => ch.id == id); // 使用鬆散比較
+  if (!chapter) {
+    console.error("找不到章節 id:", id);
+    return;
+  }
+  currentAnalect = chapter;
+  const chapterContent = document.getElementById("chapter-content");
+  if (chapterContent) {
+    chapterContent.innerHTML = `<h2>${chapter.title}</h2><p>${chapter.text}</p>`;
+  }
+  markChapterAsViewed(id);
+  updateProgress();
+}
+
+// 標記已閱讀章節
+function markChapterAsViewed(id) {
+  let viewed = JSON.parse(localStorage.getItem("viewedChapters")) || [];
+  if (!viewed.includes(id)) {
+    viewed.push(id);
+    localStorage.setItem("viewedChapters", JSON.stringify(viewed));
+  }
+}
+
+// 更新進度 (假設總共 20 章)
+function updateProgress() {
+  let viewed = JSON.parse(localStorage.getItem("viewedChapters")) || [];
+  const percent = Math.round((viewed.length / 20) * 100);
+  const progressEl = document.getElementById("progress");
+  if (progressEl) {
+    progressEl.textContent = `進度：${percent}%`;
+  }
+}
+
+/* ========== AI 互動相關函式 ========== */
 function askGemini(prompt, callback) {
   fetch(CLOUD_FLARE_WORKER_URL, {
     method: "POST",
@@ -52,37 +161,31 @@ function askGemini(prompt, callback) {
     });
 }
 
-// ========== 對話顯示相關函式 ========== //
 function addMessage(message, sender = "system") {
   const messagesEl = document.getElementById("messages");
   if (!messagesEl) return;
   const div = document.createElement("div");
   div.className = sender;
-  // 使用 innerHTML 以支持分段的 HTML 格式（例如 <p> 標籤）
-  div.innerHTML = message;
+  div.innerHTML = message; // 使用 innerHTML 支援格式化內容
   messagesEl.appendChild(div);
 }
 
-// ========== 分段格式化函式 ========== //
 function formatAnswer(text) {
   // 將文字以換行符拆分，並用 <p> 包裹每一段
   return text.split('\n').map(line => `<p>${line.trim()}</p>`).join('');
 }
 
-// ========== 按鈕點擊行為 ========== //
 function sendChoice(choice) {
   if (!currentAnalect) {
     addMessage("尚未載入任何論語內容，請稍後再試。", "system");
     return;
   }
-
   if (choice === 1) {
-    // 顯示譯文與注釋，並使用 formatAnswer() 分段處理
     const explanation = `譯文：${currentAnalect.translation || "（無譯文）"}\n\n注釋：${currentAnalect.annotations || "（無注釋）"}`;
     addMessage(formatAnswer(explanation), "孔子");
   } else if (choice === 2) {
     addMessage("Gemini AI：正在生成現代解讀……", "ai");
-    const prompt = `請用現代語言解讀以下論語內容：\n${currentAnalect.text}`;
+    const prompt = `請用現代觀念剖析以下論語內容：\n${currentAnalect.text}`;
     askGemini(prompt, function(aiAnswer) {
       addMessage("Gemini AI：" + formatAnswer(aiAnswer), "ai");
     });
@@ -92,7 +195,8 @@ function sendChoice(choice) {
 function showInput() {
   const customInputEl = document.getElementById("custom-input");
   if (customInputEl) {
-    customInputEl.style.display = "block";
+    customInputEl.style.display = "flex";
+    customInputEl.style.flexDirection = "column";
   }
 }
 
@@ -100,75 +204,13 @@ function sendCustomQuestion() {
   const input = document.getElementById("userQuestion");
   if (!input || !input.value.trim()) return;
   const question = input.value.trim();
-
   addMessage("你：" + question, "user");
   const prompt = `當前論語：${currentAnalect.text}\n用戶問題：${question}`;
   askGemini(prompt, function(aiAnswer) {
     addMessage("Gemini AI：" + formatAnswer(aiAnswer), "ai");
   });
-
   input.value = "";
   document.getElementById("custom-input").style.display = "none";
-}
-
-// ========== 目錄與章節顯示相關函式 ========== //
-function renderChapterMenu(data) {
-  const menu = document.getElementById("chapter-menu");
-  menu.innerHTML = ""; // 清空現有目錄
-  data.forEach(chapter => {
-    const link = document.createElement("a");
-    link.href = "#";
-    link.textContent = chapter.title;
-    link.onclick = () => {
-      displayChapter(chapter.id);
-      return false;
-    };
-    menu.appendChild(link);
-  });
-}
-
-let allChapters = []; // 全部章節數據
-function displayChapter(id) {
-  const chapter = allChapters.find(ch => ch.id === id);
-  if (!chapter) return;
-  currentAnalect = chapter;
-  const chapterContent = document.getElementById("chapter-content");
-  if (chapterContent) {
-    chapterContent.innerHTML = `<h2>${chapter.title}</h2><p>${chapter.text}</p>`;
-  }
-  markChapterAsViewed(id);
-  updateProgress();
-}
-
-function markChapterAsViewed(id) {
-  let viewed = JSON.parse(localStorage.getItem("viewedChapters")) || [];
-  if (!viewed.includes(id)) {
-    viewed.push(id);
-    localStorage.setItem("viewedChapters", JSON.stringify(viewed));
-  }
-}
-
-function updateProgress() {
-  let viewed = JSON.parse(localStorage.getItem("viewedChapters")) || [];
-  const percent = Math.round((viewed.length / 20) * 100);
-  document.getElementById("progress").textContent = `進度：${percent}%`;
-}
-
-function loadDialogues() {
-  fetch("data/dialogues.json")
-    .then(res => res.json())
-    .then(data => {
-      if (!Array.isArray(data)) {
-        console.error("dialogues.json 格式不正確");
-        return;
-      }
-      allChapters = data;
-      renderChapterMenu(data);
-      // 預設顯示隨機章節
-      const randomIndex = Math.floor(Math.random() * data.length);
-      displayChapter(data[randomIndex].id);
-    })
-    .catch(err => console.error("讀取 dialogues.json 出錯：", err));
 }
 
 document.addEventListener("DOMContentLoaded", loadDialogues);
