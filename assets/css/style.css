@@ -42,11 +42,12 @@ main {
 
 /* 論語正文樣式 */
 #random-text {
-  font-size: 1.6rem; /* 增加字體大小 */
+  font-size: 2.2rem; /* 顯著增加字體大小 */
   line-height: 1.8;  /* 增加行高提高可讀性 */
   margin: 1.5rem 0;  /* 增加上下間距 */
   text-align: center; /* 居中顯示 */
   font-weight: 500;   /* 稍微加粗 */
+  padding: 1rem;     /* 增加內部間距 */
 }
 
 /* 對話窗口樣式 */
@@ -171,7 +172,14 @@ button:active {
 /* 大屏幕上增大論語正文字體 */
 @media (min-width: 768px) {
   #random-text {
-    font-size: 2rem;
+    font-size: 2.8rem; /* 在大屏幕上更大的字體 */
+  }
+}
+
+/* 在小屏幕上保持較小但仍然可讀的字體 */
+@media (max-width: 480px) {
+  #random-text {
+    font-size: 1.8rem;
   }
 }
 
