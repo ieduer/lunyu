@@ -85,6 +85,11 @@ function sendChoice(choice) {
   }
 }
 
+function formatAnswer(text) {
+  // 以換行符分段，並包裹在 <p> 標籤內
+  return text.split('\n').map(line => `<p>${line.trim()}</p>`).join('');
+}
+
 // 自由提問：將用戶問題 + 當前論語正文一併傳給 AI
 function showInput() {
   const customInputEl = document.getElementById("custom-input");
@@ -108,3 +113,66 @@ function sendCustomQuestion() {
   input.value = "";
   document.getElementById("custom-input").style.display = "none";
 }
+
+function renderChapterMenu(data) {
+  const menu = document.getElementById("chapter-menu");
+  menu.innerHTML = ""; // 清空現有目錄
+  data.forEach(chapter => {
+    // 建立章節連結，點擊後調用 displayChapter(chapter.id)
+    const link = document.createElement("a");
+    link.href = "#";
+    link.textContent = chapter.title;
+    link.onclick = () => {
+      displayChapter(chapter.id);
+      return false; // 阻止預設行為
+    };
+    menu.appendChild(link);
+  });
+}
+
+let allChapters = []; // 全部章節數據
+function displayChapter(id) {
+  const chapter = allChapters.find(ch => ch.id === id);
+  if (!chapter) return;
+  currentAnalect = chapter;
+  const chapterContent = document.getElementById("chapter-content");
+  if (chapterContent) {
+    // 顯示正文（可擴充顯示譯文和注釋）
+    chapterContent.innerHTML = `<h2>${chapter.title}</h2><p>${chapter.text}</p>`;
+  }
+  markChapterAsViewed(id);
+  updateProgress();
+}
+
+function markChapterAsViewed(id) {
+  let viewed = JSON.parse(localStorage.getItem("viewedChapters")) || [];
+  if (!viewed.includes(id)) {
+    viewed.push(id);
+    localStorage.setItem("viewedChapters", JSON.stringify(viewed));
+  }
+}
+
+function updateProgress() {
+  let viewed = JSON.parse(localStorage.getItem("viewedChapters")) || [];
+  const percent = Math.round((viewed.length / 20) * 100);
+  document.getElementById("progress").textContent = `進度：${percent}%`;
+}
+
+function loadDialogues() {
+  fetch("data/dialogues.json")
+    .then(res => res.json())
+    .then(data => {
+      if (!Array.isArray(data)) {
+        console.error("dialogues.json 格式不正確");
+        return;
+      }
+      allChapters = data; // 保存到全域變數
+      renderChapterMenu(data);
+      // 預設顯示隨機章節
+      const randomIndex = Math.floor(Math.random() * data.length);
+      displayChapter(data[randomIndex].id);
+    })
+    .catch(err => console.error("讀取 dialogues.json 出錯：", err));
+}
+
+document.addEventListener("DOMContentLoaded", loadDialogues);
