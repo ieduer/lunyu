@@ -27,21 +27,6 @@ h1 {
   margin-bottom: 0.5em;
 }
 
-/* 章節目錄區域 */
-nav#chapter-menu {
-  margin-bottom: 1rem;
-  overflow-x: auto;
-  white-space: nowrap;
-}
-
-/* 章節目錄連結樣式 */
-nav#chapter-menu a {
-  display: inline-block;
-  margin: 0 0.5rem;
-  text-decoration: none;
-  color: #0077cc;
-  font-size: 1rem;
-}
 
 /* 顯示目錄的背景與間距 */
 #chapter-menu {
@@ -68,14 +53,6 @@ main {
   margin: 0 auto;
 }
 
-/* 章節內容區塊 */
-#chapter-content {
-  padding: 1rem;
-  background: #fff;
-  border: 1px solid #ddd;
-  margin-bottom: 1rem;
-  border-radius: 5px;
-}
 
 /* 對話窗口樣式 */
 #dialogue-box {

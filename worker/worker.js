@@ -1,29 +1,3 @@
-/**
- * Cloudflare Worker: 呼叫 Google Gemini API
- * 參考你的 cURL:
- *   curl -X POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=${API_KEY}
- *   -H 'Content-Type: application/json'
- *   -d '{
- *     "contents": [
- *       {
- *         "role": "user",
- *         "parts": [
- *           {
- *             "text": "INSERT_INPUT_HERE"
- *           }
- *         ]
- *       }
- *     ],
- *     "generationConfig": {
- *       "temperature": 0.7,
- *       "topK": 64,
- *       "topP": 0.95,
- *       "maxOutputTokens": 65536,
- *       "responseMimeType": "text/plain"
- *     }
- *   }'
- */
-
 addEventListener('fetch', event => {
     event.respondWith(handleRequest(event.request));
   });
