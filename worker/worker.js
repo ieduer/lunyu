@@ -3,10 +3,15 @@ addEventListener('fetch', event => {
   });
   
   /**
-   * 主函式：處理前端請求，代理轉發至 Gemini API
+   * 輪換 API 金鑰：根據當前 UTC 小時從 API_KEYS_JSON Secret 中選取金鑰
    */
+  function getCurrentApiKey() {
+    const keys = JSON.parse(API_KEYS_JSON); // API_KEYS_JSON 需使用 wrangler secret put 設定，例如 '["key1", "key2", "key3"]'
+    const hour = new Date().getUTCHours();
+    return keys[hour % keys.length];
+  }
+  
   async function handleRequest(request) {
-    // 1. 若是 OPTIONS，回傳預檢的 CORS 設定
     if (request.method === 'OPTIONS') {
       return new Response(null, {
         headers: {
@@ -18,31 +23,20 @@ addEventListener('fetch', event => {
     }
   
     try {
-      // 2. 從前端 JSON 讀取 prompt
       const { prompt } = await request.json();
-  
-      // 3. 從 Wrangler Secret 讀取 API Key（不硬編）
-      //    你必須先使用 `wrangler secret put GEMINI_API_KEY` 設定此 Secret
-      const apiKey = GEMINI_API_KEY;
-  
-      // 4. 呼叫 Google Gemini API
+      const apiKey = getCurrentApiKey();
       const apiResponse = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=${apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            // 這裡根據你目前的結構，示範官方 "contents" 格式
             contents: [{ parts: [{ text: prompt }] }]
           })
         }
       );
-  
       const result = await apiResponse.json();
-      // 若成功回傳，將 AI 內容放在 aiAnswer
       const aiAnswer = result?.candidates?.[0]?.content?.parts?.[0]?.text || "暫無回應";
-  
-      // 5. 將結果回傳給前端，並帶上正確的 CORS 標頭
       return new Response(JSON.stringify({ answer: aiAnswer }), {
         headers: {
           'Content-Type': 'application/json',
@@ -52,7 +46,6 @@ addEventListener('fetch', event => {
         }
       });
     } catch (error) {
-      // 6. 若出現錯誤，回傳錯誤訊息並帶 CORS
       return new Response(JSON.stringify({ answer: "API 請求錯誤" }), {
         headers: {
           'Content-Type': 'application/json',
