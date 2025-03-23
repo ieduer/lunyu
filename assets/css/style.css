@@ -27,54 +27,68 @@ h1 {
   margin-bottom: 0.5em;
 }
 
-/* 切換目錄按鈕 */
-#toggle-menu-btn {
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
-  margin-bottom: 1rem;
-  cursor: pointer;
-}
-
 /* 主要內容區域寬度限制 */
 main {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 0 1rem;
 }
 
-/* 目錄區：可自動換行，避免溢出 */
-#chapter-menu {
+/* 目錄區（12 地支按鈕） */
+#zodiac-menu {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* 每行放 6 個 */
+  gap: 0.5rem;
   margin-bottom: 1rem;
-  background: #fff;
-  border: 1px solid #ddd;
-  padding: 1rem;
-  /* 如果資料實在很多, 也可考慮:
-     white-space: nowrap; overflow-x: auto;
-     flex-wrap: nowrap;
-  */
 }
 
-#chapter-menu ul {
-  list-style: none;
-  padding-left: 1.2rem;
-}
-
-#chapter-menu li {
-  margin: 0.5rem 0;
-}
-
-/* 章節內容區塊 */
-#chapter-content {
-  padding: 1rem;
-  background: #fff;
-  border: 1px solid #ddd;
+#zodiac-menu button {
+  padding: 0.6rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border: 1px solid #0077cc;
+  background: #e0f0ff;
   border-radius: 5px;
+}
+
+#zodiac-menu button:hover {
+  background: #cce4ff;
+}
+
+/* 章節列表 */
+#chapter-list {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: #fff;
+}
+
+#chapter-list a {
+  display: inline-block;
+  margin: 0.3rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #0077cc;
+  font-size: 0.9rem;
+}
+
+#chapter-list a:hover {
+  background: #f0f0f0;
+}
+
+/* 條目內容 */
+#chapter-content {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  background: #fff;
   margin-bottom: 1rem;
 }
 
-/* 對話窗口樣式 */
+/* 對話窗口樣式 (可依原先需求) */
 #dialogue-box {
-  padding: 1.5rem;
+  padding: 1rem;
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -82,111 +96,57 @@ main {
 }
 
 #messages {
-  min-height: 150px;
-  margin-bottom: 1.5rem;
-}
-
-/* 按鈕共同樣式 */
-button {
-  border: 1px solid #0077cc;
-  border-radius: 5px;
-  background: #e0f0ff;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
-}
-
-button:hover {
-  background: #cce4ff;
-}
-
-button:active {
-  transform: translateY(1px);
-}
-
-/* 選項按鈕樣式 */
-#input-area {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-  margin-bottom: 1.5rem;
+  min-height: 100px;
+  margin-bottom: 1rem;
 }
 
 #input-area button {
-  flex-grow: 1;
-  min-width: 150px;
-  max-width: 100%;
+  margin: 0.5rem 0.2rem;
   padding: 0.5rem 1rem;
   font-size: 1rem;
+  border: 1px solid #0077cc;
+  border-radius: 3px;
+  background: #e0f0ff;
+  cursor: pointer;
+}
+
+#input-area button:hover {
+  background: #cce4ff;
 }
 
 /* 自由提問輸入框 */
 #custom-input {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
+  display: none;
   margin-top: 1rem;
+  flex-direction: column; /* 垂直排列 */
+  gap: 0.5rem;
 }
 
-/* 放大輸入框：增加寬度與高度 */
 #custom-input input[type="text"] {
   width: 100%;
-  height: 3rem;
-  padding: 0.8rem;
+  padding: 0.5rem;
   font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
   box-sizing: border-box;
 }
 
-#custom-input input[type="text"]:focus {
-  border-color: #0077cc;
-  outline: none;
-  box-shadow: 0 0 3px rgba(0, 119, 204, 0.3);
-}
-
-/* 送出按鈕樣式 */
 #custom-input button {
-  width: 100%;
-  padding: 0.7rem 1.2rem;
+  padding: 0.5rem 1rem;
   font-size: 1rem;
-  background-color: #0077cc;
-  color: white;
-  border: none;
-  border-radius: 5px;
 }
 
-/* 響應式設計 */
+/* 響應式設計：小螢幕 */
 @media (max-width: 768px) {
   body {
     padding: 0;
   }
-
   main {
     padding: 0 0.5rem;
   }
-
+  #zodiac-menu {
+    grid-template-columns: repeat(3, 1fr); /* 小螢幕時每行放 3 個 */
+  }
   h1 {
     font-size: 1.5em;
-  }
-
-  #dialogue-box {
-    padding: 1rem;
-  }
-
-  #input-area {
-    gap: 0.5rem;
-  }
-
-  #input-area button {
-    padding: 0.6rem;
-    font-size: 0.95rem;
-    min-width: 120px;
-  }
-
-  #custom-input input[type="text"] {
-    height: 2.5rem;
-    padding: 0.6rem;
   }
 }
 
@@ -196,22 +156,22 @@ button:active {
     background: #1a1a1a;
     color: #f0f0f0;
   }
-
-  #dialogue-box {
+  #dialogue-box, #chapter-list, #chapter-content {
     background: #2a2a2a;
     border-color: #444;
   }
-
   button {
     background: #1a3d66;
     border-color: #2a5a8a;
     color: #f0f0f0;
   }
-
   button:hover {
     background-color: #2a5a8a;
   }
-
+  #chapter-list a {
+    color: #66aaff;
+    border-color: #555;
+  }
   #custom-input input[type="text"] {
     background: #333;
     color: #f0f0f0;
