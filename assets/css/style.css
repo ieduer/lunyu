@@ -1,0 +1,30 @@
+body {
+    font-family: "Helvetica", "Arial", sans-serif;
+    background: #fdf6e3; /* 淡雅紙張背景 */
+    margin: 0;
+    padding: 20px;
+  }
+  #analects-text {
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  #dialogue-box {
+    border: 1px solid #ccc;
+    padding: 15px;
+    background: #fff;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  #messages div {
+    margin-bottom: 10px;
+    padding: 5px;
+  }
+  button {
+    margin: 5px;
+    padding: 8px 12px;
+    font-size: 1em;
+  }
+  #custom-input {
+    margin-top: 10px;
+  }
