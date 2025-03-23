@@ -164,6 +164,16 @@ button:active {
   }
 }
 
+/* 確保在移動設備上明確設置可見性 */
+@media (max-width: 768px) {
+  #random-text {
+    display: block;
+    font-size: 1.8rem;
+    min-height: 3rem; /* 確保有足夠空間顯示文字 */
+    overflow: visible;
+  }
+}
+
 /* 大屏幕上增大論語正文字體 */
 @media (min-width: 768px) {
   #random-text {
