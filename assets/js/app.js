@@ -58,7 +58,7 @@ function sendCustomQuestion() {
 
 // 調用 Cloudflare Worker 代理 Gemini AI API
 function askGemini(prompt, callback) {
-  fetch(https://lunyu.bdfz.workers.dev, {
+    fetch(CLOUD_FLARE_WORKER_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
