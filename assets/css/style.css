@@ -27,7 +27,7 @@ h1 {
   margin-bottom: 0.5em;
 }
 
-/* 按鈕：顯示/隱藏目錄 */
+/* 切換目錄按鈕 */
 #toggle-menu-btn {
   font-size: 1rem;
   padding: 0.5rem 1rem;
@@ -42,27 +42,25 @@ main {
   padding: 0 1rem;
 }
 
-/* 章節目錄：使用 flex-wrap 讓連結自動換行 */
+/* 目錄區：可自動換行，避免溢出 */
 #chapter-menu {
-  display: flex;       /* 由 JS 切換為 flex 或 none */
-  flex-wrap: wrap;     /* 允許換行 */
-  gap: 0.5rem;         /* 連結之間的間距 */
   margin-bottom: 1rem;
-}
-
-#chapter-menu a {
-  text-decoration: none;
-  color: #0077cc;
   background: #fff;
   border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 0.3rem 0.6rem;
-  font-size: 0.9rem;
-  white-space: nowrap; /* 每個連結不會拆字 */
+  padding: 1rem;
+  /* 如果資料實在很多, 也可考慮:
+     white-space: nowrap; overflow-x: auto;
+     flex-wrap: nowrap;
+  */
 }
 
-#chapter-menu a:hover {
-  background: #f0f0f0;
+#chapter-menu ul {
+  list-style: none;
+  padding-left: 1.2rem;
+}
+
+#chapter-menu li {
+  margin: 0.5rem 0;
 }
 
 /* 章節內容區塊 */
@@ -90,7 +88,6 @@ main {
 
 /* 按鈕共同樣式 */
 button {
-  font-size: 1rem;
   border: 1px solid #0077cc;
   border-radius: 5px;
   background: #e0f0ff;
@@ -118,17 +115,20 @@ button:active {
   flex-grow: 1;
   min-width: 150px;
   max-width: 100%;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
 }
 
-/* ===== 自由提問輸入框優化 ===== */
+/* 自由提問輸入框 */
 #custom-input {
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
+  margin-top: 1rem;
 }
 
-/* 放大輸入框：增加寬度與高度 */
+/* 放大輸入框 */
 #custom-input input[type="text"] {
   width: 100%;
   height: 3rem;
@@ -156,81 +156,62 @@ button:active {
   border-radius: 5px;
 }
 
-#custom-input button:hover {
-  background-color: #005fa3;
-}
-
 /* 響應式設計 */
 @media (max-width: 768px) {
   body {
     padding: 0;
   }
-  
+
   main {
     padding: 0 0.5rem;
   }
-  
+
   h1 {
     font-size: 1.5em;
   }
-  
+
   #dialogue-box {
     padding: 1rem;
   }
-  
+
   #input-area {
     gap: 0.5rem;
   }
-  
+
   #input-area button {
     padding: 0.6rem;
     font-size: 0.95rem;
     min-width: 120px;
   }
-  
+
   #custom-input input[type="text"] {
     height: 2.5rem;
     padding: 0.6rem;
   }
 }
 
-/* 高分辨率設備優化 */
-@media (min-width: 1440px) {
-  main {
-    max-width: 1000px;
-  }
-  
-  #dialogue-box {
-    padding: 2rem;
-  }
-  
-  #messages {
-    min-height: 200px;
-  }
-}
-
-/* 深色模式支持 */
+/* 深色模式支持 (可選) */
 @media (prefers-color-scheme: dark) {
   body {
     background: #1a1a1a;
     color: #f0f0f0;
   }
-  
+
   #dialogue-box {
     background: #2a2a2a;
     border-color: #444;
   }
-  
+
   button {
     background: #1a3d66;
     border-color: #2a5a8a;
     color: #f0f0f0;
   }
-  
+
   button:hover {
     background-color: #2a5a8a;
   }
-  
+
   #custom-input input[type="text"] {
     background: #333;
     color: #f0f0f0;
