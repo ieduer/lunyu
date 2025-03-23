@@ -27,11 +27,6 @@ h1 {
   margin-bottom: 0.5em;
 }
 
-/* 進度文字樣式 */
-#progress {
-  margin-bottom: 1rem;
-  font-size: 1rem;
-}
 
 /* 主要內容區域寬度限制 */
 main {
@@ -42,7 +37,7 @@ main {
 
 /* 論語正文樣式 */
 #random-text {
-  font-size: 2.2rem; /* 顯著增加字體大小 */
+  font-size: 1.6rem; /* 顯著增加字體大小 */
   line-height: 1.8;  /* 增加行高提高可讀性 */
   margin: 1.5rem 0;  /* 增加上下間距 */
   text-align: center; /* 居中顯示 */
@@ -172,16 +167,10 @@ button:active {
 /* 大屏幕上增大論語正文字體 */
 @media (min-width: 768px) {
   #random-text {
-    font-size: 2.8rem; /* 在大屏幕上更大的字體 */
+    font-size: 2rem; /* 在大屏幕上更大的字體 */
   }
 }
 
-/* 在小屏幕上保持較小但仍然可讀的字體 */
-@media (max-width: 480px) {
-  #random-text {
-    font-size: 1.8rem;
-  }
-}
 
 /* 高分辨率設備優化 */
 @media (min-width: 1440px) {
