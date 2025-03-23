@@ -27,7 +27,6 @@ h1 {
   margin-bottom: 0.5em;
 }
 
-
 /* 進度文字樣式 */
 #progress {
   margin-bottom: 1rem;
@@ -68,6 +67,31 @@ main {
   background: #cce4ff;
 }
 
+/* ===== 自由提問輸入框優化 ===== */
+#custom-input {
+  display: none;
+  margin-top: 1rem;
+  /* 為了能讓按鈕換行，可改用彈性佈局或直接讓兩者分開 block */
+  display: flex;       /* 彈性佈局 */
+  flex-direction: row; /* 預設同一行：輸入框 + 按鈕 */
+  gap: 0.5rem;         /* 輸入框與按鈕之間的間距 */
+}
+
+/* 放大輸入框：增加寬度與高度 */
+#custom-input input[type="text"] {
+  flex: 1;           /* 在同一行時，輸入框自動撐滿剩餘空間 */
+  height: 3rem;      /* 調整高度 */
+  padding: 0.5rem;
+  font-size: 1.1rem; /* 字體更大一些 */
+  box-sizing: border-box;
+}
+
+/* 放大送出按鈕 */
+#custom-input button {
+  padding: 0.7rem 1.2rem;
+  font-size: 1.1rem;
+}
+
 /* 響應式設計：小螢幕 */
 @media (max-width: 768px) {
   body {
@@ -80,26 +104,13 @@ main {
     font-size: 0.9rem;
     padding: 0.5rem;
   }
-}
-
-/* ===== 自由提問輸入框優化 ===== */
-#custom-input {
-  display: none;
-  margin-top: 1rem;
-}
-
-/* 放大輸入框：增加寬度與高度 */
-#custom-input input[type="text"] {
-  width: 90%;        /* 調整寬度 */
-  height: 2.5rem;    /* 增加高度 */
-  padding: 0.5rem;
-  font-size: 1.1rem; /* 字體更大一些 */
-  box-sizing: border-box;
-}
-
-/* 放大送出按鈕 */
-#custom-input button {
-  margin-left: 0.5rem;
-  padding: 0.7rem 1.2rem;
-  font-size: 1.1rem;
+  /* 在小螢幕時，輸入框與按鈕分兩行 */
+  #custom-input {
+    flex-direction: column; 
+  }
+  #custom-input button {
+    margin-left: 0;   /* 取消左邊距 */
+    margin-top: 0.5rem;
+    width: auto;
+  }
 }
