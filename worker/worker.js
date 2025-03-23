@@ -1,8 +1,35 @@
+/**
+ * Cloudflare Worker: 呼叫 Google Gemini API
+ * 參考你的 cURL:
+ *   curl -X POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=${API_KEY}
+ *   -H 'Content-Type: application/json'
+ *   -d '{
+ *     "contents": [
+ *       {
+ *         "role": "user",
+ *         "parts": [
+ *           {
+ *             "text": "INSERT_INPUT_HERE"
+ *           }
+ *         ]
+ *       }
+ *     ],
+ *     "generationConfig": {
+ *       "temperature": 0.7,
+ *       "topK": 64,
+ *       "topP": 0.95,
+ *       "maxOutputTokens": 65536,
+ *       "responseMimeType": "text/plain"
+ *     }
+ *   }'
+ */
+
 addEventListener('fetch', event => {
     event.respondWith(handleRequest(event.request));
   });
   
   async function handleRequest(request) {
+    // 處理預檢請求 (CORS)
     if (request.method === 'OPTIONS') {
       return new Response(null, {
         headers: {
@@ -14,32 +41,54 @@ addEventListener('fetch', event => {
     }
   
     try {
+      // 解析前端傳來的 JSON
       const { prompt } = await request.json();
   
-      // 如果有多金鑰輪換，就確保 getCurrentApiKey() 返回的是有效的 key
-      const apiKey = GEMINI_API_KEY; // 或 getCurrentApiKey();
+      // 從 Wrangler Secret 注入 (以 wrangler secret put GEMINI_API_KEY 設定)
+      const apiKey = GEMINI_API_KEY; 
   
-      // 打印 prompt 以確定前端帶來了什麼
       console.log("Received prompt:", prompt);
   
-      // 調用 Google API
-      const apiResponse = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
-          })
-        }
-      );
+      // 準備 API 請求的 URL
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=${apiKey}`;
   
-      // 解析結果並打印
+      // 依照 cURL 範例，組裝 body
+      const payload = {
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                text: prompt
+              }
+            ]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.7,
+          topK: 64,
+          topP: 0.95,
+          maxOutputTokens: 65536,
+          responseMimeType: "text/plain"
+        }
+      };
+  
+      // 呼叫 Google API
+      const apiResponse = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+  
+      // 解析結果
       const result = await apiResponse.json();
       console.log("Google API raw response:", JSON.stringify(result));
   
+      // 取得回覆 (可能要視 result 結構調整)
+      // 若 candidates 不存在或空，預設 "暫無回應"
       const aiAnswer = result?.candidates?.[0]?.content?.parts?.[0]?.text || "暫無回應";
   
+      // 回傳給前端
       return new Response(JSON.stringify({ answer: aiAnswer }), {
         headers: {
           'Content-Type': 'application/json',
