@@ -40,6 +40,15 @@ main {
   padding: 0 1rem;
 }
 
+/* 論語正文樣式 */
+#random-text {
+  font-size: 1.6rem; /* 增加字體大小 */
+  line-height: 1.8;  /* 增加行高提高可讀性 */
+  margin: 1.5rem 0;  /* 增加上下間距 */
+  text-align: center; /* 居中顯示 */
+  font-weight: 500;   /* 稍微加粗 */
+}
+
 /* 對話窗口樣式 */
 #dialogue-box {
   padding: 1.5rem;
@@ -156,6 +165,13 @@ button:active {
   #custom-input input[type="text"] {
     height: 3rem;
     padding: 0.6rem;
+  }
+}
+
+/* 大屏幕上增大論語正文字體 */
+@media (min-width: 768px) {
+  #random-text {
+    font-size: 2rem;
   }
 }
 
