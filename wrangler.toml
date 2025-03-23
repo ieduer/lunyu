@@ -1,0 +1,3 @@
+name = "lunyu"
+main = "worker/worker.js"
+compatibility_date = "2023-03-22"
