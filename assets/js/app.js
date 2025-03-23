@@ -1,4 +1,3 @@
-// 請改成你自己的 Cloudflare Worker 網址
 const CLOUD_FLARE_WORKER_URL = "https://lunyu.bdfz.workers.dev/";
 
 // 用於存放「目前隨機抽到」的那條論語內容
@@ -214,3 +213,19 @@ function sendCustomQuestion() {
 }
 
 document.addEventListener("DOMContentLoaded", loadDialogues);
+
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleMenuBtn = document.getElementById("toggle-menu-btn");
+  const chapterMenu = document.getElementById("chapter-menu");
+
+  // 切換顯示/隱藏目錄
+  toggleMenuBtn.addEventListener("click", () => {
+    if (chapterMenu.style.display === "none") {
+      chapterMenu.style.display = "block";
+      toggleMenuBtn.textContent = "隱藏目錄";
+    } else {
+      chapterMenu.style.display = "none";
+      toggleMenuBtn.textContent = "顯示目錄";
+    }
+  });
+});
