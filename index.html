@@ -8,16 +8,20 @@
 </head>
 <body>
   <header>
-    <h1>論語2025</h1>  <!-- 目錄區 -->
+    <h1>論語2025</h1>
+    <!-- 目錄區 -->
     <nav id="chapter-menu"></nav>
     <div id="progress">進度：0%</div>
   </header>
 
   <main>
-    <!-- 隨機顯示一條論語 -->
+    <!-- 隨機顯示一條論語（僅顯示正文，供初始載入用） -->
     <section id="random-analect">
       <p id="random-text"></p>
     </section>
+
+    <!-- 用來顯示點選章節的具體內容 -->
+    <section id="chapter-content"></section>
 
     <!-- 互動對話窗口 -->
     <section id="dialogue-box">
@@ -36,7 +40,7 @@
   </main>
 
   <footer style="text-align:center; margin-top:20px;">
-    <p>©bdfz suen</p>
+    <p>© bdfz suen</p>
   </footer>
 
   <script src="assets/js/app.js"></script>

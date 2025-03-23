@@ -19,7 +19,7 @@ function loadRandomAnalect() {
       // 記錄在全域變數 currentAnalect
       currentAnalect = item;
 
-      // 顯示在網頁上
+      // 顯示在網頁上 (初始隨機論語)
       const randomTextEl = document.getElementById("random-text");
       if (randomTextEl) {
         randomTextEl.textContent = item.text || "（本條論語無正文）";
@@ -32,8 +32,7 @@ function loadRandomAnalect() {
 
 // ========== 啟動程式 ========== //
 document.addEventListener("DOMContentLoaded", () => {
-  // 載入並顯示隨機論語
-  loadRandomAnalect();
+  loadDialogues();
 });
 
 // ========== AI 互動邏輯 ========== //
@@ -59,38 +58,37 @@ function addMessage(message, sender = "system") {
   if (!messagesEl) return;
   const div = document.createElement("div");
   div.className = sender;
-  div.textContent = message;
+  // 使用 innerHTML 以支持分段的 HTML 格式（例如 <p> 標籤）
+  div.innerHTML = message;
   messagesEl.appendChild(div);
+}
+
+// ========== 分段格式化函式 ========== //
+function formatAnswer(text) {
+  // 將文字以換行符拆分，並用 <p> 包裹每一段
+  return text.split('\n').map(line => `<p>${line.trim()}</p>`).join('');
 }
 
 // ========== 按鈕點擊行為 ========== //
 function sendChoice(choice) {
-  // 若尚未載入任何論語，提示用戶
   if (!currentAnalect) {
     addMessage("尚未載入任何論語內容，請稍後再試。", "system");
     return;
   }
 
   if (choice === 1) {
-    // 「孔子：我該如何解釋這句？」 => 顯示譯文與注釋
+    // 顯示譯文與注釋，並使用 formatAnswer() 分段處理
     const explanation = `譯文：${currentAnalect.translation || "（無譯文）"}\n\n注釋：${currentAnalect.annotations || "（無注釋）"}`;
-    addMessage(explanation, "孔子");
+    addMessage(formatAnswer(explanation), "孔子");
   } else if (choice === 2) {
-    // 「Gemini AI：請給我現代解讀」 => 呼叫 AI，並把正文帶入 Prompt
     addMessage("Gemini AI：正在生成現代解讀……", "ai");
     const prompt = `請用現代語言解讀以下論語內容：\n${currentAnalect.text}`;
     askGemini(prompt, function(aiAnswer) {
-      addMessage("Gemini AI：" + aiAnswer, "ai");
+      addMessage("Gemini AI：" + formatAnswer(aiAnswer), "ai");
     });
   }
 }
 
-function formatAnswer(text) {
-  // 以換行符分段，並包裹在 <p> 標籤內
-  return text.split('\n').map(line => `<p>${line.trim()}</p>`).join('');
-}
-
-// 自由提問：將用戶問題 + 當前論語正文一併傳給 AI
 function showInput() {
   const customInputEl = document.getElementById("custom-input");
   if (customInputEl) {
@@ -104,27 +102,26 @@ function sendCustomQuestion() {
   const question = input.value.trim();
 
   addMessage("你：" + question, "user");
-  // 將當前論語正文也加入 Prompt
   const prompt = `當前論語：${currentAnalect.text}\n用戶問題：${question}`;
   askGemini(prompt, function(aiAnswer) {
-    addMessage("Gemini AI：" + aiAnswer, "ai");
+    addMessage("Gemini AI：" + formatAnswer(aiAnswer), "ai");
   });
 
   input.value = "";
   document.getElementById("custom-input").style.display = "none";
 }
 
+// ========== 目錄與章節顯示相關函式 ========== //
 function renderChapterMenu(data) {
   const menu = document.getElementById("chapter-menu");
   menu.innerHTML = ""; // 清空現有目錄
   data.forEach(chapter => {
-    // 建立章節連結，點擊後調用 displayChapter(chapter.id)
     const link = document.createElement("a");
     link.href = "#";
     link.textContent = chapter.title;
     link.onclick = () => {
       displayChapter(chapter.id);
-      return false; // 阻止預設行為
+      return false;
     };
     menu.appendChild(link);
   });
@@ -137,7 +134,6 @@ function displayChapter(id) {
   currentAnalect = chapter;
   const chapterContent = document.getElementById("chapter-content");
   if (chapterContent) {
-    // 顯示正文（可擴充顯示譯文和注釋）
     chapterContent.innerHTML = `<h2>${chapter.title}</h2><p>${chapter.text}</p>`;
   }
   markChapterAsViewed(id);
@@ -166,7 +162,7 @@ function loadDialogues() {
         console.error("dialogues.json 格式不正確");
         return;
       }
-      allChapters = data; // 保存到全域變數
+      allChapters = data;
       renderChapterMenu(data);
       // 預設顯示隨機章節
       const randomIndex = Math.floor(Math.random() * data.length);
