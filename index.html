@@ -7,33 +7,41 @@
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
-  <header>
-    <h1>論語2025</h1>
-    <!-- 切換顯示/隱藏目錄按鈕 -->
-    <button id="toggle-menu-btn">顯示目錄</button>
-    <!-- 兩級目錄：第一層只有 1~20 章，點擊再展開對應子章節 -->
-    <nav id="chapter-menu" style="display: none;"></nav>
-  </header>
+  <!-- 將整體頁面劃分為左右兩欄 -->
+  <div id="container">
+    <!-- 左側：側邊欄 -->
+    <aside id="sidebar">
+      <!-- 切換顯示/隱藏目錄按鈕 -->
+      <button id="toggle-menu-btn">顯示目錄</button>
+      <!-- 兩級目錄：第一級目錄 -->
+      <nav id="chapter-menu" style="display: none;"></nav>
+    </aside>
 
-  <main>
-    <!-- 用於顯示選中論語章節內容 -->
-    <section id="chapter-content"></section>
+    <!-- 右側：主要內容 -->
+    <div id="main-content">
+      <header>
+        <h1>論語2025</h1>
+      </header>
 
-    <!-- 互動對話窗口 -->
-    <section id="dialogue-box">
-      <div id="messages"></div>
-      <div id="input-area">
-        <!-- 三個互動入口 -->
-        <button onclick="sendChoice(1)">孔子：我該如何解釋這句？</button>
-        <button onclick="sendChoice(2)">Gemini AI：請給我現代解讀</button>
-        <button onclick="showInput()">自由提問</button>
-        <div id="custom-input" style="display:none;">
-          <input type="text" id="userQuestion" placeholder="請輸入你的問題" />
-          <button onclick="sendCustomQuestion()">送出</button>
+      <!-- 用於顯示選中論語章節內容 -->
+      <section id="chapter-content"></section>
+
+      <!-- 互動對話窗口 -->
+      <section id="dialogue-box">
+        <div id="messages"></div>
+        <div id="input-area">
+          <!-- 三個互動入口 -->
+          <button onclick="sendChoice(1)">孔子：我該如何解釋這句？</button>
+          <button onclick="sendChoice(2)">Gemini AI：請給我現代解讀</button>
+          <button onclick="showInput()">自由提問</button>
+          <div id="custom-input" style="display:none;">
+            <input type="text" id="userQuestion" placeholder="請輸入你的問題" />
+            <button onclick="sendCustomQuestion()">送出</button>
+          </div>
         </div>
-      </div>
-    </section>
-  </main>
+      </section>
+    </div>
+  </div>
 
   <footer style="text-align:center; margin-top:20px;">
     <p>© bdfz suen</p>
@@ -41,106 +49,104 @@
 
   <script src="assets/js/app.js"></script>
   <script>
-  /********************************************
-   * 目錄折疊/展開 + 兩級目錄邏輯
-   ********************************************/
-  document.addEventListener("DOMContentLoaded", () => {
-    const toggleMenuBtn = document.getElementById("toggle-menu-btn");
-    const chapterMenu = document.getElementById("chapter-menu");
+    /********************************************
+     * 目錄折疊/展開 + 兩級目錄邏輯
+     ********************************************/
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggleMenuBtn = document.getElementById("toggle-menu-btn");
+      const chapterMenu = document.getElementById("chapter-menu");
 
-    // 切換顯示/隱藏目錄
-    toggleMenuBtn.addEventListener("click", () => {
-      if (chapterMenu.style.display === "none") {
-        chapterMenu.style.display = "block";
-        toggleMenuBtn.textContent = "隱藏目錄";
-      } else {
-        chapterMenu.style.display = "none";
-        toggleMenuBtn.textContent = "顯示目錄";
+      // 切換顯示/隱藏目錄
+      toggleMenuBtn.addEventListener("click", () => {
+        if (chapterMenu.style.display === "none") {
+          chapterMenu.style.display = "block";
+          toggleMenuBtn.textContent = "隱藏目錄";
+        } else {
+          chapterMenu.style.display = "none";
+          toggleMenuBtn.textContent = "顯示目錄";
+        }
+      });
+    });
+
+    /**
+     * 建立兩級目錄:
+     *   1. 第 1~20 章(以 title 解析, 例如 "學而 1.x" => 1; "為政 2.x" => 2; ...)
+     *   2. 點擊展開對應子節 (該章下所有 items)
+     *   3. 連結文字改用 ID 數字, 避免太長
+     */
+    function renderChapterMenu(data) {
+      const menu = document.getElementById("chapter-menu");
+      if (!menu) return;
+
+      // 先按 "章" 分組 (1~20)
+      const grouped = {};
+      data.forEach(item => {
+        const match = item.title.match(/(\d+)\.(\d+)/);
+        if (!match) return;
+        const major = parseInt(match[1], 10);
+        if (major < 1 || major > 20) return;
+        if (!grouped[major]) grouped[major] = [];
+        grouped[major].push(item);
+      });
+
+      // 生成第一級目錄，以 CSS Grid 呈現 4 行 5 列
+      const gridContainer = document.createElement("div");
+      gridContainer.style.display = "grid";
+      gridContainer.style.gridTemplateColumns = "repeat(5, 1fr)";
+      gridContainer.style.gridAutoRows = "auto";
+      gridContainer.style.gap = "0.5rem";
+
+      for (let i = 1; i <= 20; i++) {
+        if (!grouped[i] || grouped[i].length === 0) continue;
+        const btn = document.createElement("button");
+        btn.textContent = `第 ${i} 章`;
+        btn.style.width = "100%";
+        btn.onclick = () => {
+          renderSubChapterMenu(i);
+          return false;
+        };
+        gridContainer.appendChild(btn);
       }
-    });
-  });
+      menu.appendChild(gridContainer);
+    }
 
-  /**
-   * 建立兩級目錄:
-   *   1. 第 1~20 章(以 title 解析, 例如 "學而 1.x" => 1; "為政 2.x" => 2; ...)
-   *   2. 點擊展開對應子節 (該章下所有 items)
-   *   3. 連結文字改用 ID 數字, 避免太長
-   */
-  function renderChapterMenu(data) {
-    const menu = document.getElementById("chapter-menu");
-    if (!menu) return;
+    function renderSubChapterMenu(major) {
+      let subMenuContainer = document.getElementById("sub-chapter-menu");
+      if (!subMenuContainer) {
+        subMenuContainer = document.createElement("div");
+        subMenuContainer.id = "sub-chapter-menu";
+        subMenuContainer.style.marginTop = "1rem";
+        // 將子目錄放在側邊欄底部
+        document.getElementById("chapter-menu").appendChild(subMenuContainer);
+      }
+      subMenuContainer.innerHTML = "";
+      const subChapters = groupedChapters[major];
+      if (!subChapters || subChapters.length === 0) return;
+      // 每列最多 5 個，採用 grid 佈局
+      subMenuContainer.style.display = "grid";
+      subMenuContainer.style.gridTemplateColumns = "repeat(5, 1fr)";
+      subMenuContainer.style.gap = "0.5rem";
 
-    // 先按 "章" 分組 (1~20)
-    // 假設 title 格式 "學而 1.1" => 1.1 => major=1, minor=1
-    // 用對象 id=xx 生成 link
-    const grouped = {};
-
-    data.forEach(item => {
-      // 從 item.title 解析 "x.y"
-      // 假設 title 可能是 "學而 1.1" => 找到 '1.1'
-      // 也可能是 "20.3" => 直接 parse
-      const match = item.title.match(/(\d+)\.(\d+)/);
-      if (!match) return; // 不符合 x.y 格式的就跳過
-      const major = parseInt(match[1], 10);
-      // 只取 1~20 章
-      if (major < 1 || major > 20) return;
-
-      // 放入 grouped[major] 裏
-      if (!grouped[major]) grouped[major] = [];
-      grouped[major].push(item);
-    });
-
-    // 生成第一層 UL
-    const topUl = document.createElement("ul");
-    for (let chapter = 1; chapter <= 20; chapter++) {
-      // 若該章沒有內容, 跳過
-      if (!grouped[chapter] || grouped[chapter].length === 0) continue;
-
-      const li = document.createElement("li");
-      // 做一個展開/折疊按鈕
-      const toggleBtn = document.createElement("button");
-      toggleBtn.textContent = `第 ${chapter} 章 ▼`; // 預設箭頭
-      toggleBtn.style.marginRight = "0.5rem";
-
-      // 子 UL (放所有該章節)
-      const subUl = document.createElement("ul");
-      subUl.style.display = "none"; // 初始隱藏
-      // 生成該章所有 items
-      grouped[chapter].forEach(item => {
-        const subLi = document.createElement("li");
-        // 連結文字用 item.id
+      subChapters.forEach(item => {
         const a = document.createElement("a");
         a.href = "#";
-        a.textContent = `ID: ${item.id}`; // 不用 title, 避免太長
+        a.textContent = `ID: ${item.id}`;
+        a.style.display = "block";
+        a.style.textAlign = "center";
+        a.style.padding = "0.3rem";
+        a.style.border = "1px solid #ddd";
+        a.style.borderRadius = "3px";
+        a.style.textDecoration = "none";
+        a.style.color = "#0077cc";
         a.onclick = () => {
           displayChapter(item.id);
           return false;
         };
-        subLi.appendChild(a);
-        subUl.appendChild(subLi);
+        subMenuContainer.appendChild(a);
       });
-
-      // 切換折疊
-      toggleBtn.addEventListener("click", () => {
-        if (subUl.style.display === "none") {
-          subUl.style.display = "block";
-          toggleBtn.textContent = `第 ${chapter} 章 ▲`;
-        } else {
-          subUl.style.display = "none";
-          toggleBtn.textContent = `第 ${chapter} 章 ▼`;
-        }
-      });
-
-      li.appendChild(toggleBtn);
-      li.appendChild(subUl);
-      topUl.appendChild(li);
     }
-
-    menu.appendChild(topUl);
-  }
-
-  // 覆蓋原本的 renderChapterMenu
-  window.renderChapterMenu = renderChapterMenu;
+    // 將 renderChapterMenu 函式暴露到全域
+    window.renderChapterMenu = renderChapterMenu;
   </script>
 </body>
 </html>

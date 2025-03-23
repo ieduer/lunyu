@@ -128,7 +128,7 @@ button:active {
   margin-top: 1rem;
 }
 
-/* 放大輸入框 */
+/* 放大輸入框：增加寬度與高度 */
 #custom-input input[type="text"] {
   width: 100%;
   height: 3rem;
