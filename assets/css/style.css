@@ -27,6 +27,19 @@ h1 {
   margin-bottom: 0.5em;
 }
 
+ /* 章節目錄 (移除白底和邊距) */
+ #chapter-menu {
+  margin: 0; /* 若要完全貼近上下區塊，可改為 0 */
+  /* background-color: #f9f9f9; */ /* 移除白色背景 */
+  /* padding: 0.5rem; */ /* 移除邊距 */
+}
+
+/* 目錄連結 */
+#chapter-menu a {
+  margin-right: 1rem;
+  text-decoration: none;
+  color: #0077cc;
+}
 
 /* 主要內容區域寬度限制 */
 main {
