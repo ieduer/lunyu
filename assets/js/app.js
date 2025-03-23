@@ -18,8 +18,8 @@ function loadDialogues() {
       }
       allChapters = data;
       groupChapters();
-      renderChapterMenu();        // 渲染第一級目錄
-      // 預設顯示隨機一個子節
+      renderChapterMenu(); // 渲染第一級目錄
+      // 預設顯示隨機一個條目
       const randomIndex = Math.floor(Math.random() * data.length);
       displayChapter(data[randomIndex].id);
     })
@@ -28,7 +28,7 @@ function loadDialogues() {
 
 // 按 title 中的 "x.y" 格式解析大章號(1~20)，並分組
 function groupChapters() {
-  groupedChapters = {};
+  groupedChapters = {}; // 清空全局分組資料
   allChapters.forEach(item => {
     const match = item.title.match(/(\d+)\.(\d+)/);
     if (!match) return;
@@ -45,10 +45,10 @@ function groupChapters() {
 function renderChapterMenu() {
   const menu = document.getElementById("chapter-menu");
   if (!menu) return;
-  // 先清空，避免重複渲染
+  // 清空容器，避免重複渲染
   menu.innerHTML = "";
 
-  // 創建第一級容器
+  // 創建第一級容器：使用 CSS Grid 佈局（默認4行5列排列）
   const gridContainer = document.createElement("div");
   gridContainer.style.display = "grid";
   gridContainer.style.gridTemplateColumns = "repeat(5, 1fr)";
@@ -61,7 +61,7 @@ function renderChapterMenu() {
     btn.textContent = `第 ${i} 章`;
     btn.style.width = "100%";
     btn.onclick = () => {
-      // 點擊後隱藏第一級目錄，顯示該章的子目錄
+      // 點擊後隱藏第一級目錄，並顯示該章的子目錄
       menu.style.display = "none";
       renderSubChapterMenu(i);
       return false;
@@ -86,15 +86,14 @@ function renderSubChapterMenu(major) {
   subMenuContainer.style.marginTop = "1rem";
 
   const parentMenu = document.getElementById("chapter-menu");
-  // 放在第一級目錄後面 (同層)
+  // 將子目錄容器插入在第一級目錄之後
   parentMenu.insertAdjacentElement("afterend", subMenuContainer);
 
-  // 加一個返回按鈕
+  // 加一個返回按鈕，點擊後隱藏子目錄並顯示第一級目錄
   const backBtn = document.createElement("button");
   backBtn.textContent = "返回章列表";
   backBtn.style.marginBottom = "1rem";
   backBtn.onclick = () => {
-    // 移除子目錄容器，並重新顯示第一級目錄
     subMenuContainer.remove();
     parentMenu.style.display = "block";
   };
@@ -143,6 +142,7 @@ function displayChapter(id) {
   currentAnalect = chapter;
   const chapterContent = document.getElementById("chapter-content");
   if (chapterContent) {
+    chapterContent.style.display = "block";
     chapterContent.innerHTML = `<h2>${chapter.title}</h2><p>${chapter.text}</p>`;
   }
   markChapterAsViewed(id);
@@ -204,7 +204,7 @@ function sendChoice(choice) {
     return;
   }
   if (choice === 1) {
-    const explanation = `譯文：${currentAnalect.translation || "（無譯文）"}\n\n注釋：${currentAnalect.annotations || "（無注釋）"}`;
+    const explanation = `譯文：${currentAnalect.translation || "（無譯文）"}<br/><br/>注釋：${currentAnalect.annotations || "（無注釋）"}`;
     addMessage(formatAnswer(explanation), "孔子");
   } else if (choice === 2) {
     addMessage("Gemini AI：正在生成現代解讀……", "ai");
@@ -240,7 +240,7 @@ function sendCustomQuestion() {
  *  啟動程式：載入數據 + 綁定事件
  ****************************************************/
 document.addEventListener("DOMContentLoaded", () => {
-  // 先載入 dialogues.json
+  // 載入 dialogues.json 並初始化
   loadDialogues();
 
   // 切換顯示/隱藏第一級目錄
