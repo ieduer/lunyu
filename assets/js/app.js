@@ -2,7 +2,6 @@
 const CLOUD_FLARE_WORKER_URL = "https://lunyu.bdfz.workers.dev";
 
 const dialogues = {
-  // 這裡特別使用單引號包住中文引號，以免混淆
   text: '子曰：「學而時習之，不亦說乎？」',
   responses: {
     1: "孔子：善哉！溫習所學，方能持續進步。",
@@ -26,15 +25,18 @@ function addMessage(message, sender = "system") {
   messagesContainer.appendChild(messageDiv);
 }
 
-// 3. 將函式掛到 window，以便 inline onclick 能呼叫
+// 3. 全域函式：HTML inline onclick 能呼叫
 window.sendChoice = function(choice) {
   if (choice === 1) {
     addMessage(dialogues.responses[1], "孔子");
   } else if (choice === 2) {
     addMessage(dialogues.responses[2], "ai");
-    askGemini("請用現代語言解讀以下論語內容：" + dialogues.text, function(aiAnswer) {
-      addMessage("Gemini AI：" + aiAnswer, "ai");
-    });
+    askGemini(
+      "請用現代語言解讀以下論語內容：" + dialogues.text,
+      function(aiAnswer) {
+        addMessage("Gemini AI：" + aiAnswer, "ai");
+      }
+    );
   }
 };
 
