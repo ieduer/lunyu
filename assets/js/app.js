@@ -235,7 +235,6 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleMenuBtn.textContent = "顯示目錄";
     }
   });
-}
 
 // 夜晚模式切換按鈕
 const toggleDarkBtn = document.getElementById("toggle-dark-btn");
