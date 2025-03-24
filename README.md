@@ -23,5 +23,7 @@ Gemini AI會跟你長長長長說下ta的看法。
 代碼全部開源在這，論語數據也是；有能力繼續深加工的，拿走就好。  
 學術為公器，技術也是。
 
-網址 https://kz.bdfz.net/
+網址 https://kz.bdfz.net/  
 字體：匯文明朝體。
+
+以上為說明文字1.0，更新說明會在：[AI論語](tab:https://bdfz.net/posts/lunyu/)
