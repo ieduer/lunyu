@@ -212,6 +212,13 @@ function sendCustomQuestion() {
   document.getElementById("custom-input").style.display = "none";
 }
 
+/****************************************************
+ *  夜晚模式切換
+ ****************************************************/
+function toggleDarkMode() {
+  document.body.classList.toggle("dark-mode");
+}
+
 document.addEventListener("DOMContentLoaded", loadDialogues);
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -228,4 +235,11 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleMenuBtn.textContent = "顯示目錄";
     }
   });
+}
+
+// 夜晚模式切換按鈕
+const toggleDarkBtn = document.getElementById("toggle-dark-btn");
+if (toggleDarkBtn) {
+  toggleDarkBtn.addEventListener("click", toggleDarkMode);
+}
 });
