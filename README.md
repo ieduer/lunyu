@@ -26,4 +26,4 @@ Gemini AI會跟你長長長長說下ta的看法。
 網址 https://kz.bdfz.net/  
 字體：匯文明朝體。
 
-> 以上為說明文字1.0，更新說明會在：<a href="https://bdfz.net/posts/lunyu">AI論語</a>
+> 以上為說明文字1.0，更新說明會在：<a href="https://bdfz.net/posts/lunyu" target="_blank" rel="noopener noreferrer">AI論語</a>
