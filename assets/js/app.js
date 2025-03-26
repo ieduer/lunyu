@@ -1,4 +1,4 @@
-const CLOUD_FLARE_WORKER_URL = "https://lunyu.bdfz.workers.dev/";
+const CLOUD_FLARE_WORKER_URL = "https://apis.bdfz.workers.dev/";
 
 // 用於存放「目前隨機抽到」的那條論語內容
 let currentAnalect = null;
