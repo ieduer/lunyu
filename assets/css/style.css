@@ -10,11 +10,20 @@
 /* 全局樣式 */
 body {
   font-family: 'HuWenMingChaoTi', "Noto Serif TC", serif;
-  background: #f9f5e7; /* 淡雅背景色 */
+  /* background: #f9f5e7;  <-- Comment out or remove the old background color */
   color: #333;
   margin: 0;
-  padding: 0 10px;
+  padding: 0 10px; /* Keep padding if you need spacing from viewport edges */
   line-height: 1.6;
+
+  /* --- Add these lines for the background image --- */
+  background-image: url('../img/bg.webp'); /* Path relative to the CSS file */
+  background-color: #f9f5e7; /* Fallback color if image doesn't load */
+  background-size: cover; /* Scale the image to cover the entire viewport */
+  background-position: center center; /* Center the image */
+  background-repeat: no-repeat; /* Prevent the image from tiling */
+  background-attachment: fixed; /* Keep the background fixed when scrolling */
+  min-height: 100vh; /* Ensure body takes at least full viewport height */
 }
 
 header, footer {
