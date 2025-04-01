@@ -13,27 +13,24 @@
 </head>
 <body>
 
-  <!-- Fixed Top Bar -->
-  <div id="top-bar">
-    <button id="toggle-menu-btn" class="ghibli-button">顯示目錄</button>
-    <header>
-      <h1>AI論語</h1>
-      <!-- Dark Mode Button moved inside header for positioning context -->
-      <button id="toggle-dark-btn" title="切換夜晚模式" class="ghibli-button icon-button">🌓</button>
-    </header>
-  </div>
-
-  <!-- Main Container (pushes down below top-bar) -->
+  <!-- Main Container -->
   <div id="container">
     <!-- 左側：側邊欄 -->
     <aside id="sidebar">
+      <!-- Toggle Button MOVED HERE -->
+      <button id="toggle-menu-btn" class="ghibli-button">顯示目錄</button>
       <!-- 目錄容器 (Level 1 items added by JS) -->
       <nav id="chapter-menu" style="display: none;"></nav>
     </aside>
 
     <!-- 右側：主要內容 -->
     <div id="main-content">
-      <!-- Header removed from here, moved to top-bar -->
+      <!-- Header is now the first element here, will be sticky -->
+      <header>
+        <h1>AI論語</h1>
+        <button id="toggle-dark-btn" title="切換夜晚模式" class="ghibli-button icon-button">🌓</button>
+      </header>
+
       <!-- 互動對話窗口 -->
       <section id="dialogue-box" class="ghibli-dialogue">
         <div id="messages">
@@ -42,7 +39,6 @@
         <!-- Input area only contains the Yang button now -->
         <div id="input-area">
           <button id="btn-yang" onclick="handleYangAnnotationClick()" class="ghibli-button interaction-button" disabled>楊伯峻「論語譯註」</button>
-          <!-- Gemini button removed -->
         </div>
          <!-- 用戶輸入區域 (預設隱藏) -->
          <div id="user-input-area" style="display:none;" class="ghibli-input-area">

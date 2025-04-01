@@ -10,7 +10,6 @@
 /* Global Variables & Reset */
 :root {
     --footer-height: 35px; /* Slightly reduced footer height */
-    --top-bar-height: 60px; /* Approximate height for fixed top bar */
     /* Ghibli Color Palette (Example - Needs refinement) */
     --ghibli-bg: #f9f5e7;
     --ghibli-text: #3d322b;
@@ -30,6 +29,7 @@
     --ghibli-white-semi: rgba(255, 255, 255, 0.8);
     --ghibli-white-lighter: rgba(255, 255, 255, 0.6);
     --ghibli-dialogue-bg: rgba(245, 240, 230, 0.9);
+    --ghibli-header-bg: rgba(249, 245, 231, 0.85); /* Header BG same as footer */
 
     /* Dark Mode Colors */
     --ghibli-dark-bg: #1f1d1b;
@@ -53,23 +53,18 @@
     --ghibli-dark-subitem-bg: #444;
     --ghibli-dark-subitem-hover: #555;
     --ghibli-dark-subitem-text: #a0d8ef;
+    --ghibli-dark-header-bg: rgba(30, 30, 30, 0.9); /* Dark Header BG */
 }
 
-html {
-  box-sizing: border-box;
-}
-*, *:before, *:after {
-  box-sizing: inherit;
-}
+html { box-sizing: border-box; }
+*, *:before, *:after { box-sizing: inherit; }
 
 body {
   font-family: 'HuWenMingChaoTi', "Noto Serif TC", serif;
   color: var(--ghibli-text);
   margin: 0;
   padding: 0;
-  /* Add padding-top for fixed header AND padding-bottom for fixed footer */
-  padding-top: var(--top-bar-height);
-  padding-bottom: var(--footer-height);
+  padding-bottom: var(--footer-height); /* Keep padding for footer */
   line-height: 1.7;
   background-image: url('../img/bg.webp');
   background-color: var(--ghibli-bg);
@@ -78,619 +73,328 @@ body {
   background-repeat: no-repeat;
   background-attachment: fixed;
   min-height: 100vh;
-  display: flex; /* Keep flex for centering container */
+  display: flex;
   justify-content: center;
 }
-
-/* --- Fixed Top Bar --- */
-#top-bar {
-    position: sticky; /* Stick to top */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: var(--top-bar-height);
-    background: rgba(249, 245, 231, 0.85); /* Match footer style */
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid rgba(216, 207, 192, 0.6);
-    z-index: 1100; /* High z-index */
-    display: flex;
-    align-items: center;
-    padding: 0 15px; /* Horizontal padding */
-}
-
-#toggle-menu-btn {
-    width: auto; /* Don't force full width */
-    padding: 0.5rem 1rem; /* Adjust padding */
-    font-size: 0.95rem;
-    margin-right: 15px; /* Space between toggle and header */
-    flex-shrink: 0; /* Prevent shrinking */
-}
-
-#top-bar header {
-    flex-grow: 1; /* Allow header to take remaining space */
-    display: flex;
-    align-items: center;
-    justify-content: center; /* Center title by default */
-    position: relative; /* Needed for absolute positioning of dark mode button */
-    padding: 0; /* Remove default header padding */
-    color: var(--ghibli-text-light);
-}
-
-#top-bar header h1 {
-    font-size: 1.8em; /* Adjust title size */
-    margin: 0;
-    font-weight: 600;
-    color: var(--ghibli-text);
-    text-align: center; /* Explicitly center */
-    /* No flex-grow needed if parent uses justify-content: center */
-}
-
-#top-bar header #toggle-dark-btn {
-    position: absolute; /* Position relative to header */
-    top: 50%; /* Center vertically */
-    right: 0px; /* Align to the right edge of the header */
-    transform: translateY(-50%); /* Fine-tune vertical centering */
-    width: auto;
-    padding: 0.3rem 0.6rem;
-    margin: 0; /* Reset margin */
-}
-
 
 /* --- Main Content Container --- */
 #container {
   display: flex;
   width: 100%;
   max-width: 1200px;
-  /* Margin-top removed as padding-top on body handles space */
-  padding: 15px; /* Padding around sidebar/main-content */
-  align-items: flex-start; /* Align items top */
+  padding: 15px;
+  align-items: flex-start;
 }
 
 #sidebar {
   width: 280px;
   margin-right: 20px;
   flex-shrink: 0;
-  /* Max height considering top bar and footer */
-  max-height: calc(100vh - var(--top-bar-height) - var(--footer-height) - 30px); /* 30px for container padding */
+  /* Max height considering ONLY footer and container padding */
+  max-height: calc(100vh - var(--footer-height) - 30px);
   overflow-y: auto;
-  position: sticky; /* Make sidebar sticky below top-bar */
-  top: var(--top-bar-height); /* Stick below the top bar */
-  padding-top: 0; /* Remove previous padding-top */
+  position: sticky; /* Keep sidebar sticky to the top of the container */
+  top: 15px; /* Stick relative to container padding */
+  padding-top: 0;
 }
+
+/* Toggle button moved inside sidebar */
+#toggle-menu-btn {
+    width: 100%; /* Take full width of sidebar */
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+    margin-bottom: 1rem; /* Space below button, above menu */
+    /* Inherit ghibli-button styles */
+    background-color: var(--ghibli-accent-yellow); /* Explicitly set color */
+    color: var(--ghibli-accent-yellow-dark);
+}
+#toggle-menu-btn:hover {
+    background-color: #f4d992;
+}
+
 
 #main-content {
   flex-grow: 1;
   max-width: 800px;
   display: flex;
   flex-direction: column;
-  /* Calculate min-height to push footer down */
-   min-height: calc(100vh - var(--top-bar-height) - var(--footer-height) - 30px); /* Ensure it fills vertical space */
+  min-height: calc(100vh - var(--footer-height) - 30px);
+  position: relative;
+}
+
+/* Sticky Header within Main Content */
+#main-content > header {
+    position: sticky; /* Stick to top of main-content */
+    top: 0; /* Stick right at the top */
+    background: var(--ghibli-header-bg); /* Use variable */
+    backdrop-filter: blur(8px);
+    z-index: 1050; /* Above dialogue, below footer/modals */
+    padding: 10px 15px; /* Padding inside header */
+    margin-bottom: 1rem; /* Space below header before dialogue box */
+    border-bottom: 1px solid rgba(216, 207, 192, 0.6); /* Match footer */
+
+    /* Flex layout for title and button */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center title by default */
+    position: relative; /* For absolute positioning moon button */
+}
+
+#main-content > header h1 {
+    flex-grow: 1; /* Allow title to take space */
+    text-align: center; /* Ensure centering */
+    margin: 0;
+    font-size: 1.8em;
+    font-weight: 600;
+    color: var(--ghibli-text);
+    padding: 0 40px; /* Add padding so title doesn't overlap button */
+}
+
+#main-content > header #toggle-dark-btn {
+    position: absolute; /* Position relative to header */
+    right: 15px; /* Position to the right */
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%); /* Fine-tune vertical centering */
+    width: auto;
+    padding: 0.3rem 0.6rem;
+    margin: 0; /* Reset margin */
+    /* Inherit icon button styles */
 }
 
 
-/* Footer Styles */
+/* Footer Styles (Unchanged) */
 footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: var(--footer-height);
-  background: rgba(249, 245, 231, 0.85); /* Match top-bar */
-  backdrop-filter: blur(8px);
-  color: var(--ghibli-text-light);
-  font-size: 0.85em; /* Slightly smaller footer text */
-  text-align: center;
-  line-height: var(--footer-height); /* Vertically center text */
-  padding: 0 10px; /* Add horizontal padding */
-  border-top: 1px solid rgba(216, 207, 192, 0.6);
-  z-index: 1000;
-  overflow: hidden; /* Prevent content overflow */
-  white-space: nowrap; /* Prevent wrapping */
+  position: fixed; bottom: 0; left: 0; width: 100%; height: var(--footer-height);
+  background: var(--ghibli-header-bg); backdrop-filter: blur(8px); color: var(--ghibli-text-light);
+  font-size: 0.85em; text-align: center; line-height: var(--footer-height); padding: 0 10px;
+  border-top: 1px solid rgba(216, 207, 192, 0.6); z-index: 1000; overflow: hidden; white-space: nowrap;
 }
-footer p {
-    margin: 0; /* Remove default paragraph margin */
-    line-height: inherit; /* Inherit line-height for centering */
-}
-footer a {
-  color: var(--ghibli-text); /* Darker link for visibility */
-  text-decoration: none;
-}
-footer a:hover {
-  color: var(--ghibli-accent-blue-dark);
-}
+footer p { margin: 0; line-height: inherit; }
+footer a { color: var(--ghibli-text); text-decoration: none; }
+footer a:hover { color: var(--ghibli-accent-blue-dark); }
 
 
 /* --- Ghibli 風格按鈕 --- */
 .ghibli-button {
-  font-family: 'HuWenMingChaoTi', "Noto Serif TC", serif;
-  border: none;
-  border-radius: 10px; /* Slightly less round */
-  background-color: var(--ghibli-accent-blue);
-  color: var(--ghibli-accent-blue-dark);
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  cursor: pointer;
+  font-family: 'HuWenMingChaoTi', "Noto Serif TC", serif; border: none; border-radius: 10px;
+  background-color: var(--ghibli-accent-blue); color: var(--ghibli-accent-blue-dark);
+  padding: 0.6rem 1.2rem; font-size: 1rem; cursor: pointer;
   transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
-  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
-  margin: 0.2rem;
-  text-align: center;
-  display: block;
-  width: 100%;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1); margin: 0.2rem; text-align: center;
+  display: block; width: 100%;
 }
-.ghibli-button:hover:not(:disabled) {
-  background-color: #87ceeb; /* Keep hover consistent */
-  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
-}
-.ghibli-button:active:not(:disabled) {
-  transform: translateY(1px);
-  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-}
-.ghibli-button:disabled {
-    background-color: #d0e0f0; /* Adjusted disabled color */
-    color: #a0b0c0;
-    cursor: not-allowed;
-    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-/* Icon button */
+.ghibli-button:hover:not(:disabled) { background-color: #87ceeb; box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15); }
+.ghibli-button:active:not(:disabled) { transform: translateY(1px); box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); }
+.ghibli-button:disabled { background-color: #d0e0f0; color: #a0b0c0; cursor: not-allowed; box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05); }
 .icon-button {
-  font-size: 1.5rem;
-  padding: 0.3rem 0.6rem;
-  background: none;
-  box-shadow: none;
-  color: var(--ghibli-text-light);
-  width: auto;
-  flex-shrink: 0;
-  border-radius: 50%; /* Make icon button round */
+  font-size: 1.5rem; padding: 0.3rem 0.6rem; background: none; box-shadow: none;
+  color: var(--ghibli-text-light); width: auto; flex-shrink: 0; border-radius: 50%;
 }
-.icon-button:hover {
-  background: rgba(0, 0, 0, 0.05); /* Subtle hover background */
-  color: var(--ghibli-text);
-  box-shadow: none;
-}
-.icon-button:active {
-  transform: scale(0.95) translateY(0); /* Adjust active effect */
-}
+.icon-button:hover { background: rgba(0, 0, 0, 0.05); color: var(--ghibli-text); box-shadow: none; }
+.icon-button:active { transform: scale(0.95) translateY(0); }
 
 
 /* --- 目錄樣式 --- */
-#chapter-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
+#chapter-menu { display: flex; flex-direction: column; gap: 0.5rem; }
 .major-chapter-container {
-    border: 1px solid var(--ghibli-border);
-    border-radius: 8px;
-    background: var(--ghibli-white-semi);
-    backdrop-filter: blur(3px);
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    margin-bottom: 0.5rem;
+    border: 1px solid var(--ghibli-border); border-radius: 8px; background: var(--ghibli-white-semi);
+    backdrop-filter: blur(3px); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 0.5rem;
 }
-
 .major-chapter-btn {
-    /* Base color set using nth-of-type below */
-    color: var(--ghibli-text);
-    padding: 0.7rem 1rem;
-    font-size: 1.05rem;
-    font-weight: 500;
-    border-radius: 0;
-    margin: 0;
-    border-bottom: 1px solid rgba(224, 216, 204, 0); /* Transparent border initially */
-    width: 100%;
-    text-align: left;
-    box-shadow: none;
-    transition: background-color 0.2s ease, border-color 0.2s ease; /* Smooth transition */
+    color: var(--ghibli-text); padding: 0.7rem 1rem; font-size: 1.05rem; font-weight: 500; border-radius: 0; margin: 0;
+    border-bottom: 1px solid rgba(224, 216, 204, 0); width: 100%; text-align: left; box-shadow: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease, filter 0.2s ease;
 }
-.major-chapter-btn:hover {
-    filter: brightness(95%); /* Darken slightly on hover */
-}
-.major-chapter-btn.active {
-    filter: brightness(92%);
-    border-bottom-color: var(--ghibli-border-darker); /* Show border when active */
-}
-
-/* Cyclic Ghibli Colors for Chapters (Example with 6 colors) */
-.major-chapter-container:nth-of-type(6n+1) .major-chapter-btn { background-color: #a0d8ef; color: #3d5a66; } /* Blue */
-.major-chapter-container:nth-of-type(6n+2) .major-chapter-btn { background-color: #c8e6c9; color: #556B2F; } /* Green */
-.major-chapter-container:nth-of-type(6n+3) .major-chapter-btn { background-color: #f6e4a8; color: #7b6a4c; } /* Yellow */
-.major-chapter-container:nth-of-type(6n+4) .major-chapter-btn { background-color: #ffcc80; color: #8f5d00; } /* Orange */
-.major-chapter-container:nth-of-type(6n+5) .major-chapter-btn { background-color: #f8c8dc; color: #8b5f6f; } /* Pink */
-.major-chapter-container:nth-of-type(6n+6) .major-chapter-btn { background-color: #d7ccc8; color: #5d4037; } /* Brownish */
-
+.major-chapter-btn:hover { filter: brightness(95%); }
+.major-chapter-btn.active { filter: brightness(92%); border-bottom-color: var(--ghibli-border-darker); }
+.major-chapter-container:nth-of-type(6n+1) .major-chapter-btn { background-color: #a0d8ef; color: #3d5a66; }
+.major-chapter-container:nth-of-type(6n+2) .major-chapter-btn { background-color: #c8e6c9; color: #556B2F; }
+.major-chapter-container:nth-of-type(6n+3) .major-chapter-btn { background-color: #f6e4a8; color: #7b6a4c; }
+.major-chapter-container:nth-of-type(6n+4) .major-chapter-btn { background-color: #ffcc80; color: #8f5d00; }
+.major-chapter-container:nth-of-type(6n+5) .major-chapter-btn { background-color: #f8c8dc; color: #8b5f6f; }
+.major-chapter-container:nth-of-type(6n+6) .major-chapter-btn { background-color: #d7ccc8; color: #5d4037; }
 
 /* Sub-Menu */
 .sub-menu-container {
-    padding: 0.5rem 0.8rem;
-    background: var(--ghibli-white-lighter);
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-    gap: 0.5rem;
-    max-height: 250px; /* Reduced max-height */
-    overflow-y: auto;
+    padding: 0.5rem 0.8rem; background: var(--ghibli-white-lighter); display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); gap: 0.5rem; max-height: 250px; overflow-y: auto;
 }
-
 .sub-chapter-link {
-    padding: 0.4rem;
-    font-size: 0.9rem;
-    background-color: #fff;
-    color: var(--ghibli-accent-blue-dark); /* Use theme color */
-    text-decoration: none;
-    border-radius: 6px;
-    border: 1px solid var(--ghibli-border);
-    box-shadow: 1px 1px 2px rgba(0,0,0,0.05);
-    width: auto;
-    text-align: center;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    padding: 0.4rem; font-size: 0.9rem; background-color: #fff; color: var(--ghibli-accent-blue-dark); text-decoration: none;
+    border-radius: 6px; border: 1px solid var(--ghibli-border); box-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+    width: auto; text-align: center; transition: background-color 0.2s ease, border-color 0.2s ease;
 }
-.sub-chapter-link:hover {
-    background-color: #f0f8ff;
-    border-color: var(--ghibli-accent-blue);
-}
+.sub-chapter-link:hover { background-color: #f0f8ff; border-color: var(--ghibli-accent-blue); }
 
 
 /* --- 對話框 --- */
 #dialogue-box {
-  padding: 1.5rem;
-  background: var(--ghibli-dialogue-bg);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--ghibli-border-darker);
-  border-radius: 12px; /* Match button radius */
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  margin-top: 0; /* No margin needed as main-content handles spacing */
+  padding: 1.5rem; background: var(--ghibli-dialogue-bg); backdrop-filter: blur(10px); border: 1px solid var(--ghibli-border-darker);
+  border-radius: 12px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1); flex-grow: 1; display: flex; flex-direction: column;
+  overflow: hidden; margin-top: 0;
 }
-
-/* Messages Area */
 #messages {
-  min-height: 150px;
-  flex-grow: 1;
-  overflow-y: auto;
-  margin-bottom: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  padding-right: 8px; /* Space for scrollbar */
+  min-height: 150px; flex-grow: 1; overflow-y: auto; margin-bottom: 1.5rem; display: flex; flex-direction: column;
+  gap: 0.8rem; padding-right: 8px;
 }
-/* Scrollbar styling (optional) */
 #messages::-webkit-scrollbar { width: 6px; }
 #messages::-webkit-scrollbar-track { background: transparent; }
 #messages::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 3px; }
 #messages::-webkit-scrollbar-thumb:hover { background-color: rgba(0,0,0,0.25); }
 
-
 /* Message Bubbles */
 .message-container {
-  padding: 0.8rem 1.2rem;
-  border-radius: 15px; /* More rounded */
-  max-width: 85%;
-  word-wrap: break-word;
-  font-size: 1.15rem; /* Slightly adjusted */
-  line-height: 1.6;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.07);
+  padding: 0.8rem 1.2rem; border-radius: 15px; max-width: 85%; word-wrap: break-word; font-size: 1.15rem;
+  line-height: 1.6; box-shadow: 1px 1px 3px rgba(0,0,0,0.07);
 }
 .message-container p { margin-bottom: 0.5em; line-height: 1.6; }
 .message-container p:last-child { margin-bottom: 0; }
-.message-container strong { font-weight: 600; color: var(--ghibli-text); } /* Style for bolded text */
+.message-container strong { font-weight: 600; color: var(--ghibli-text); }
 
-/* System Message */
-.message-container.system {
-    background-color: rgba(230, 230, 230, 0.7); /* Slightly transparent grey */
-    color: var(--ghibli-text-light);
-    font-style: italic;
-    max-width: 95%;
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
-    border-radius: 8px; /* Less round for system */
-    font-size: 1.05rem; /* Slightly smaller */
+/* System & Initial Message */
+.message-container.system, .message-container.initial {
+    background-color: rgba(230, 230, 230, 0.7); color: var(--ghibli-text-light); font-style: italic; max-width: 95%;
+    text-align: center; margin-left: auto; margin-right: auto; border-radius: 8px; font-size: 1.05rem;
 }
-.message-container.system strong { color: var(--ghibli-text); }
+.message-container.system strong, .message-container.initial strong {
+    color: var(--ghibli-text); font-size: 1.1em; display: block; margin-bottom: 0.3em; font-style: normal;
+}
+.message-container.initial p { font-style: normal; } /* Ensure initial text isn't italic */
+.message-container.initial p:last-of-type { font-style: italic; } /* Keep last prompt italic if needed */
+
+
+/* --- Style for Enlarged Chapter Text --- */
+.message-container.chapter-display {
+    background-color: rgba(255, 250, 240, 0.8); text-align: left; font-style: normal;
+    max-width: 100%; border-radius: 10px;
+}
+.message-container.chapter-display strong {
+    font-size: 1.3em; color: var(--ghibli-text); display: block; margin-bottom: 0.6em;
+}
+.message-container.chapter-display p {
+    /* Base font size * multiplier or fixed rem value */
+    /* Assuming 1.15rem base => 1.15 * 1.5 = ~1.7rem OR fixed 1.8rem */
+    font-size: 1.8rem; /* Enlarged font size +3 levels approx */
+    line-height: 1.8;
+    color: var(--ghibli-text);
+    font-style: normal;
+}
 
 /* AI/Confucius Message */
-.message-container.ai,
-.message-container.confucius {
-  background-color: #ffffff;
-  color: var(--ghibli-text);
-  margin-right: auto;
-  border-top-left-radius: 5px;
-  text-align: left;
+.message-container.ai, .message-container.confucius {
+  background-color: #ffffff; color: var(--ghibli-text); margin-right: auto; border-top-left-radius: 5px; text-align: left;
 }
 /* Loading Message */
 .loading-message {
-    font-style: italic;
-    color: var(--ghibli-accent-orange-dark);
-    animation: blink 1.5s linear infinite;
-    background-color: rgba(255, 230, 200, 0.7); /* Soft orange background */
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
-    border-radius: 10px;
-    max-width: 90%;
+    font-style: italic; color: var(--ghibli-accent-orange-dark); animation: blink 1.5s linear infinite;
+    background-color: rgba(255, 230, 200, 0.7); text-align: center; margin-left: auto; margin-right: auto;
+    border-radius: 10px; max-width: 90%;
 }
 @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-
 /* User Message */
 .message-container.user {
-  background-color: var(--ghibli-accent-green);
-  color: var(--ghibli-accent-green-dark);
-  margin-left: auto;
-  border-top-right-radius: 5px;
-  text-align: left;
+  background-color: var(--ghibli-accent-green); color: var(--ghibli-accent-green-dark); margin-left: auto;
+  border-top-right-radius: 5px; text-align: left;
 }
 
 /* Interaction Button Area */
-#input-area {
-  display: flex; /* Keep flex, even for one button */
-  flex-wrap: wrap;
-  gap: 0.8rem;
-  margin-bottom: 1rem;
-  justify-content: center; /* Center the button(s) */
-  flex-shrink: 0;
-}
-
+#input-area { display: flex; gap: 0.8rem; margin-bottom: 1rem; justify-content: center; flex-shrink: 0; }
 #input-area .interaction-button {
-  flex-grow: 0; /* Don't grow if only one button */
-  min-width: 200px; /* Ensure decent width */
-  max-width: 300px; /* Limit max width */
-  padding: 0.7rem 1rem;
-  font-size: 1.05rem;
-  background-color: var(--ghibli-accent-orange);
-  color: var(--ghibli-accent-orange-dark);
+  flex-grow: 0; min-width: 200px; max-width: 300px; padding: 0.7rem 1rem; font-size: 1.05rem;
+  background-color: var(--ghibli-accent-orange); color: var(--ghibli-accent-orange-dark);
 }
-#input-area .interaction-button:hover:not(:disabled) {
-    background-color: #ffb74d;
-}
+#input-area .interaction-button:hover:not(:disabled) { background-color: #ffb74d; }
 
 /* User Input Area */
-#user-input-area {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  margin-top: 1rem;
-  align-items: flex-end;
-  flex-shrink: 0;
-}
-
+#user-input-area { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem; align-items: flex-end; flex-shrink: 0; }
 #user-input-area textarea {
-  width: 100%;
-  padding: 0.8rem;
-  font-size: 1.1rem;
-  font-family: inherit;
-  border: 1px solid var(--ghibli-border);
-  border-radius: 10px;
-  box-sizing: border-box;
-  resize: vertical;
-  background-color: #fff;
-  color: var(--ghibli-text);
-  min-height: 60px;
+  width: 100%; padding: 0.8rem; font-size: 1.1rem; font-family: inherit; border: 1px solid var(--ghibli-border);
+  border-radius: 10px; box-sizing: border-box; resize: vertical; background-color: #fff; color: var(--ghibli-text); min-height: 60px;
 }
-#user-input-area textarea:focus {
-  border-color: var(--ghibli-accent-blue);
-  outline: none;
-  box-shadow: 0 0 5px rgba(160, 216, 239, 0.4);
-}
-
+#user-input-area textarea:focus { border-color: var(--ghibli-accent-blue); outline: none; box-shadow: 0 0 5px rgba(160, 216, 239, 0.4); }
 #user-input-area .send-button {
-  padding: 0.6rem 1.5rem;
-  font-size: 1rem;
-  background-color: #81c784; /* Keep send button green */
-  color: #1b5e20;
-  min-width: 100px;
-  align-self: flex-end;
-  width: auto;
+  padding: 0.6rem 1.5rem; font-size: 1rem; background-color: #81c784; color: #1b5e20;
+  min-width: 100px; align-self: flex-end; width: auto;
 }
-#user-input-area .send-button:hover {
-    background-color: #66bb6a;
-}
+#user-input-area .send-button:hover { background-color: #66bb6a; }
 
 
 /* --- 夜晚模式 --- */
-body.dark-mode {
-  background-color: var(--ghibli-dark-bg);
-  background-image: none;
-  color: var(--ghibli-dark-text);
-}
+body.dark-mode { background-color: var(--ghibli-dark-bg); background-image: none; color: var(--ghibli-dark-text); }
 
-/* Dark Top Bar */
-body.dark-mode #top-bar {
-    background: rgba(30, 30, 30, 0.9); /* Dark background */
-    border-bottom-color: rgba(68, 68, 68, 0.6);
-}
-body.dark-mode #top-bar header h1 { color: var(--ghibli-dark-text); }
-body.dark-mode #top-bar header #toggle-dark-btn { color: var(--ghibli-dark-text-light); }
-body.dark-mode #top-bar header #toggle-dark-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--ghibli-dark-text); }
-body.dark-mode #toggle-menu-btn { background-color: var(--ghibli-dark-accent-yellow); color: var(--ghibli-dark-accent-yellow-light); }
-body.dark-mode #toggle-menu-btn:hover { background-color: #5a5a5a; }
-
+/* Dark Sticky Header */
+body.dark-mode #main-content > header { background: var(--ghibli-dark-header-bg); border-bottom-color: rgba(68, 68, 68, 0.6); }
+body.dark-mode #main-content > header h1 { color: var(--ghibli-dark-text); }
+body.dark-mode #main-content > header #toggle-dark-btn { color: var(--ghibli-dark-text-light); }
+body.dark-mode #main-content > header #toggle-dark-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--ghibli-dark-text); }
 
 /* Dark Footer */
-body.dark-mode footer {
-  background: rgba(30, 30, 30, 0.9); /* Match top bar */
-  color: var(--ghibli-dark-text-light);
-  border-top-color: rgba(68, 68, 68, 0.6);
-}
+body.dark-mode footer { background: var(--ghibli-dark-header-bg); color: var(--ghibli-dark-text-light); border-top-color: rgba(68, 68, 68, 0.6); }
 body.dark-mode footer a { color: var(--ghibli-dark-text); }
 body.dark-mode footer a:hover { color: var(--ghibli-dark-accent-blue-light); }
 
 /* Dark Ghibli Buttons */
-body.dark-mode .ghibli-button {
-  background-color: var(--ghibli-dark-accent-blue);
-  color: var(--ghibli-dark-accent-blue-light);
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
-}
-body.dark-mode .ghibli-button:hover:not(:disabled) {
-  background-color: #34495e;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-}
-body.dark-mode .ghibli-button:active:not(:disabled) {
-  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
-}
-body.dark-mode .ghibli-button:disabled {
-    background-color: #3a4a5a;
-    color: #7f8c8d;
-}
+body.dark-mode .ghibli-button { background-color: var(--ghibli-dark-accent-blue); color: var(--ghibli-dark-accent-blue-light); box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4); }
+body.dark-mode .ghibli-button:hover:not(:disabled) { background-color: #34495e; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5); }
+body.dark-mode .ghibli-button:active:not(:disabled) { box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4); }
+body.dark-mode .ghibli-button:disabled { background-color: #3a4a5a; color: #7f8c8d; }
+body.dark-mode #toggle-menu-btn { background-color: var(--ghibli-dark-accent-yellow); color: var(--ghibli-dark-accent-yellow-light); }
+body.dark-mode #toggle-menu-btn:hover { background-color: #5a5a5a; }
 
 /* Dark Menu */
-body.dark-mode .major-chapter-container {
-    border-color: var(--ghibli-dark-border);
-    background: var(--ghibli-dark-menu-bg);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-body.dark-mode .major-chapter-btn {
-    color: var(--ghibli-dark-text);
-    border-bottom-color: rgba(68, 68, 68, 0); /* Transparent */
-}
+body.dark-mode .major-chapter-container { border-color: var(--ghibli-dark-border); background: var(--ghibli-dark-menu-bg); box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+body.dark-mode .major-chapter-btn { color: var(--ghibli-dark-text); border-bottom-color: rgba(68, 68, 68, 0); }
 body.dark-mode .major-chapter-btn:hover { filter: brightness(110%); }
-body.dark-mode .major-chapter-btn.active {
-    filter: brightness(115%);
-    border-bottom-color: var(--ghibli-dark-border-lighter);
-}
-/* Dark Cyclic Colors */
+body.dark-mode .major-chapter-btn.active { filter: brightness(115%); border-bottom-color: var(--ghibli-dark-border-lighter); }
 body.dark-mode .major-chapter-container:nth-of-type(6n+1) .major-chapter-btn { background-color: #2c3e50; color: #ecf0f1; }
-body.dark-mode .major-chapter-container:nth-of-type(6n+2) .major-chapter-btn { background-color: #27ae60; color: #e8f5e9; } /* Dark Green */
-body.dark-mode .major-chapter-container:nth-of-type(6n+3) .major-chapter-btn { background-color: #f39c12; color: #fef9e7; } /* Dark Yellow */
-body.dark-mode .major-chapter-container:nth-of-type(6n+4) .major-chapter-btn { background-color: #e67e22; color: #fdf3e6; } /* Dark Orange */
-body.dark-mode .major-chapter-container:nth-of-type(6n+5) .major-chapter-btn { background-color: #8e44ad; color: #f4ecf7; } /* Dark Purple/Pink */
-body.dark-mode .major-chapter-container:nth-of-type(6n+6) .major-chapter-btn { background-color: #795548; color: #efebe9; } /* Dark Brown */
-
+body.dark-mode .major-chapter-container:nth-of-type(6n+2) .major-chapter-btn { background-color: #27ae60; color: #e8f5e9; }
+body.dark-mode .major-chapter-container:nth-of-type(6n+3) .major-chapter-btn { background-color: #f39c12; color: #fef9e7; }
+body.dark-mode .major-chapter-container:nth-of-type(6n+4) .major-chapter-btn { background-color: #e67e22; color: #fdf3e6; }
+body.dark-mode .major-chapter-container:nth-of-type(6n+5) .major-chapter-btn { background-color: #8e44ad; color: #f4ecf7; }
+body.dark-mode .major-chapter-container:nth-of-type(6n+6) .major-chapter-btn { background-color: #795548; color: #efebe9; }
 body.dark-mode .sub-menu-container { background: var(--ghibli-dark-submenu-bg); }
-body.dark-mode .sub-chapter-link {
-    background-color: var(--ghibli-dark-subitem-bg);
-    color: var(--ghibli-dark-subitem-text);
-    border-color: var(--ghibli-dark-border);
-    box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-}
-body.dark-mode .sub-chapter-link:hover {
-    background-color: var(--ghibli-dark-subitem-hover);
-    border-color: var(--ghibli-dark-subitem-text);
-}
+body.dark-mode .sub-chapter-link { background-color: var(--ghibli-dark-subitem-bg); color: var(--ghibli-dark-subitem-text); border-color: var(--ghibli-dark-border); box-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+body.dark-mode .sub-chapter-link:hover { background-color: var(--ghibli-dark-subitem-hover); border-color: var(--ghibli-dark-subitem-text); }
 
-/* Dark Dialogue Box */
-body.dark-mode #dialogue-box {
-  background: var(--ghibli-dark-dialogue-bg);
-  border-color: var(--ghibli-dark-border-lighter);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-}
-/* Dark Messages */
-body.dark-mode .message-container.system {
-    background-color: rgba(40, 40, 40, 0.7);
-    color: var(--ghibli-dark-text-light);
-}
-body.dark-mode .message-container.system strong { color: var(--ghibli-dark-text); }
-body.dark-mode .message-container.ai,
-body.dark-mode .message-container.confucius {
-  background-color: var(--ghibli-dark-menu-item-bg);
-  color: var(--ghibli-dark-text);
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-}
-body.dark-mode .message-container.user {
-  background-color: var(--ghibli-dark-accent-green);
-  color: var(--ghibli-dark-accent-green-light);
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-}
-body.dark-mode .loading-message {
-    color: var(--ghibli-accent-orange-light);
-    background-color: rgba(90, 90, 90, 0.7);
-}
+/* Dark Dialogue Box & Messages */
+body.dark-mode #dialogue-box { background: var(--ghibli-dark-dialogue-bg); border-color: var(--ghibli-dark-border-lighter); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); }
+body.dark-mode .message-container.system, body.dark-mode .message-container.initial { background-color: rgba(40, 40, 40, 0.7); color: var(--ghibli-dark-text-light); }
+body.dark-mode .message-container.system strong, body.dark-mode .message-container.initial strong { color: var(--ghibli-dark-text); }
+body.dark-mode .message-container.chapter-display { background-color: rgba(50, 50, 50, 0.8); }
+body.dark-mode .message-container.chapter-display strong { color: var(--ghibli-dark-text); }
+body.dark-mode .message-container.chapter-display p { color: var(--ghibli-dark-text); }
+body.dark-mode .message-container.ai, body.dark-mode .message-container.confucius { background-color: var(--ghibli-dark-menu-item-bg); color: var(--ghibli-dark-text); box-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
+body.dark-mode .message-container.user { background-color: var(--ghibli-dark-accent-green); color: var(--ghibli-dark-accent-green-light); box-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
+body.dark-mode .loading-message { color: var(--ghibli-accent-orange-light); background-color: rgba(90, 90, 90, 0.7); }
 
 /* Dark Input Area */
-body.dark-mode #input-area .interaction-button {
-    background-color: var(--ghibli-dark-accent-orange);
-    color: var(--ghibli-dark-accent-orange-light);
-}
-body.dark-mode #input-area .interaction-button:hover:not(:disabled) {
-    background-color: #6a6a6a;
-}
-body.dark-mode #user-input-area textarea {
-    background-color: var(--ghibli-dark-subitem-bg);
-    color: var(--ghibli-dark-text);
-    border-color: var(--ghibli-dark-border);
-}
-body.dark-mode #user-input-area textarea:focus {
-    border-color: var(--ghibli-dark-border-lighter);
-    box-shadow: 0 0 5px rgba(119, 119, 119, 0.4);
-}
-body.dark-mode #user-input-area .send-button {
-    background-color: #388e3c;
-    color: #e8f5e9;
-}
-body.dark-mode #user-input-area .send-button:hover {
-    background-color: #4caf50;
-}
+body.dark-mode #input-area .interaction-button { background-color: var(--ghibli-dark-accent-orange); color: var(--ghibli-dark-accent-orange-light); }
+body.dark-mode #input-area .interaction-button:hover:not(:disabled) { background-color: #6a6a6a; }
+body.dark-mode #user-input-area textarea { background-color: var(--ghibli-dark-subitem-bg); color: var(--ghibli-dark-text); border-color: var(--ghibli-dark-border); }
+body.dark-mode #user-input-area textarea:focus { border-color: var(--ghibli-dark-border-lighter); box-shadow: 0 0 5px rgba(119, 119, 119, 0.4); }
+body.dark-mode #user-input-area .send-button { background-color: #388e3c; color: #e8f5e9; }
+body.dark-mode #user-input-area .send-button:hover { background-color: #4caf50; }
 
 
 /* --- 響應式設計 --- */
 @media (max-width: 768px) {
-  :root {
-      --top-bar-height: 50px; /* Smaller top bar on mobile */
-      --footer-height: 30px; /* Smaller footer on mobile */
-  }
-  body {
-      padding-top: var(--top-bar-height);
-      padding-bottom: var(--footer-height);
-      line-height: 1.6; /* Adjust line height for mobile */
-  }
-
-  #top-bar {
-      height: var(--top-bar-height);
-      padding: 0 10px;
-  }
-  #toggle-menu-btn { padding: 0.4rem 0.8rem; font-size: 0.9rem; margin-right: 10px;}
-  #top-bar header h1 { font-size: 1.4em; }
-  #top-bar header #toggle-dark-btn { font-size: 1.3rem; padding: 0.2rem 0.5rem;}
-
-  #container {
-    flex-direction: column;
-    padding: 10px; /* Restore some padding */
-  }
-
-  #sidebar {
-    width: 100%;
-    margin-right: 0;
-    margin-bottom: 1rem;
-    max-height: 35vh; /* Further restrict sidebar height */
-    position: static; /* Sidebar no longer sticky */
-    order: 2; /* Display sidebar below main content */
-    padding-top: 0;
-  }
-
-  #main-content {
-     max-width: 100%;
-     min-height: auto; /* Let content determine height */
-     order: 1; /* Display main content first */
-  }
-
-  footer {
-      height: var(--footer-height);
-      line-height: var(--footer-height);
-      font-size: 0.8em;
-      padding: 0 8px;
-  }
-
-  #dialogue-box {
-    padding: 1rem;
-    border-radius: 10px;
-  }
-
-  #messages { min-height: 100px; padding-right: 5px; }
-  .message-container { padding: 0.6rem 1rem; font-size: 1.05rem; max-width: 90%; }
-  .message-container.system { font-size: 0.95rem; }
-
-
-  #input-area { gap: 0.5rem; }
-  #input-area .interaction-button {
-    min-width: 150px; /* Adjusted min-width */
-    max-width: 100%; /* Allow full width if needed */
-    font-size: 0.95rem;
-    padding: 0.6rem 0.8rem;
-  }
-
-  #user-input-area textarea { font-size: 1rem; min-height: 50px; }
-  #user-input-area .send-button { padding: 0.5rem 1.2rem; font-size: 0.95rem; }
+  body { padding-bottom: var(--footer-height); }
+  #container { flex-direction: column; padding: 10px; }
+  #sidebar { width: 100%; margin-right: 0; margin-bottom: 1rem; max-height: 40vh; position: static; order: 2; padding-top: 0; }
+  #toggle-menu-btn { margin-bottom: 0.8rem; }
+  #main-content { max-width: 100%; min-height: auto; order: 1; }
+  #main-content > header { padding: 8px 10px; margin-bottom: 0.8rem; }
+  #main-content > header h1 { font-size: 1.3em; padding: 0 35px; }
+  #main-content > header #toggle-dark-btn { font-size: 1.2rem; padding: 0.2rem 0.5rem; right: 10px; }
+  footer { height: var(--footer-height); line-height: var(--footer-height); font-size: 0.75em; padding: 0 8px; }
+  #dialogue-box { padding: 0.8rem; border-radius: 10px; }
+  #messages { min-height: 100px; padding-right: 5px; gap: 0.6rem; }
+  .message-container { padding: 0.6rem 1rem; font-size: 1.0rem; max-width: 90%; border-radius: 12px; } /* Reduced mobile font */
+  .message-container.system, .message-container.initial { font-size: 0.85rem; } /* Smaller system font */
+  .message-container.chapter-display p { font-size: 1.4rem; line-height: 1.7; } /* Adjusted enlarged size */
+  .message-container.chapter-display strong { font-size: 1.1em; margin-bottom: 0.4em;}
+  #input-area { gap: 0.5rem; margin-bottom: 0.8rem; }
+  #input-area .interaction-button { min-width: 180px; font-size: 0.9rem; padding: 0.5rem 0.7rem; }
+  #user-input-area textarea { font-size: 0.95rem; min-height: 45px; }
+  #user-input-area .send-button { padding: 0.4rem 1rem; font-size: 0.9rem; }
 }
