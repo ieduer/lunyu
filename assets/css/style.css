@@ -7,9 +7,52 @@
   font-style: normal;
 }
 
-/* 全局樣式 */
+/* Global Variables & Reset */
 :root {
-    --footer-height: 40px; /* Define footer height variable */
+    --footer-height: 35px; /* Slightly reduced footer height */
+    --top-bar-height: 60px; /* Approximate height for fixed top bar */
+    /* Ghibli Color Palette (Example - Needs refinement) */
+    --ghibli-bg: #f9f5e7;
+    --ghibli-text: #3d322b;
+    --ghibli-text-light: #6b5f55;
+    --ghibli-border: #e0d8cc;
+    --ghibli-border-darker: #d8cfc0;
+    --ghibli-accent-blue: #a0d8ef;
+    --ghibli-accent-blue-dark: #3d5a66;
+    --ghibli-accent-yellow: #f6e4a8;
+    --ghibli-accent-yellow-dark: #7b6a4c;
+    --ghibli-accent-green: #c8e6c9;
+    --ghibli-accent-green-dark: #556B2F;
+    --ghibli-accent-orange: #ffcc80;
+    --ghibli-accent-orange-dark: #8f5d00;
+    --ghibli-accent-pink: #f8c8dc;
+    --ghibli-accent-pink-dark: #8b5f6f;
+    --ghibli-white-semi: rgba(255, 255, 255, 0.8);
+    --ghibli-white-lighter: rgba(255, 255, 255, 0.6);
+    --ghibli-dialogue-bg: rgba(245, 240, 230, 0.9);
+
+    /* Dark Mode Colors */
+    --ghibli-dark-bg: #1f1d1b;
+    --ghibli-dark-text: #dcdcdc;
+    --ghibli-dark-text-light: #a0a0a0;
+    --ghibli-dark-border: #444;
+    --ghibli-dark-border-lighter: #555;
+    --ghibli-dark-accent-blue: #2c3e50;
+    --ghibli-dark-accent-blue-light: #ecf0f1;
+    --ghibli-dark-accent-yellow: #4a4a4a;
+    --ghibli-dark-accent-yellow-light: #e0e0e0;
+    --ghibli-dark-accent-green: #2a5a2a;
+    --ghibli-dark-accent-green-light: #c8e6c9;
+    --ghibli-dark-accent-orange: #5a5a5a;
+    --ghibli-dark-accent-orange-light: #e0e0e0;
+    --ghibli-dark-dialogue-bg: rgba(30, 30, 30, 0.9);
+    --ghibli-dark-menu-bg: rgba(42, 42, 42, 0.8);
+    --ghibli-dark-menu-item-bg: #3a3a3a;
+    --ghibli-dark-menu-item-hover: #4a4a4a;
+    --ghibli-dark-submenu-bg: rgba(30, 30, 30, 0.7);
+    --ghibli-dark-subitem-bg: #444;
+    --ghibli-dark-subitem-hover: #555;
+    --ghibli-dark-subitem-text: #a0d8ef;
 }
 
 html {
@@ -21,357 +64,397 @@ html {
 
 body {
   font-family: 'HuWenMingChaoTi', "Noto Serif TC", serif;
-  color: #3d322b;
+  color: var(--ghibli-text);
   margin: 0;
   padding: 0;
-  /* Add padding-bottom equal to footer height to prevent overlap */
+  /* Add padding-top for fixed header AND padding-bottom for fixed footer */
+  padding-top: var(--top-bar-height);
   padding-bottom: var(--footer-height);
   line-height: 1.7;
   background-image: url('../img/bg.webp');
-  background-color: #f9f5e7;
+  background-color: var(--ghibli-bg);
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
   background-attachment: fixed;
   min-height: 100vh;
-  display: flex; /* Use flex to help center container */
+  display: flex; /* Keep flex for centering container */
   justify-content: center;
 }
 
-/* 容器佈局：左右兩欄 */
+/* --- Fixed Top Bar --- */
+#top-bar {
+    position: sticky; /* Stick to top */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--top-bar-height);
+    background: rgba(249, 245, 231, 0.85); /* Match footer style */
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(216, 207, 192, 0.6);
+    z-index: 1100; /* High z-index */
+    display: flex;
+    align-items: center;
+    padding: 0 15px; /* Horizontal padding */
+}
+
+#toggle-menu-btn {
+    width: auto; /* Don't force full width */
+    padding: 0.5rem 1rem; /* Adjust padding */
+    font-size: 0.95rem;
+    margin-right: 15px; /* Space between toggle and header */
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+#top-bar header {
+    flex-grow: 1; /* Allow header to take remaining space */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center title by default */
+    position: relative; /* Needed for absolute positioning of dark mode button */
+    padding: 0; /* Remove default header padding */
+    color: var(--ghibli-text-light);
+}
+
+#top-bar header h1 {
+    font-size: 1.8em; /* Adjust title size */
+    margin: 0;
+    font-weight: 600;
+    color: var(--ghibli-text);
+    text-align: center; /* Explicitly center */
+    /* No flex-grow needed if parent uses justify-content: center */
+}
+
+#top-bar header #toggle-dark-btn {
+    position: absolute; /* Position relative to header */
+    top: 50%; /* Center vertically */
+    right: 0px; /* Align to the right edge of the header */
+    transform: translateY(-50%); /* Fine-tune vertical centering */
+    width: auto;
+    padding: 0.3rem 0.6rem;
+    margin: 0; /* Reset margin */
+}
+
+
+/* --- Main Content Container --- */
 #container {
   display: flex;
   width: 100%;
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 10px;
+  /* Margin-top removed as padding-top on body handles space */
+  padding: 15px; /* Padding around sidebar/main-content */
+  align-items: flex-start; /* Align items top */
 }
 
 #sidebar {
-  width: 280px; /* Slightly wider sidebar */
+  width: 280px;
   margin-right: 20px;
   flex-shrink: 0;
-  padding-top: 1rem;
-  /* Allow sidebar content to scroll if it overflows */
-  max-height: calc(100vh - 20px - var(--footer-height)); /* Adjust max-height considering padding and footer */
+  /* Max height considering top bar and footer */
+  max-height: calc(100vh - var(--top-bar-height) - var(--footer-height) - 30px); /* 30px for container padding */
   overflow-y: auto;
+  position: sticky; /* Make sidebar sticky below top-bar */
+  top: var(--top-bar-height); /* Stick below the top bar */
+  padding-top: 0; /* Remove previous padding-top */
 }
 
 #main-content {
   flex-grow: 1;
   max-width: 800px;
-  display: flex; /* Use flex for vertical layout */
-  flex-direction: column; /* Stack header and dialogue box */
+  display: flex;
+  flex-direction: column;
+  /* Calculate min-height to push footer down */
+   min-height: calc(100vh - var(--top-bar-height) - var(--footer-height) - 30px); /* Ensure it fills vertical space */
 }
 
-
-header {
-  display: flex; /* Use Flexbox */
-  align-items: center; /* Vertically center items */
-  justify-content: space-between; /* Space between title and button */
-  padding: 0.5rem 1rem; /* Adjust padding */
-  color: #5a4a42;
-  width: 100%; /* Ensure header takes full width of its container */
-  flex-shrink: 0; /* Prevent header from shrinking */
-}
-
-h1 {
-  font-size: 2.0em; /* Slightly smaller */
-  margin: 0; /* Remove default margin */
-  font-weight: 600;
-  color: #4a3f35;
-  text-align: left; /* Align title left */
-  /* flex-grow: 1; Remove grow if space-between is used */
-}
 
 /* Footer Styles */
 footer {
-  position: fixed; /* Fix to viewport */
+  position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: var(--footer-height); /* Use variable */
-  background: rgba(249, 245, 231, 0.8); /* Semi-transparent background */
-  backdrop-filter: blur(5px);
-  color: #6b5f55;
-  font-size: 0.9em;
+  height: var(--footer-height);
+  background: rgba(249, 245, 231, 0.85); /* Match top-bar */
+  backdrop-filter: blur(8px);
+  color: var(--ghibli-text-light);
+  font-size: 0.85em; /* Slightly smaller footer text */
   text-align: center;
-  padding: 10px 0; /* Vertical padding */
-  border-top: 1px solid rgba(216, 207, 192, 0.5); /* Subtle top border */
-  z-index: 1000; /* Ensure footer is above other content */
+  line-height: var(--footer-height); /* Vertically center text */
+  padding: 0 10px; /* Add horizontal padding */
+  border-top: 1px solid rgba(216, 207, 192, 0.6);
+  z-index: 1000;
+  overflow: hidden; /* Prevent content overflow */
+  white-space: nowrap; /* Prevent wrapping */
+}
+footer p {
+    margin: 0; /* Remove default paragraph margin */
+    line-height: inherit; /* Inherit line-height for centering */
 }
 footer a {
-  color: #8c7b70;
+  color: var(--ghibli-text); /* Darker link for visibility */
   text-decoration: none;
 }
 footer a:hover {
-  color: #5a4a42;
+  color: var(--ghibli-accent-blue-dark);
 }
 
 
-/* --- Ghibli 風格按鈕 (Copied from previous version, may need minor adjustments) --- */
+/* --- Ghibli 風格按鈕 --- */
 .ghibli-button {
   font-family: 'HuWenMingChaoTi', "Noto Serif TC", serif;
   border: none;
-  border-radius: 12px;
-  background-color: #a0d8ef;
-  color: #3d5a66;
+  border-radius: 10px; /* Slightly less round */
+  background-color: var(--ghibli-accent-blue);
+  color: var(--ghibli-accent-blue-dark);
   padding: 0.6rem 1.2rem;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
   margin: 0.2rem;
   text-align: center;
-  display: block; /* Make buttons block elements by default */
-  width: 100%; /* Default to full width within container */
+  display: block;
+  width: 100%;
 }
-
-.ghibli-button:hover {
-  background-color: #87ceeb;
-  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.15);
+.ghibli-button:hover:not(:disabled) {
+  background-color: #87ceeb; /* Keep hover consistent */
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
 }
-
-.ghibli-button:active {
+.ghibli-button:active:not(:disabled) {
   transform: translateY(1px);
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 .ghibli-button:disabled {
-    background-color: #cce0ff; /* Lighter blue when disabled */
-    color: #a0b0c0; /* Greyed out text */
+    background-color: #d0e0f0; /* Adjusted disabled color */
+    color: #a0b0c0;
     cursor: not-allowed;
     box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-
-/* Icon button (Dark mode) */
+/* Icon button */
 .icon-button {
   font-size: 1.5rem;
   padding: 0.3rem 0.6rem;
   background: none;
   box-shadow: none;
-  color: #8c7b70;
-  /* Remove absolute positioning */
-  width: auto; /* Override default width */
-  flex-shrink: 0; /* Prevent button from shrinking */
+  color: var(--ghibli-text-light);
+  width: auto;
+  flex-shrink: 0;
+  border-radius: 50%; /* Make icon button round */
 }
 .icon-button:hover {
-  background: none;
-  color: #5a4a42;
+  background: rgba(0, 0, 0, 0.05); /* Subtle hover background */
+  color: var(--ghibli-text);
   box-shadow: none;
 }
 .icon-button:active {
-  transform: scale(0.95);
+  transform: scale(0.95) translateY(0); /* Adjust active effect */
 }
 
-/* 目錄切換按鈕 */
-#toggle-menu-btn {
-  margin-bottom: 1rem;
-  background-color: #f6e4a8;
-  color: #7b6a4c;
-}
-#toggle-menu-btn:hover {
-  background-color: #f4d992;
-}
 
-/* 目錄區域 */
+/* --- 目錄樣式 --- */
 #chapter-menu {
-  /* background: rgba(255, 255, 255, 0.7); */ /* Remove background from main container */
-  /* backdrop-filter: blur(5px); */
-  /* border: 1px solid #e0d8cc; */
-  /* padding: 1rem; */
-  /* border-radius: 8px; */
-  /* box-shadow: 0 2px 4px rgba(0,0,0,0.05); */
-  display: flex; /* Use flex for vertical layout */
+  display: flex;
   flex-direction: column;
-  gap: 0.5rem; /* Space between Level 1 items */
+  gap: 0.5rem;
 }
 
-/* Level 1 Chapter Button Container */
 .major-chapter-container {
-    border: 1px solid #e0d8cc;
+    border: 1px solid var(--ghibli-border);
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--ghibli-white-semi);
     backdrop-filter: blur(3px);
-    overflow: hidden; /* Ensures border-radius clips content */
+    overflow: hidden;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    margin-bottom: 0.5rem; /* Space between chapter blocks */
+    margin-bottom: 0.5rem;
 }
 
 .major-chapter-btn {
-    background-color: #e6f2ff;
-    color: #336699;
+    /* Base color set using nth-of-type below */
+    color: var(--ghibli-text);
     padding: 0.7rem 1rem;
     font-size: 1.05rem;
     font-weight: 500;
-    border-radius: 0; /* Remove radius as container has it */
-    margin: 0; /* Remove default margin */
-    border-bottom: 1px solid rgba(224, 216, 204, 0.5); /* Separator line if submenu open */
-    width: 100%; /* Take full width */
-    text-align: left; /* Align text left */
-    box-shadow: none; /* Remove individual shadow */
+    border-radius: 0;
+    margin: 0;
+    border-bottom: 1px solid rgba(224, 216, 204, 0); /* Transparent border initially */
+    width: 100%;
+    text-align: left;
+    box-shadow: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease; /* Smooth transition */
 }
 .major-chapter-btn:hover {
-    background-color: #d0e6ff;
+    filter: brightness(95%); /* Darken slightly on hover */
 }
-.major-chapter-btn.active { /* Style for the currently open chapter */
-    background-color: #cce4ff;
+.major-chapter-btn.active {
+    filter: brightness(92%);
+    border-bottom-color: var(--ghibli-border-darker); /* Show border when active */
 }
 
-/* Level 2 Sub-Chapter Menu Container */
+/* Cyclic Ghibli Colors for Chapters (Example with 6 colors) */
+.major-chapter-container:nth-of-type(6n+1) .major-chapter-btn { background-color: #a0d8ef; color: #3d5a66; } /* Blue */
+.major-chapter-container:nth-of-type(6n+2) .major-chapter-btn { background-color: #c8e6c9; color: #556B2F; } /* Green */
+.major-chapter-container:nth-of-type(6n+3) .major-chapter-btn { background-color: #f6e4a8; color: #7b6a4c; } /* Yellow */
+.major-chapter-container:nth-of-type(6n+4) .major-chapter-btn { background-color: #ffcc80; color: #8f5d00; } /* Orange */
+.major-chapter-container:nth-of-type(6n+5) .major-chapter-btn { background-color: #f8c8dc; color: #8b5f6f; } /* Pink */
+.major-chapter-container:nth-of-type(6n+6) .major-chapter-btn { background-color: #d7ccc8; color: #5d4037; } /* Brownish */
+
+
+/* Sub-Menu */
 .sub-menu-container {
-    padding: 0.5rem 0.8rem; /* Padding inside the sub-menu */
-    background: rgba(255, 255, 255, 0.6); /* Slightly more transparent */
+    padding: 0.5rem 0.8rem;
+    background: var(--ghibli-white-lighter);
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); /* Adjust minmax for button size */
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
     gap: 0.5rem;
-    max-height: 300px; /* Limit height and allow scrolling */
+    max-height: 250px; /* Reduced max-height */
     overflow-y: auto;
 }
 
 .sub-chapter-link {
-    padding: 0.4rem; /* Smaller padding */
-    font-size: 0.9rem; /* Smaller font */
+    padding: 0.4rem;
+    font-size: 0.9rem;
     background-color: #fff;
-    color: #0077cc;
+    color: var(--ghibli-accent-blue-dark); /* Use theme color */
     text-decoration: none;
     border-radius: 6px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--ghibli-border);
     box-shadow: 1px 1px 2px rgba(0,0,0,0.05);
-    width: auto; /* Let grid control width */
+    width: auto;
     text-align: center;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 .sub-chapter-link:hover {
     background-color: #f0f8ff;
-    border-color: #0077cc;
+    border-color: var(--ghibli-accent-blue);
 }
 
 
-/* --- REMOVED #chapter-content styles --- */
-
-/* --- Ghibli 風格對話框 (Mostly unchanged from previous version) --- */
+/* --- 對話框 --- */
 #dialogue-box {
   padding: 1.5rem;
-  background: rgba(245, 240, 230, 0.85);
+  background: var(--ghibli-dialogue-bg);
   backdrop-filter: blur(10px);
-  border: 1px solid #d8cfc0;
-  border-radius: 15px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  /* Make dialogue box take remaining height */
+  border: 1px solid var(--ghibli-border-darker);
+  border-radius: 12px; /* Match button radius */
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Prevent content overflow */
-  margin-top: 1rem; /* Space below header */
+  overflow: hidden;
+  margin-top: 0; /* No margin needed as main-content handles spacing */
 }
 
-/* 對話消息區域 */
+/* Messages Area */
 #messages {
-  min-height: 150px; /* Minimum height */
-  flex-grow: 1; /* Take available space */
-  overflow-y: auto; /* Scroll if content exceeds space */
+  min-height: 150px;
+  flex-grow: 1;
+  overflow-y: auto;
   margin-bottom: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
-  padding-right: 5px; /* Space for scrollbar */
+  padding-right: 8px; /* Space for scrollbar */
 }
+/* Scrollbar styling (optional) */
+#messages::-webkit-scrollbar { width: 6px; }
+#messages::-webkit-scrollbar-track { background: transparent; }
+#messages::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 3px; }
+#messages::-webkit-scrollbar-thumb:hover { background-color: rgba(0,0,0,0.25); }
 
-/* 單條消息容器 */
+
+/* Message Bubbles */
 .message-container {
   padding: 0.8rem 1.2rem;
-  border-radius: 18px;
-  max-width: 85%; /* Wider max-width */
+  border-radius: 15px; /* More rounded */
+  max-width: 85%;
   word-wrap: break-word;
-  font-size: 1.2rem;
+  font-size: 1.15rem; /* Slightly adjusted */
   line-height: 1.6;
   box-shadow: 1px 1px 3px rgba(0,0,0,0.07);
 }
-.message-container p {
-    margin-bottom: 0.5em;
-    line-height: 1.6;
-}
-.message-container p:last-child {
-    margin-bottom: 0;
-}
-/* Added specific styling for system messages */
+.message-container p { margin-bottom: 0.5em; line-height: 1.6; }
+.message-container p:last-child { margin-bottom: 0; }
+.message-container strong { font-weight: 600; color: var(--ghibli-text); } /* Style for bolded text */
+
+/* System Message */
 .message-container.system {
-    background-color: #f0f0f0; /* Light grey */
-    color: #555;
+    background-color: rgba(230, 230, 230, 0.7); /* Slightly transparent grey */
+    color: var(--ghibli-text-light);
     font-style: italic;
     max-width: 95%;
     text-align: center;
     margin-left: auto;
     margin-right: auto;
+    border-radius: 8px; /* Less round for system */
+    font-size: 1.05rem; /* Slightly smaller */
 }
+.message-container.system strong { color: var(--ghibli-text); }
 
-
-/* AI/系統消息 (左側) */
+/* AI/Confucius Message */
 .message-container.ai,
-.message-container.confucius { /* Removed .system */
+.message-container.confucius {
   background-color: #ffffff;
-  color: #4a3f35;
+  color: var(--ghibli-text);
   margin-right: auto;
   border-top-left-radius: 5px;
   text-align: left;
 }
-/* loading 樣式 */
+/* Loading Message */
 .loading-message {
     font-style: italic;
-    color: #888;
+    color: var(--ghibli-accent-orange-dark);
     animation: blink 1.5s linear infinite;
-    background-color: #f8f8f8; /* Distinct background for loading */
+    background-color: rgba(255, 230, 200, 0.7); /* Soft orange background */
     text-align: center;
     margin-left: auto;
     margin-right: auto;
+    border-radius: 10px;
+    max-width: 90%;
 }
-@keyframes blink {
-    0% { opacity: 1; }
-    50% { opacity: 0.3; }
-    100% { opacity: 1; }
-}
+@keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-
-/* 用戶消息 (右側) */
+/* User Message */
 .message-container.user {
-  background-color: #dcf8c6;
-  color: #556B2F;
+  background-color: var(--ghibli-accent-green);
+  color: var(--ghibli-accent-green-dark);
   margin-left: auto;
   border-top-right-radius: 5px;
   text-align: left;
 }
 
-/* 交互按鈕區域 */
+/* Interaction Button Area */
 #input-area {
-  display: flex;
+  display: flex; /* Keep flex, even for one button */
   flex-wrap: wrap;
   gap: 0.8rem;
   margin-bottom: 1rem;
-  justify-content: center;
-  flex-shrink: 0; /* Prevent shrinking */
+  justify-content: center; /* Center the button(s) */
+  flex-shrink: 0;
 }
 
 #input-area .interaction-button {
-  flex-grow: 1;
-  min-width: 180px;
-  max-width: calc(50% - 0.4rem);
+  flex-grow: 0; /* Don't grow if only one button */
+  min-width: 200px; /* Ensure decent width */
+  max-width: 300px; /* Limit max width */
   padding: 0.7rem 1rem;
   font-size: 1.05rem;
-  background-color: #ffcc80;
-  color: #8f5d00;
+  background-color: var(--ghibli-accent-orange);
+  color: var(--ghibli-accent-orange-dark);
 }
-#input-area .interaction-button:hover:not(:disabled) { /* Add :not(:disabled) */
+#input-area .interaction-button:hover:not(:disabled) {
     background-color: #ffb74d;
 }
 
-/* --- 用戶輸入區域樣式 --- */
+/* User Input Area */
 #user-input-area {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
   margin-top: 1rem;
   align-items: flex-end;
-  flex-shrink: 0; /* Prevent shrinking */
+  flex-shrink: 0;
 }
 
 #user-input-area textarea {
@@ -379,29 +462,28 @@ footer a:hover {
   padding: 0.8rem;
   font-size: 1.1rem;
   font-family: inherit;
-  border: 1px solid #ccc;
+  border: 1px solid var(--ghibli-border);
   border-radius: 10px;
   box-sizing: border-box;
   resize: vertical;
   background-color: #fff;
-  color: #333;
+  color: var(--ghibli-text);
   min-height: 60px;
 }
-
 #user-input-area textarea:focus {
-  border-color: #a0d8ef;
+  border-color: var(--ghibli-accent-blue);
   outline: none;
-  box-shadow: 0 0 5px rgba(160, 216, 239, 0.5);
+  box-shadow: 0 0 5px rgba(160, 216, 239, 0.4);
 }
 
 #user-input-area .send-button {
   padding: 0.6rem 1.5rem;
   font-size: 1rem;
-  background-color: #81c784;
+  background-color: #81c784; /* Keep send button green */
   color: #1b5e20;
   min-width: 100px;
   align-self: flex-end;
-  width: auto; /* Override default button width */
+  width: auto;
 }
 #user-input-area .send-button:hover {
     background-color: #66bb6a;
@@ -410,132 +492,129 @@ footer a:hover {
 
 /* --- 夜晚模式 --- */
 body.dark-mode {
-  background-color: #1a1a1a;
+  background-color: var(--ghibli-dark-bg);
   background-image: none;
-  color: #dcdcdc;
+  color: var(--ghibli-dark-text);
 }
 
-body.dark-mode header h1 {
-  color: #e0e0e0;
+/* Dark Top Bar */
+body.dark-mode #top-bar {
+    background: rgba(30, 30, 30, 0.9); /* Dark background */
+    border-bottom-color: rgba(68, 68, 68, 0.6);
 }
-body.dark-mode header .icon-button { /* Target icon button specifically */
-  color: #bdbdbd; /* Adjust dark mode icon color */
-}
-body.dark-mode header .icon-button:hover {
-    color: #f5f5f5;
-}
+body.dark-mode #top-bar header h1 { color: var(--ghibli-dark-text); }
+body.dark-mode #top-bar header #toggle-dark-btn { color: var(--ghibli-dark-text-light); }
+body.dark-mode #top-bar header #toggle-dark-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--ghibli-dark-text); }
+body.dark-mode #toggle-menu-btn { background-color: var(--ghibli-dark-accent-yellow); color: var(--ghibli-dark-accent-yellow-light); }
+body.dark-mode #toggle-menu-btn:hover { background-color: #5a5a5a; }
 
+
+/* Dark Footer */
 body.dark-mode footer {
-  background: rgba(26, 26, 26, 0.85); /* Dark footer background */
-  color: #a0a0a0;
-  border-top-color: rgba(68, 68, 68, 0.5); /* Darker border */
+  background: rgba(30, 30, 30, 0.9); /* Match top bar */
+  color: var(--ghibli-dark-text-light);
+  border-top-color: rgba(68, 68, 68, 0.6);
 }
-body.dark-mode footer a {
-  color: #bdbdbd;
-}
-body.dark-mode footer a:hover {
-  color: #e0e0e0;
-}
+body.dark-mode footer a { color: var(--ghibli-dark-text); }
+body.dark-mode footer a:hover { color: var(--ghibli-dark-accent-blue-light); }
 
-/* Dark mode Ghibli buttons */
+/* Dark Ghibli Buttons */
 body.dark-mode .ghibli-button {
-  background-color: #2c3e50;
-  color: #ecf0f1;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  background-color: var(--ghibli-dark-accent-blue);
+  color: var(--ghibli-dark-accent-blue-light);
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
 }
-body.dark-mode .ghibli-button:hover:not(:disabled) { /* Add :not(:disabled) */
+body.dark-mode .ghibli-button:hover:not(:disabled) {
   background-color: #34495e;
-  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.4);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 }
-body.dark-mode .ghibli-button:active {
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+body.dark-mode .ghibli-button:active:not(:disabled) {
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
 }
 body.dark-mode .ghibli-button:disabled {
-    background-color: #3a4a5a; /* Darker disabled blue */
-    color: #7f8c8d; /* Greyed out text */
+    background-color: #3a4a5a;
+    color: #7f8c8d;
 }
 
-
-body.dark-mode #toggle-menu-btn {
-    background-color: #4a4a4a;
-    color: #e0e0e0;
-}
-body.dark-mode #toggle-menu-btn:hover {
-    background-color: #5a5a5a;
-}
-
-/* Dark Mode Menu Items */
+/* Dark Menu */
 body.dark-mode .major-chapter-container {
-    border-color: #444;
-    background: rgba(42, 42, 42, 0.8); /* Darker container */
+    border-color: var(--ghibli-dark-border);
+    background: var(--ghibli-dark-menu-bg);
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 body.dark-mode .major-chapter-btn {
-    background-color: #3a3a3a;
-    color: #c0c0c0;
-    border-bottom-color: rgba(68, 68, 68, 0.5);
+    color: var(--ghibli-dark-text);
+    border-bottom-color: rgba(68, 68, 68, 0); /* Transparent */
 }
-body.dark-mode .major-chapter-btn:hover {
-    background-color: #4a4a4a;
-}
+body.dark-mode .major-chapter-btn:hover { filter: brightness(110%); }
 body.dark-mode .major-chapter-btn.active {
-    background-color: #505050;
+    filter: brightness(115%);
+    border-bottom-color: var(--ghibli-dark-border-lighter);
 }
-body.dark-mode .sub-menu-container {
-    background: rgba(30, 30, 30, 0.7); /* Darker sub-menu */
-}
+/* Dark Cyclic Colors */
+body.dark-mode .major-chapter-container:nth-of-type(6n+1) .major-chapter-btn { background-color: #2c3e50; color: #ecf0f1; }
+body.dark-mode .major-chapter-container:nth-of-type(6n+2) .major-chapter-btn { background-color: #27ae60; color: #e8f5e9; } /* Dark Green */
+body.dark-mode .major-chapter-container:nth-of-type(6n+3) .major-chapter-btn { background-color: #f39c12; color: #fef9e7; } /* Dark Yellow */
+body.dark-mode .major-chapter-container:nth-of-type(6n+4) .major-chapter-btn { background-color: #e67e22; color: #fdf3e6; } /* Dark Orange */
+body.dark-mode .major-chapter-container:nth-of-type(6n+5) .major-chapter-btn { background-color: #8e44ad; color: #f4ecf7; } /* Dark Purple/Pink */
+body.dark-mode .major-chapter-container:nth-of-type(6n+6) .major-chapter-btn { background-color: #795548; color: #efebe9; } /* Dark Brown */
+
+body.dark-mode .sub-menu-container { background: var(--ghibli-dark-submenu-bg); }
 body.dark-mode .sub-chapter-link {
-    background-color: #444;
-    color: #a0d8ef; /* Light blue links */
-    border-color: #555;
+    background-color: var(--ghibli-dark-subitem-bg);
+    color: var(--ghibli-dark-subitem-text);
+    border-color: var(--ghibli-dark-border);
     box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
 }
 body.dark-mode .sub-chapter-link:hover {
-    background-color: #555;
-    border-color: #a0d8ef;
+    background-color: var(--ghibli-dark-subitem-hover);
+    border-color: var(--ghibli-dark-subitem-text);
 }
 
-/* Dark mode Dialogue Box */
+/* Dark Dialogue Box */
 body.dark-mode #dialogue-box {
-  background: rgba(30, 30, 30, 0.9);
-  border-color: #555;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  background: var(--ghibli-dark-dialogue-bg);
+  border-color: var(--ghibli-dark-border-lighter);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
 }
-
+/* Dark Messages */
 body.dark-mode .message-container.system {
-    background-color: #2a2a2a; /* Darker grey */
-    color: #aaa;
+    background-color: rgba(40, 40, 40, 0.7);
+    color: var(--ghibli-dark-text-light);
 }
-
+body.dark-mode .message-container.system strong { color: var(--ghibli-dark-text); }
 body.dark-mode .message-container.ai,
 body.dark-mode .message-container.confucius {
-  background-color: #3a3a3a;
-  color: #dcdcdc;
+  background-color: var(--ghibli-dark-menu-item-bg);
+  color: var(--ghibli-dark-text);
   box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
 }
-
 body.dark-mode .message-container.user {
-  background-color: #2a5a2a;
-  color: #c8e6c9;
+  background-color: var(--ghibli-dark-accent-green);
+  color: var(--ghibli-dark-accent-green-light);
   box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
 }
-
-body.dark-mode #input-area .interaction-button {
-    background-color: #5a5a5a;
-    color: #e0e0e0;
+body.dark-mode .loading-message {
+    color: var(--ghibli-accent-orange-light);
+    background-color: rgba(90, 90, 90, 0.7);
 }
-body.dark-mode #input-area .interaction-button:hover:not(:disabled) { /* Add :not(:disabled) */
+
+/* Dark Input Area */
+body.dark-mode #input-area .interaction-button {
+    background-color: var(--ghibli-dark-accent-orange);
+    color: var(--ghibli-dark-accent-orange-light);
+}
+body.dark-mode #input-area .interaction-button:hover:not(:disabled) {
     background-color: #6a6a6a;
 }
-
 body.dark-mode #user-input-area textarea {
-    background-color: #444;
-    color: #e0e0e0;
-    border-color: #666;
+    background-color: var(--ghibli-dark-subitem-bg);
+    color: var(--ghibli-dark-text);
+    border-color: var(--ghibli-dark-border);
 }
 body.dark-mode #user-input-area textarea:focus {
-    border-color: #777;
-    box-shadow: 0 0 5px rgba(119, 119, 119, 0.5);
+    border-color: var(--ghibli-dark-border-lighter);
+    box-shadow: 0 0 5px rgba(119, 119, 119, 0.4);
 }
 body.dark-mode #user-input-area .send-button {
     background-color: #388e3c;
@@ -546,69 +625,72 @@ body.dark-mode #user-input-area .send-button:hover {
 }
 
 
-/* 響應式設計 */
+/* --- 響應式設計 --- */
 @media (max-width: 768px) {
-  body {
-      padding-bottom: calc(var(--footer-height) + 10px); /* Ensure padding for footer on mobile */
+  :root {
+      --top-bar-height: 50px; /* Smaller top bar on mobile */
+      --footer-height: 30px; /* Smaller footer on mobile */
   }
+  body {
+      padding-top: var(--top-bar-height);
+      padding-bottom: var(--footer-height);
+      line-height: 1.6; /* Adjust line height for mobile */
+  }
+
+  #top-bar {
+      height: var(--top-bar-height);
+      padding: 0 10px;
+  }
+  #toggle-menu-btn { padding: 0.4rem 0.8rem; font-size: 0.9rem; margin-right: 10px;}
+  #top-bar header h1 { font-size: 1.4em; }
+  #top-bar header #toggle-dark-btn { font-size: 1.3rem; padding: 0.2rem 0.5rem;}
+
   #container {
     flex-direction: column;
-    padding: 5px;
+    padding: 10px; /* Restore some padding */
   }
 
   #sidebar {
     width: 100%;
     margin-right: 0;
     margin-bottom: 1rem;
-    max-height: 40vh; /* Limit sidebar height on mobile */
+    max-height: 35vh; /* Further restrict sidebar height */
+    position: static; /* Sidebar no longer sticky */
+    order: 2; /* Display sidebar below main content */
+    padding-top: 0;
   }
 
   #main-content {
      max-width: 100%;
-     /* Ensure main content takes up remaining space */
-     min-height: calc(60vh - 50px); /* Adjust based on sidebar/header/footer */
+     min-height: auto; /* Let content determine height */
+     order: 1; /* Display main content first */
   }
 
-  header {
-      padding: 0.5rem;
+  footer {
+      height: var(--footer-height);
+      line-height: var(--footer-height);
+      font-size: 0.8em;
+      padding: 0 8px;
   }
-  header h1 {
-    font-size: 1.6em;
-  }
-
-  /* Footer height might need adjustment on mobile if needed */
 
   #dialogue-box {
     padding: 1rem;
     border-radius: 10px;
-    margin-top: 0.5rem;
   }
 
-  #messages {
-      min-height: 100px;
-      /* max-height removed, rely on flex-grow */
-  }
-   .message-container {
-       padding: 0.6rem 1rem;
-       font-size: 1.1rem;
-       max-width: 90%;
-   }
+  #messages { min-height: 100px; padding-right: 5px; }
+  .message-container { padding: 0.6rem 1rem; font-size: 1.05rem; max-width: 90%; }
+  .message-container.system { font-size: 0.95rem; }
 
-  #input-area {
-    gap: 0.5rem;
-  }
+
+  #input-area { gap: 0.5rem; }
   #input-area .interaction-button {
-    min-width: calc(50% - 0.25rem);
+    min-width: 150px; /* Adjusted min-width */
+    max-width: 100%; /* Allow full width if needed */
     font-size: 0.95rem;
     padding: 0.6rem 0.8rem;
   }
 
-  #user-input-area textarea {
-    font-size: 1rem;
-    min-height: 50px;
-  }
-  #user-input-area .send-button {
-    padding: 0.5rem 1.2rem;
-    font-size: 0.95rem;
-  }
+  #user-input-area textarea { font-size: 1rem; min-height: 50px; }
+  #user-input-area .send-button { padding: 0.5rem 1.2rem; font-size: 0.95rem; }
 }
