@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" href="https://raw.githubusercontent.com/gptv/suen/main/images/Avatar-small.jpeg" type="image/jpeg">
+  <!-- Favicons (保持不變) -->
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -16,41 +17,47 @@
     <!-- 左側：側邊欄 -->
     <aside id="sidebar">
       <!-- 切換顯示/隱藏目錄按鈕 -->
-     <button id="toggle-menu-btn">顯示目錄</button>
+     <button id="toggle-menu-btn" class="ghibli-button">顯示目錄</button>
       <!-- 兩級目錄：第一級目錄 -->
       <nav id="chapter-menu" style="display: none;"></nav>
+       <!-- 第二級目錄容器 (由 JS 動態填充) -->
+       <div id="sub-chapter-menu-container">
+           <nav id="sub-chapter-menu"></nav>
+       </div>
     </aside>
 
     <!-- 右側：主要內容 -->
     <div id="main-content">
       <header>
         <h1>AI論語</h1>
-<!-- 夜晚模式切換按鈕，僅顯示月亮 icon -->
-<button id="toggle-dark-btn" title="切換夜晚模式" style="font-size: 1.5rem; background: none; border: none; cursor: pointer;">🌓</button>
+        <!-- 夜晚模式切換按鈕 -->
+        <button id="toggle-dark-btn" title="切換夜晚模式" class="ghibli-button icon-button">🌓</button>
       </header>
 
       <!-- 用於顯示選中論語章節內容 -->
       <section id="chapter-content"></section>
 
       <!-- 互動對話窗口 -->
-      <section id="dialogue-box">
-        <div id="messages"></div>
-        <div id="input-area">
-          <!-- 三個互動入口 -->
-          <button onclick="sendChoice(1)">孔子：我該如何解釋這句？</button>
-          <button onclick="sendChoice(2)">Gemini AI：請給我現代解讀</button>
-          <button onclick="showInput()">自由提問</button>
-          <div id="custom-input" style="display:none;">
-            <input type="text" id="userQuestion" placeholder="請先讓AI解讀後，輸入你的問題，開始對話" />
-            <button onclick="sendCustomQuestion()">送出</button>
-          </div>
+      <section id="dialogue-box" class="ghibli-dialogue">
+        <div id="messages">
+            <!-- 對話內容由 JS 填充 -->
         </div>
+        <div id="input-area">
+          <!-- 兩個互動入口 -->
+          <button id="btn-yang" onclick="handleYangAnnotationClick()" class="ghibli-button interaction-button">楊伯峻「論語譯註」</button>
+          <button id="btn-gemini" onclick="handleGeminiAnalysisClick()" class="ghibli-button interaction-button">Gemini 解讀</button>
+        </div>
+         <!-- 用戶輸入區域 (預設隱藏) -->
+         <div id="user-input-area" style="display:none;" class="ghibli-input-area">
+            <textarea id="user-input" placeholder="請輸入你的問題，與孔子深入對話..." rows="3"></textarea>
+            <button id="send-input-btn" onclick="handleUserInput()" class="ghibli-button send-button">發送</button>
+          </div>
       </section>
     </div>
   </div>
 
   <footer style="text-align:center; margin-top:20px;">
-    <p>©Suen <a href="https://bdfz.net/posts/lunyu">About</a></p>
+    <p>©Suen <a href="https://bdfz.net/posts/lunyu" target="_blank" rel="noopener noreferrer">About</a></p>
   </footer>
 
   <script src="assets/js/app.js"></script>

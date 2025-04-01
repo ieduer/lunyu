@@ -1,4 +1,4 @@
-/* 引入匯文明朝體，請確保字體文件在 assets/fonts 目錄下 */
+/* 引入匯文明朝體 */
 @font-face {
   font-family: 'HuWenMingChaoTi';
   src: url('../fonts/HuWenMingChaoTi.woff2') format('woff2'),
@@ -10,238 +10,501 @@
 /* 全局樣式 */
 body {
   font-family: 'HuWenMingChaoTi', "Noto Serif TC", serif;
-  /* background: #f9f5e7;  <-- Comment out or remove the old background color */
-  color: #333;
+  color: #3d322b; /* 更柔和的深棕色 */
   margin: 0;
-  padding: 0 10px; /* Keep padding if you need spacing from viewport edges */
-  line-height: 1.6;
+  padding: 0; /* 移除全局 padding，讓背景圖完全填滿 */
+  line-height: 1.7; /* 稍微增加行高 */
 
-  /* --- Add these lines for the background image --- */
-  background-image: url('../img/bg.webp'); /* Path relative to the CSS file */
-  background-color: #f9f5e7; /* Fallback color if image doesn't load */
-  background-size: cover; /* Scale the image to cover the entire viewport */
-  background-position: center center; /* Center the image */
-  background-repeat: no-repeat; /* Prevent the image from tiling */
-  background-attachment: fixed; /* Keep the background fixed when scrolling */
-  min-height: 100vh; /* Ensure body takes at least full viewport height */
+  /* 背景圖樣式 (保持不變) */
+  background-image: url('../img/bg.webp');
+  background-color: #f9f5e7; /* Fallback color */
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+  display: flex; /* 使用 flex 佈局 */
+  justify-content: center; /* 水平居中主要內容 */
 }
 
-header, footer {
+/* 容器佈局：左右兩欄 */
+#container {
+  display: flex;
+  width: 100%;
+  max-width: 1200px; /* 限制最大寬度 */
+  margin: 0 auto; /* 頁面居中 */
+  padding: 10px; /* 在容器內部加回一些邊距 */
+  box-sizing: border-box;
+}
+
+#sidebar {
+  width: 250px; /* 側邊欄固定寬度 */
+  margin-right: 20px;
+  flex-shrink: 0; /* 防止側邊欄被壓縮 */
+  padding-top: 1rem; /* 給頂部一些空間 */
+}
+
+#main-content {
+  flex-grow: 1; /* 主內容區佔滿剩餘空間 */
+  max-width: 800px; /* 限制主內容區的最大寬度 */
+}
+
+
+header {
   text-align: center;
-  padding: 1rem;
+  padding: 1rem 0; /* 調整 padding */
+  position: relative; /* 為了定位夜晚模式按鈕 */
+  color: #5a4a42; /* 標題顏色 */
 }
 
 h1 {
-  font-size: 2em;
+  font-size: 2.2em; /* 稍微加大 */
   margin-bottom: 0.5em;
+  font-weight: 600; /* 加粗一點 */
+  color: #4a3f35;
 }
 
-/* 夜晚模式（通過 body.dark-mode 啟用） */
-body.dark-mode {
-  background: #1a1a1a;
-  color: #f0f0f0;
+footer {
+  color: #6b5f55; /* 頁腳顏色 */
+  font-size: 0.9em;
+}
+footer a {
+  color: #8c7b70;
+  text-decoration: none;
+}
+footer a:hover {
+  color: #5a4a42;
 }
 
-body.dark-mode header,
-body.dark-mode footer {
-  background: #1a1a1a;
-}
 
-body.dark-mode #dialogue-box,
-body.dark-mode #chapter-menu,
-body.dark-mode #chapter-content {
-  background: #2a2a2a;
-  border-color: #444;
-}
-
-/* 切換目錄按鈕 */
-#toggle-menu-btn {
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
-  margin-bottom: 1rem;
+/* --- Ghibli 風格按鈕 --- */
+.ghibli-button {
+  font-family: 'HuWenMingChaoTi', "Noto Serif TC", serif;
+  border: none; /* 移除默認邊框 */
+  border-radius: 12px; /* 更圓潤的邊角 */
+  background-color: #a0d8ef; /* 淡藍色背景 */
+  color: #3d5a66; /* 深藍灰色文字 */
+  padding: 0.6rem 1.2rem; /* 調整內邊距 */
+  font-size: 1rem; /* 基礎字號 */
   cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* 微妙陰影 */
+  margin: 0.2rem; /* 按鈕間加點間距 */
+  text-align: center;
 }
 
-/* 主要內容區域寬度限制 */
-main {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 1rem;
+.ghibli-button:hover {
+  background-color: #87ceeb; /* 懸停時變亮 */
+  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.15);
 }
 
-/* 目錄區：可自動換行，避免溢出 */
-#chapter-menu {
+.ghibli-button:active {
+  transform: translateY(1px); /* 按下效果 */
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 圖標按鈕 (夜晚模式) */
+.icon-button {
+  font-size: 1.5rem;
+  padding: 0.3rem 0.6rem; /* 調整 padding 適應圖標 */
+  position: absolute; /* 定位到 header 右上角 */
+  top: 1rem;
+  right: 1rem;
+  background: none; /* 透明背景 */
+  box-shadow: none; /* 無陰影 */
+  color: #8c7b70; /* 初始顏色 */
+}
+.icon-button:hover {
+  background: none;
+  color: #5a4a42; /* 懸停顏色 */
+  box-shadow: none;
+}
+.icon-button:active {
+  transform: scale(0.95); /* 按下縮小 */
+}
+
+/* 目錄切換按鈕 */
+#toggle-menu-btn {
+  width: 100%; /* 佔滿側邊欄寬度 */
   margin-bottom: 1rem;
-  background: #fff;
-  border: 1px solid #ddd;
+  background-color: #f6e4a8; /* 淡黃色 */
+  color: #7b6a4c;
+}
+#toggle-menu-btn:hover {
+  background-color: #f4d992;
+}
+
+/* 目錄區域 */
+#chapter-menu, #sub-chapter-menu {
+  margin-bottom: 1rem;
+  background: rgba(255, 255, 255, 0.7); /* 半透明背景，看到一點背景圖 */
+  backdrop-filter: blur(5px); /* 毛玻璃效果 */
+  border: 1px solid #e0d8cc; /* 淺邊框 */
   padding: 1rem;
-  /* 如果資料實在很多, 也可考慮:
-     white-space: nowrap; overflow-x: auto;
-     flex-wrap: nowrap;
-  */
+  border-radius: 8px; /* 圓角 */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-#chapter-menu ul {
-  list-style: none;
-  padding-left: 1.2rem;
+/* 目錄網格佈局 (保持 JS 控制) */
+#chapter-menu div, #sub-chapter-menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* 自適應列數 */
+  gap: 0.6rem; /* 網格間距 */
 }
 
-#chapter-menu li {
-  margin: 0.5rem 0;
+/* 目錄項按鈕/鏈接 */
+#chapter-menu button, #sub-chapter-menu a {
+  width: 100%;
+  padding: 0.5rem; /* 調整內邊距 */
+  font-size: 0.95rem; /* 稍小字號 */
+  background-color: #e6f2ff; /* 更淡的藍色 */
+  color: #336699;
+  text-decoration: none; /* for <a> */
+  border-radius: 8px;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.05);
+}
+#chapter-menu button:hover, #sub-chapter-menu a:hover {
+  background-color: #d0e6ff;
+}
+/* 子目錄容器 (確保存在) */
+#sub-chapter-menu-container {
+    margin-top: 1rem;
 }
 
 /* 章節內容區塊 */
 #chapter-content {
-  padding: 1rem;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-bottom: 1rem;
+  padding: 1.5rem; /* 增加內邊距 */
+  background: rgba(255, 255, 255, 0.8); /* 更不透明一些 */
+  backdrop-filter: blur(8px);
+  border: 1px solid #e0d8cc;
+  border-radius: 10px; /* 更大的圓角 */
+  margin-bottom: 1.5rem;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+}
+#chapter-content h2 {
+  font-size: 1.8em; /* 標題字號 */
+  color: #5a4a42;
+  margin-bottom: 0.8rem;
+  font-weight: 500;
+}
+#chapter-content p {
+  font-size: 1.4rem; /* 論語正文字號增大 (原1em + 增加2號左右) */
+  line-height: 1.8; /* 調整行高 */
+  color: #4a3f35; /* 深一點的文字顏色 */
+  margin-bottom: 1em;
 }
 
-/* 對話窗口樣式 */
+/* --- Ghibli 風格對話框 --- */
 #dialogue-box {
   padding: 1.5rem;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  background: rgba(245, 240, 230, 0.85); /* 溫暖的米白色背景，半透明 */
+  backdrop-filter: blur(10px);
+  border: 1px solid #d8cfc0; /* 柔和邊框 */
+  border-radius: 15px; /* 圓角 */
   margin-bottom: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 更明顯的陰影 */
 }
 
+/* 對話消息區域 */
 #messages {
-  min-height: 150px;
+  min-height: 200px; /* 增加最小高度 */
+  max-height: 50vh; /* 限制最大高度，超出滾動 */
+  overflow-y: auto; /* 內容超出時顯示滾動條 */
   margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column; /* 消息垂直排列 */
+  gap: 0.8rem; /* 消息之間的間距 */
 }
 
-/* 按鈕共同樣式 */
-button {
-  border: 1px solid #0077cc;
-  border-radius: 5px;
-  background: #e0f0ff;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+/* 單條消息容器 */
+.message-container {
+  padding: 0.8rem 1.2rem;
+  border-radius: 18px; /* 聊天氣泡圓角 */
+  max-width: 75%; /* 最大寬度，防止佔滿整行 */
+  word-wrap: break-word; /* 自動換行 */
+  font-size: 1.2rem; /* 對話字號增大 (原1em + 增加2號左右) */
+  line-height: 1.6;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.07);
+}
+.message-container p { /* 確保消息內的段落有合適間距 */
+    margin-bottom: 0.5em;
+    line-height: 1.6; /* 繼承或設置獨立行高 */
+}
+.message-container p:last-child {
+    margin-bottom: 0; /* 移除最後一段的下邊距 */
 }
 
-button:hover {
-  background: #cce4ff;
+/* AI/系統消息 (左側) */
+.message-container.ai,
+.message-container.confucius,
+.message-container.system {
+  background-color: #ffffff; /* 白色背景 */
+  color: #4a3f35;
+  margin-right: auto; /* 推到左邊 */
+  border-top-left-radius: 5px; /* 左上角直一點 */
+  text-align: left;
+}
+/* loading 樣式 */
+.loading-message {
+    font-style: italic;
+    color: #888;
+    animation: blink 1.5s linear infinite; /* 閃爍動畫 */
+}
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1; }
 }
 
-button:active {
-  transform: translateY(1px);
+
+/* 用戶消息 (右側) */
+.message-container.user {
+  background-color: #dcf8c6; /* 淡綠色背景 */
+  color: #556B2F; /* 深綠色文字 */
+  margin-left: auto; /* 推到右邊 */
+  border-top-right-radius: 5px; /* 右上角直一點 */
+  text-align: left; /* 雖然靠右，但文字還是左對齊好看 */
 }
 
-/* 選項按鈕樣式 */
+/* 交互按鈕區域 */
 #input-area {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* 允許換行 */
   gap: 0.8rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem; /* 與下方輸入區的間距 */
+  justify-content: center; /* 按鈕居中 */
 }
 
-#input-area button {
-  flex-grow: 1;
-  min-width: 150px;
-  max-width: 100%;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
+#input-area .interaction-button {
+  flex-grow: 1; /* 允許按鈕伸展 */
+  min-width: 180px; /* 最小寬度 */
+  max-width: calc(50% - 0.4rem); /* 每行最多2個 */
+  padding: 0.7rem 1rem;
+  font-size: 1.05rem;
+  background-color: #ffcc80; /* 橙黃色 */
+  color: #8f5d00;
+}
+#input-area .interaction-button:hover {
+    background-color: #ffb74d;
 }
 
-/* 自由提問輸入框 */
-#custom-input {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
+/* --- 用戶輸入區域樣式 --- */
+#user-input-area {
+  display: flex; /* 改為 flex 佈局 */
+  flex-direction: column; /* 垂直排列 */
   gap: 0.8rem;
-  margin-top: 1rem;
+  margin-top: 1rem; /* 與上方按鈕區的間距 */
+  align-items: flex-end; /* 送出按鈕靠右 */
 }
 
-/* 放大輸入框：增加寬度與高度 */
-#custom-input input[type="text"] {
+#user-input-area textarea {
   width: 100%;
-  height: 3rem;
   padding: 0.8rem;
-  font-size: 1rem;
+  font-size: 1.1rem; /* 輸入框字號 */
+  font-family: inherit; /* 繼承字體 */
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 10px;
   box-sizing: border-box;
+  resize: vertical; /* 允許垂直調整大小 */
+  background-color: #fff;
+  color: #333;
+  min-height: 60px; /* 最小高度 */
 }
 
-#custom-input input[type="text"]:focus {
-  border-color: #0077cc;
+#user-input-area textarea:focus {
+  border-color: #a0d8ef;
   outline: none;
-  box-shadow: 0 0 3px rgba(0, 119, 204, 0.3);
+  box-shadow: 0 0 5px rgba(160, 216, 239, 0.5);
 }
 
-/* 送出按鈕樣式 */
-#custom-input button {
-  width: 100%;
-  padding: 0.7rem 1.2rem;
+#user-input-area .send-button {
+  padding: 0.6rem 1.5rem; /* 調整 padding */
   font-size: 1rem;
-  background-color: #0077cc;
-  color: white;
-  border: none;
-  border-radius: 5px;
+  background-color: #81c784; /* 綠色 */
+  color: #1b5e20;
+  min-width: 100px; /* 設置最小寬度 */
+  align-self: flex-end; /* 確保按鈕在 flex 容器中靠右 */
 }
+#user-input-area .send-button:hover {
+    background-color: #66bb6a;
+}
+
+
+/* --- 夜晚模式 --- */
+body.dark-mode {
+  background-color: #1a1a1a; /* 深色背景 */
+  background-image: none; /* 移除背景圖 */
+  color: #dcdcdc; /* 淺灰色文字 */
+}
+
+body.dark-mode header h1,
+body.dark-mode header #toggle-dark-btn {
+  color: #e0e0e0;
+}
+body.dark-mode footer, body.dark-mode footer a {
+  color: #a0a0a0;
+}
+body.dark-mode footer a:hover {
+  color: #c0c0c0;
+}
+
+/* 深色模式 Ghibli 按鈕 */
+body.dark-mode .ghibli-button {
+  background-color: #2c3e50; /* 深藍灰 */
+  color: #ecf0f1; /* 淺灰文字 */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+body.dark-mode .ghibli-button:hover {
+  background-color: #34495e;
+  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.4);
+}
+body.dark-mode .ghibli-button:active {
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+body.dark-mode #toggle-menu-btn {
+    background-color: #4a4a4a;
+    color: #e0e0e0;
+}
+body.dark-mode #toggle-menu-btn:hover {
+    background-color: #5a5a5a;
+}
+body.dark-mode #chapter-menu button, body.dark-mode #sub-chapter-menu a {
+    background-color: #3a3a3a;
+    color: #c0c0c0;
+    border-color: #555;
+     box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+body.dark-mode #chapter-menu button:hover, body.dark-mode #sub-chapter-menu a:hover {
+    background-color: #4a4a4a;
+}
+
+
+body.dark-mode #chapter-content {
+  background: rgba(42, 42, 42, 0.85); /* 深灰背景 */
+  border-color: #444;
+  color: #dcdcdc;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+}
+body.dark-mode #chapter-content h2 {
+  color: #e8e8e8;
+}
+body.dark-mode #chapter-content p {
+    color: #cccccc;
+}
+
+body.dark-mode #dialogue-box {
+  background: rgba(30, 30, 30, 0.9); /* 更深的對話框背景 */
+  border-color: #555;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode #messages {
+    /* 可選：調整滾動條樣式 */
+}
+
+body.dark-mode .message-container.ai,
+body.dark-mode .message-container.confucius,
+body.dark-mode .message-container.system {
+  background-color: #3a3a3a; /* AI 消息背景 */
+  color: #dcdcdc;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+body.dark-mode .message-container.user {
+  background-color: #2a5a2a; /* 用戶消息背景 */
+  color: #c8e6c9; /* 用戶消息文字 */
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+body.dark-mode #input-area .interaction-button {
+    background-color: #5a5a5a;
+    color: #e0e0e0;
+}
+body.dark-mode #input-area .interaction-button:hover {
+    background-color: #6a6a6a;
+}
+
+body.dark-mode #user-input-area textarea {
+    background-color: #444;
+    color: #e0e0e0;
+    border-color: #666;
+}
+body.dark-mode #user-input-area textarea:focus {
+    border-color: #777;
+    box-shadow: 0 0 5px rgba(119, 119, 119, 0.5);
+}
+body.dark-mode #user-input-area .send-button {
+    background-color: #388e3c;
+    color: #e8f5e9;
+}
+body.dark-mode #user-input-area .send-button:hover {
+    background-color: #4caf50;
+}
+
 
 /* 響應式設計 */
 @media (max-width: 768px) {
-  body {
-    padding: 0;
+  #container {
+    flex-direction: column; /* 變為垂直佈局 */
+    padding: 5px;
   }
 
-  main {
-    padding: 0 0.5rem;
+  #sidebar {
+    width: 100%; /* 側邊欄佔滿寬度 */
+    margin-right: 0;
+    margin-bottom: 1rem;
   }
 
-  h1 {
-    font-size: 1.5em;
+  #main-content {
+     max-width: 100%; /* 移除最大寬度限制 */
+  }
+
+  header h1 {
+    font-size: 1.8em;
+  }
+   header #toggle-dark-btn {
+       top: 0.5rem;
+       right: 0.5rem;
+   }
+
+  #chapter-content {
+      padding: 1rem;
+  }
+  #chapter-content p {
+      font-size: 1.2rem; /* 移動端稍微縮小字號 */
+      line-height: 1.7;
   }
 
   #dialogue-box {
     padding: 1rem;
+    border-radius: 10px;
   }
+
+  #messages {
+      min-height: 150px;
+      max-height: 40vh; /* 移動端限制高度 */
+  }
+   .message-container {
+       padding: 0.6rem 1rem;
+       font-size: 1.1rem; /* 移動端對話字號 */
+       max-width: 85%; /* 允許更寬 */
+   }
 
   #input-area {
     gap: 0.5rem;
   }
-
-  #input-area button {
-    padding: 0.6rem;
+  #input-area .interaction-button {
+    min-width: calc(50% - 0.25rem); /* 每行兩個 */
     font-size: 0.95rem;
-    min-width: 120px;
+    padding: 0.6rem 0.8rem;
   }
 
-  #custom-input input[type="text"] {
-    height: 2.5rem;
-    padding: 0.6rem;
+  #user-input-area textarea {
+    font-size: 1rem;
+    min-height: 50px;
   }
-}
-
-/* 深色模式支持 (可選) */
-@media (prefers-color-scheme: dark) {
-  body {
-    background: #1a1a1a;
-    color: #f0f0f0;
-  }
-
-  #dialogue-box {
-    background: #2a2a2a;
-    border-color: #444;
-  }
-
-  button {
-    background: #1a3d66;
-    border-color: #2a5a8a;
-    color: #f0f0f0;
-  }
-
-  button:hover {
-    background-color: #2a5a8a;
-  }
-
-  #custom-input input[type="text"] {
-    background: #333;
-    color: #f0f0f0;
-    border-color: #555;
+  #user-input-area .send-button {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.95rem;
   }
 }
