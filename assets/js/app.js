@@ -1,4 +1,4 @@
-const CLOUD_FLARE_WORKER_URL = "https://apis.bdfz.workers.dev/";
+const CLOUD_FLARE_WORKER_URL = "https://ai.bdfz.net/";
 
 // ----- 狀態變數 -----
 let currentAnalect = null;
