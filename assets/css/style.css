@@ -56,7 +56,11 @@
     --ghibli-dark-header-bg: rgba(30, 30, 30, 0.9); /* Dark Header BG */
 }
 
-html { box-sizing: border-box; }
+html {
+  box-sizing: border-box;
+  /* --- MODIFIED --- Prevent page scroll on desktop */
+  overflow: hidden;
+}
 *, *:before, *:after { box-sizing: inherit; }
 
 body {
@@ -64,17 +68,21 @@ body {
   color: var(--ghibli-text);
   margin: 0;
   padding: 0;
-  padding-bottom: var(--footer-height); /* Keep padding for footer */
+  /* --- REMOVED --- padding-bottom: var(--footer-height); Footer is fixed, no padding needed */
   line-height: 1.7;
   background-image: url('../img/bg.webp');
   background-color: var(--ghibli-bg);
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-  background-attachment: fixed;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
+  background-attachment: fixed; /* Keep fixed background */
+  /* --- MODIFIED --- Set explicit height and prevent body scroll on desktop */
+  height: 100vh;
+  overflow: hidden;
+  display: flex; /* Keep flex for centering container */
+  justify-content: center; /* Keep centering container */
+  /* --- ADDED --- Align container to top */
+  align-items: flex-start;
 }
 
 /* --- Main Content Container --- */
@@ -84,18 +92,21 @@ body {
   max-width: 1200px;
   padding: 15px;
   align-items: flex-start;
+  /* --- MODIFIED --- Take full available height minus padding */
+  height: 100vh; /* Let container fill viewport height */
+  padding-bottom: calc(var(--footer-height) + 15px); /* Add padding to prevent content overlap with fixed footer */
 }
 
 #sidebar {
   width: 280px;
   margin-right: 20px;
   flex-shrink: 0;
-  /* Max height considering ONLY footer and container padding */
-  max-height: calc(100vh - var(--footer-height) - 30px);
-  overflow-y: auto;
-  position: sticky; /* Keep sidebar sticky to the top of the container */
-  top: 15px; /* Stick relative to container padding */
+  /* --- REMOVED --- max-height, overflow-y, position: sticky, top */
+  /* --- ADDED --- Ensure it doesn't exceed container height if content is very long, but don't force scroll */
+  max-height: calc(100vh - var(--footer-height) - 30px); /* Optional: Prevent extreme overflow */
   padding-top: 0;
+  /* --- ADDED --- Let sidebar scroll IF its content exceeds max-height */
+  overflow-y: auto; /* Restore scrolling for sidebar itself if needed */
 }
 
 /* Toggle button moved inside sidebar */
@@ -115,22 +126,27 @@ body {
 
 #main-content {
   flex-grow: 1;
-  max-width: 800px;
+  /* --- MODIFIED --- Remove max-width or adjust as needed for right column */
+  /* max-width: 800px; */
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - var(--footer-height) - 30px);
-  position: relative;
+  /* --- MODIFIED --- Occupy full height of the container */
+  height: 100%;
+  /* --- MODIFIED --- Make this the scrolling container */
+  overflow-y: auto;
+  position: relative; /* Keep for potential absolute children */
+  /* --- REMOVED --- min-height */
 }
 
 /* Sticky Header within Main Content */
 #main-content > header {
-    position: sticky; /* Stick to top of main-content */
+    position: sticky; /* Stick to top of main-content scrolling container */
     top: 0; /* Stick right at the top */
     background: var(--ghibli-header-bg); /* Use variable */
     backdrop-filter: blur(8px);
-    z-index: 1050; /* Above dialogue, below footer/modals */
+    z-index: 10; /* Needs to be above content within main-content */
     padding: 10px 15px; /* Padding inside header */
-    margin-bottom: 1rem; /* Space below header before dialogue box */
+    /* --- REMOVED --- margin-bottom: 1rem; Let dialogue box handle its own top margin/padding */
     border-bottom: 1px solid rgba(216, 207, 192, 0.6); /* Match footer */
 
     /* Flex layout for title and button */
@@ -138,6 +154,7 @@ body {
     align-items: center;
     justify-content: center; /* Center title by default */
     position: relative; /* For absolute positioning moon button */
+    flex-shrink: 0; /* --- ADDED --- Prevent header from shrinking */
 }
 
 #main-content > header h1 {
@@ -162,7 +179,7 @@ body {
 }
 
 
-/* Footer Styles (Unchanged) */
+/* Footer Styles (Unchanged - Fixed position works fine) */
 footer {
   position: fixed; bottom: 0; left: 0; width: 100%; height: var(--footer-height);
   background: var(--ghibli-header-bg); backdrop-filter: blur(8px); color: var(--ghibli-text-light);
@@ -230,19 +247,29 @@ footer a:hover { color: var(--ghibli-accent-blue-dark); }
 /* --- 對話框 --- */
 #dialogue-box {
   padding: 1.5rem; background: var(--ghibli-dialogue-bg); backdrop-filter: blur(10px); border: 1px solid var(--ghibli-border-darker);
-  border-radius: 12px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1); flex-grow: 1; display: flex; flex-direction: column;
-  overflow: hidden; margin-top: 0;
+  border-radius: 12px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  flex-grow: 1; /* Allow dialogue box to fill remaining space in main-content */
+  display: flex;
+  flex-direction: column;
+  /* --- REMOVED --- overflow: hidden; Parent (#main-content) now handles scroll */
+  /* --- ADDED --- Margin top to create space below sticky header */
+  margin-top: 1rem;
 }
-#messages {
-  min-height: 150px; flex-grow: 1; overflow-y: auto; margin-bottom: 1.5rem; display: flex; flex-direction: column;
-  gap: 0.8rem; padding-right: 8px;
-}
-#messages::-webkit-scrollbar { width: 6px; }
-#messages::-webkit-scrollbar-track { background: transparent; }
-#messages::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 3px; }
-#messages::-webkit-scrollbar-thumb:hover { background-color: rgba(0,0,0,0.25); }
 
-/* Message Bubbles */
+#messages {
+  /* --- REMOVED --- min-height: 150px; Not strictly needed if dialogue-box grows */
+  flex-grow: 1; /* Let messages fill available space within dialogue-box */
+  /* --- REMOVED --- overflow-y: auto; Parent (#main-content) handles scroll */
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding-right: 8px; /* Keep padding for potential scrollbar space from parent */
+}
+/* --- REMOVED --- Scrollbar styles for #messages, as it no longer scrolls independently */
+
+
+/* Message Bubbles (Unchanged) */
 .message-container {
   padding: 0.8rem 1.2rem; border-radius: 15px; max-width: 85%; word-wrap: break-word; font-size: 1.15rem;
   line-height: 1.6; box-shadow: 1px 1px 3px rgba(0,0,0,0.07);
@@ -251,7 +278,7 @@ footer a:hover { color: var(--ghibli-accent-blue-dark); }
 .message-container p:last-child { margin-bottom: 0; }
 .message-container strong { font-weight: 600; color: var(--ghibli-text); }
 
-/* System & Initial Message */
+/* System & Initial Message (Unchanged) */
 .message-container.system, .message-container.initial {
     background-color: rgba(230, 230, 230, 0.7); color: var(--ghibli-text-light); font-style: italic; max-width: 95%;
     text-align: center; margin-left: auto; margin-right: auto; border-radius: 8px; font-size: 1.05rem;
@@ -259,11 +286,10 @@ footer a:hover { color: var(--ghibli-accent-blue-dark); }
 .message-container.system strong, .message-container.initial strong {
     color: var(--ghibli-text); font-size: 1.1em; display: block; margin-bottom: 0.3em; font-style: normal;
 }
-.message-container.initial p { font-style: normal; } /* Ensure initial text isn't italic */
-.message-container.initial p:last-of-type { font-style: italic; } /* Keep last prompt italic if needed */
+.message-container.initial p { font-style: normal; }
+.message-container.initial p:last-of-type { font-style: italic; }
 
-
-/* --- Style for Enlarged Chapter Text --- */
+/* --- Style for Enlarged Chapter Text --- (Unchanged) */
 .message-container.chapter-display {
     background-color: rgba(255, 250, 240, 0.8); text-align: left; font-style: normal;
     max-width: 100%; border-radius: 10px;
@@ -272,32 +298,27 @@ footer a:hover { color: var(--ghibli-accent-blue-dark); }
     font-size: 1.3em; color: var(--ghibli-text); display: block; margin-bottom: 0.6em;
 }
 .message-container.chapter-display p {
-    /* Base font size * multiplier or fixed rem value */
-    /* Assuming 1.15rem base => 1.15 * 1.5 = ~1.7rem OR fixed 1.8rem */
-    font-size: 1.8rem; /* Enlarged font size +3 levels approx */
-    line-height: 1.8;
-    color: var(--ghibli-text);
-    font-style: normal;
+    font-size: 1.8rem; line-height: 1.8; color: var(--ghibli-text); font-style: normal;
 }
 
-/* AI/Confucius Message */
+/* AI/Confucius Message (Unchanged) */
 .message-container.ai, .message-container.confucius {
   background-color: #ffffff; color: var(--ghibli-text); margin-right: auto; border-top-left-radius: 5px; text-align: left;
 }
-/* Loading Message */
+/* Loading Message (Unchanged) */
 .loading-message {
     font-style: italic; color: var(--ghibli-accent-orange-dark); animation: blink 1.5s linear infinite;
     background-color: rgba(255, 230, 200, 0.7); text-align: center; margin-left: auto; margin-right: auto;
     border-radius: 10px; max-width: 90%;
 }
 @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-/* User Message */
+/* User Message (Unchanged) */
 .message-container.user {
   background-color: var(--ghibli-accent-green); color: var(--ghibli-accent-green-dark); margin-left: auto;
   border-top-right-radius: 5px; text-align: left;
 }
 
-/* Interaction Button Area */
+/* Interaction Button Area (Unchanged within dialogue-box) */
 #input-area { display: flex; gap: 0.8rem; margin-bottom: 1rem; justify-content: center; flex-shrink: 0; }
 #input-area .interaction-button {
   flex-grow: 0; min-width: 200px; max-width: 300px; padding: 0.7rem 1rem; font-size: 1.05rem;
@@ -305,7 +326,7 @@ footer a:hover { color: var(--ghibli-accent-blue-dark); }
 }
 #input-area .interaction-button:hover:not(:disabled) { background-color: #ffb74d; }
 
-/* User Input Area */
+/* User Input Area (Unchanged within dialogue-box) */
 #user-input-area { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem; align-items: flex-end; flex-shrink: 0; }
 #user-input-area textarea {
   width: 100%; padding: 0.8rem; font-size: 1.1rem; font-family: inherit; border: 1px solid var(--ghibli-border);
@@ -378,20 +399,85 @@ body.dark-mode #user-input-area .send-button:hover { background-color: #4caf50; 
 
 /* --- 響應式設計 --- */
 @media (max-width: 768px) {
-  body { padding-bottom: var(--footer-height); }
-  #container { flex-direction: column; padding: 10px; }
-  #sidebar { width: 100%; margin-right: 0; margin-bottom: 1rem; max-height: 40vh; position: static; order: 2; padding-top: 0; }
+  /* --- MODIFIED --- Allow page scroll on mobile */
+  html { overflow: auto; }
+  body {
+      /* --- MODIFIED --- Allow natural height and page scroll */
+      height: auto;
+      overflow: auto;
+      /* --- ADDED --- Restore padding-bottom for footer space */
+      padding-bottom: var(--footer-height);
+  }
+
+  #container {
+      flex-direction: column;
+      padding: 10px;
+      /* --- MODIFIED --- Allow natural height */
+      height: auto;
+      padding-bottom: 10px; /* Reset container padding */
+  }
+
+  #sidebar {
+      width: 100%;
+      margin-right: 0;
+      margin-left: 0; /* --- ADDED --- Reset desktop margin */
+      margin-bottom: 1rem;
+      /* --- MODIFIED --- Restore max-height and overflow for mobile */
+      max-height: 40vh;
+      overflow-y: auto;
+      /* --- MODIFIED --- Ensure correct stacking order */
+      order: 2;
+      padding-top: 0;
+  }
+
   #toggle-menu-btn { margin-bottom: 0.8rem; }
-  #main-content { max-width: 100%; min-height: auto; order: 1; }
-  #main-content > header { padding: 8px 10px; margin-bottom: 0.8rem; }
+
+  #main-content {
+      /* --- MODIFIED --- Allow natural height and remove forced scroll */
+      height: auto;
+      overflow-y: visible; /* Let page scroll handle content */
+      /* --- REMOVED --- max-width: 100%; (already default) */
+      min-height: auto; /* Already set, but confirm */
+      /* --- MODIFIED --- Ensure correct stacking order */
+      order: 1;
+  }
+
+  #main-content > header {
+      padding: 8px 10px;
+      /* --- ADDED --- Make header static on mobile (or keep sticky if preferred relative to viewport) */
+      position: static; /* Simpler for mobile */
+      /* --- ADDED --- Restore margin-bottom */
+      margin-bottom: 0.8rem;
+  }
   #main-content > header h1 { font-size: 1.3em; padding: 0 35px; }
   #main-content > header #toggle-dark-btn { font-size: 1.2rem; padding: 0.2rem 0.5rem; right: 10px; }
-  footer { height: var(--footer-height); line-height: var(--footer-height); font-size: 0.75em; padding: 0 8px; }
-  #dialogue-box { padding: 0.8rem; border-radius: 10px; }
-  #messages { min-height: 100px; padding-right: 5px; gap: 0.6rem; }
-  .message-container { padding: 0.6rem 1rem; font-size: 1.0rem; max-width: 90%; border-radius: 12px; } /* Reduced mobile font */
-  .message-container.system, .message-container.initial { font-size: 0.85rem; } /* Smaller system font */
-  .message-container.chapter-display p { font-size: 1.4rem; line-height: 1.7; } /* Adjusted enlarged size */
+
+  footer {
+      /* --- MODIFIED --- Ensure footer is fixed or static depending on desired mobile behavior. Fixed is usually fine. */
+      height: var(--footer-height);
+      line-height: var(--footer-height);
+      font-size: 0.75em;
+      padding: 0 8px;
+  }
+
+  #dialogue-box {
+      padding: 0.8rem;
+      border-radius: 10px;
+      /* --- ADDED --- Reset margin-top if header is static */
+      margin-top: 0;
+  }
+
+  #messages {
+      /* --- REMOVED --- min-height: 100px; */
+      padding-right: 5px;
+      gap: 0.6rem;
+      /* --- REMOVED --- overflow-y: visible; Let page scroll */
+  }
+
+  /* Other mobile adjustments remain the same */
+  .message-container { padding: 0.6rem 1rem; font-size: 1.0rem; max-width: 90%; border-radius: 12px; }
+  .message-container.system, .message-container.initial { font-size: 0.85rem; }
+  .message-container.chapter-display p { font-size: 1.4rem; line-height: 1.7; }
   .message-container.chapter-display strong { font-size: 1.1em; margin-bottom: 0.4em;}
   #input-area { gap: 0.5rem; margin-bottom: 0.8rem; }
   #input-area .interaction-button { min-width: 180px; font-size: 0.9rem; padding: 0.5rem 0.7rem; }
