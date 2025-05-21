@@ -484,3 +484,25 @@ body.dark-mode #user-input-area .send-button:hover { background-color: #4caf50; 
   #user-input-area textarea { font-size: 0.95rem; min-height: 45px; }
   #user-input-area .send-button { padding: 0.4rem 1rem; font-size: 0.9rem; }
 }
+
+/* Styling for the copy button in message containers */
+.message-container mo-copy-button {
+  font-size: 16px; /* Adjust as needed, similar to Metso documentation */
+  margin-left: 8px; /* Space between message text and button */
+  vertical-align: middle; /* Align with text if text is not in a block */
+  display: inline-flex; /* Helps with alignment and sizing */
+  align-items: center; /* Vertically center icon within button */
+}
+
+/* Adjustments for message content when a copy button is present */
+.message-container > span[id^="message-content-"] {
+  display: inline-block; /* Or 'flex-grow: 1' if message-container is flex */
+  max-width: calc(100% - 30px); /* Adjust 30px based on button size + margin */
+}
+
+/* Ensure message container can hold content and button */
+.message-container.ai, .message-container.confucius {
+  display: flex; /* Use flexbox for better alignment */
+  align-items: flex-start; /* Align items to the start of the cross axis */
+  justify-content: space-between; /* Puts space between message and button */
+}
