@@ -229,7 +229,21 @@ function addMessage(messageText, sender = "system", isError = false) {
         messageContainer.classList.add('loading-message');
         messageContainer.innerHTML = `<p>${messageText}</p>`;
         currentLoadingElement = messageContainer; // Track loading message
-    } else {
+    } else if (sender === 'ai' || sender === 'confucius') {
+        const messageContentId = `message-content-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+        const contentSpan = document.createElement('span');
+        contentSpan.id = messageContentId;
+        contentSpan.innerHTML = formatMessageText(messageText);
+
+        messageContainer.innerHTML = ''; // Clear existing content
+        messageContainer.appendChild(contentSpan);
+
+        const copyButton = document.createElement('mo-copy-button');
+        copyButton.setAttribute('from', messageContentId);
+        copyButton.setAttribute('copy-label', '複製'); // Optional: Add a label
+        messageContainer.appendChild(copyButton);
+    }
+    else {
         // Apply strong tag styling within the formatted HTML
         messageContainer.innerHTML = formatMessageText(messageText);
     }
@@ -239,6 +253,7 @@ function addMessage(messageText, sender = "system", isError = false) {
     messagesEl.scrollTop = messagesEl.scrollHeight;
 
     // Add to history only if it's user or AI/Confucius response
+    // Make sure to push the original messageText, not the HTML content
     if (sender === 'user' || sender === 'ai' || sender === 'confucius') {
         conversationHistory.push({ role: sender, content: messageText });
     }
