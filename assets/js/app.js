@@ -229,7 +229,7 @@ function addMessage(messageText, sender = "system", isError = false) {
         messageContainer.classList.add('loading-message');
         messageContainer.innerHTML = `<p>${messageText}</p>`;
         currentLoadingElement = messageContainer; // Track loading message
-    } else if (sender === 'ai' || sender === 'confucius') {
+    } else if (sender === 'ai' || sender === 'confucius' || sender === 'user') {
         const messageContentId = `message-content-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
         const contentSpan = document.createElement('span');
         contentSpan.id = messageContentId;
