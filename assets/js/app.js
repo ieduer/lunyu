@@ -209,8 +209,20 @@ function disableInteractionButtons(permanently = false) {
 /* ========== AI 互動相關函式 ========== */
 
 // Format Text Helper
+// Escape HTML to prevent injection
+function escapeHtml(str) {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function formatMessageText(text) {
     if (!text) return "";
+    // Sanitize HTML first
+    text = escapeHtml(text);
     // Bold markdown-like syntax
     text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     // Replace double newlines with paragraph breaks, single newlines with <br>
@@ -229,7 +241,7 @@ function addMessage(messageText, sender = "system", isError = false) {
         messageContainer.classList.add('loading-message');
         messageContainer.innerHTML = `<p>${messageText}</p>`;
         currentLoadingElement = messageContainer; // Track loading message
-    } else if (sender === 'ai' || sender === 'confucius') {
+    } else if (sender === 'ai' || sender === 'confucius' || sender === 'user') {
         const messageContentId = `message-content-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
         const contentSpan = document.createElement('span');
         contentSpan.id = messageContentId;
@@ -238,9 +250,11 @@ function addMessage(messageText, sender = "system", isError = false) {
         messageContainer.innerHTML = ''; // Clear existing content
         messageContainer.appendChild(contentSpan);
 
-        const copyButton = document.createElement('mo-copy-button');
-        copyButton.setAttribute('from', messageContentId);
-        copyButton.setAttribute('copy-label', '複製'); // Optional: Add a label
+        const copyButton = document.createElement('button');
+        copyButton.className = 'copy-btn';
+        copyButton.dataset.target = messageContentId;
+        copyButton.title = '複製';
+        copyButton.textContent = '複製';
         messageContainer.appendChild(copyButton);
     }
     else {

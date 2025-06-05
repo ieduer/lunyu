@@ -27,3 +27,4 @@ Gemini AI會跟你長長長長說下ta的看法。
 字體：匯文明朝體。
 
 > 以上為說明文字1.0，更新說明會在：<a href="https://bdfz.net/posts/lunyu" target="_blank" rel="noopener noreferrer">AI論語</a>
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
