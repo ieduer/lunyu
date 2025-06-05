@@ -209,8 +209,20 @@ function disableInteractionButtons(permanently = false) {
 /* ========== AI 互動相關函式 ========== */
 
 // Format Text Helper
+// Escape HTML to prevent injection
+function escapeHtml(str) {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function formatMessageText(text) {
     if (!text) return "";
+    // Sanitize HTML first
+    text = escapeHtml(text);
     // Bold markdown-like syntax
     text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     // Replace double newlines with paragraph breaks, single newlines with <br>
