@@ -501,7 +501,7 @@ body.dark-mode #user-input-area .send-button:hover { background-color: #4caf50; 
 }
 
 /* Ensure message container can hold content and button */
-.message-container.ai, .message-container.confucius {
+.message-container.ai, .message-container.confucius, .message-container.user {
   display: flex; /* Use flexbox for better alignment */
   align-items: flex-start; /* Align items to the start of the cross axis */
   justify-content: space-between; /* Puts space between message and button */
