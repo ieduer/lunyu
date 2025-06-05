@@ -486,12 +486,13 @@ body.dark-mode #user-input-area .send-button:hover { background-color: #4caf50; 
 }
 
 /* Styling for the copy button in message containers */
-.message-container mo-copy-button {
-  font-size: 16px; /* Adjust as needed, similar to Metso documentation */
+.message-container .copy-btn {
+  font-size: 16px; /* Adjust as needed */
   margin-left: 8px; /* Space between message text and button */
-  vertical-align: middle; /* Align with text if text is not in a block */
-  display: inline-flex; /* Helps with alignment and sizing */
-  align-items: center; /* Vertically center icon within button */
+  vertical-align: middle; /* Align with text */
+  display: inline-flex;
+  align-items: center; /* Vertically center text */
+  cursor: pointer;
 }
 
 /* Adjustments for message content when a copy button is present */
