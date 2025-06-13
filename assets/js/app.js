@@ -148,6 +148,10 @@ function renderSubChapterMenu(major, container) {
     subChapters.forEach(item => {
         const a = document.createElement("a"); a.href = "#"; a.textContent = `${item.major}.${item.minor}`;
         a.classList.add('ghibli-button', 'sub-chapter-link');
+        a.dataset.id = item.id;
+        if (getViewedChapters().includes(item.id)) {
+            a.classList.add('visited');
+        }
         a.onclick = (e) => { e.preventDefault(); displayChapter(item.id);
              if (window.innerWidth <= 768 && chapterMenuEl && chapterMenuEl.style.display !== 'none') { toggleMenu(); } };
         subMenuContainer.appendChild(a);
@@ -174,6 +178,9 @@ function displayChapter(id) {
   if (chapterMessage) {
       chapterMessage.classList.add('chapter-display'); // Add class
   }
+
+  recordViewedChapter(id);
+  markVisitedLinks(id);
 
   // Enable the Yang button and show its area
   if(btnYangEl) btnYangEl.disabled = false;
@@ -449,4 +456,26 @@ function applyDarkModePreference() {
     if (localStorage.getItem("darkMode") === "enabled") {
         document.body.classList.add("dark-mode");
     }
+}
+
+// ---- Progress Tracking ----
+function getViewedChapters() {
+    try {
+        return JSON.parse(localStorage.getItem('viewedChapters')) || [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function recordViewedChapter(id) {
+    const viewed = getViewedChapters();
+    if (!viewed.includes(id)) {
+        viewed.push(id);
+        localStorage.setItem('viewedChapters', JSON.stringify(viewed));
+    }
+}
+
+function markVisitedLinks(id) {
+    const links = document.querySelectorAll(`.sub-chapter-link[data-id="${id}"]`);
+    links.forEach(link => link.classList.add('visited'));
 }

@@ -242,6 +242,7 @@ footer a:hover { color: var(--ghibli-accent-blue-dark); }
     width: auto; text-align: center; transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 .sub-chapter-link:hover { background-color: #f0f8ff; border-color: var(--ghibli-accent-blue); }
+.sub-chapter-link.visited { opacity: 0.6; }
 
 
 /* --- 對話框 --- */
@@ -376,6 +377,7 @@ body.dark-mode .major-chapter-container:nth-of-type(6n+6) .major-chapter-btn { b
 body.dark-mode .sub-menu-container { background: var(--ghibli-dark-submenu-bg); }
 body.dark-mode .sub-chapter-link { background-color: var(--ghibli-dark-subitem-bg); color: var(--ghibli-dark-subitem-text); border-color: var(--ghibli-dark-border); box-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
 body.dark-mode .sub-chapter-link:hover { background-color: var(--ghibli-dark-subitem-hover); border-color: var(--ghibli-dark-subitem-text); }
+body.dark-mode .sub-chapter-link.visited { opacity: 0.6; }
 
 /* Dark Dialogue Box & Messages */
 body.dark-mode #dialogue-box { background: var(--ghibli-dark-dialogue-bg); border-color: var(--ghibli-dark-border-lighter); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); }
