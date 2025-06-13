@@ -4,6 +4,8 @@ const CLOUD_FLARE_WORKER_URL = "https://ai.bdfz.net/";
 let currentAnalect = null;
 let allChapters = [];
 let groupedChapters = {};
+let allPuzzles = [];
+let puzzleState = { current: null, questionCount: 0, hintIndex: 0, max: 15 };
 let conversationHistory = [];
 let currentInteractionType = null; // 'yang' or null
 let isWaitingForAI = false;
@@ -12,8 +14,10 @@ let currentLoadingElement = null;
 
 // ----- DOM 元素引用 -----
 let chapterMenuEl, messagesEl, inputAreaEl, userInputAreaEl, userInputEl,
-    sendInputBtnEl, btnYangEl, toggleMenuBtnEl, toggleDarkBtnEl,
-    sidebarEl, mainHeaderEl;
+    sendInputBtnEl, btnYangEl, btnPuzzleEl,
+    toggleMenuBtnEl, toggleDarkBtnEl,
+    sidebarEl, mainHeaderEl,
+    puzzleBoxEl, puzzleMessagesEl, puzzleInputAreaEl, puzzleInputEl, puzzleSendBtnEl;
 
 // ----- Constants -----
 const animals = ['🐶', '🐱', '🐷', '🦊', '🐻', '🐨', '🐼', '🐰', '🐯', '🦁', '🐬', '🐳', '🦉', '🦋']; // More animals
@@ -24,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeDOMElements();
     bindEventListeners();
     loadDialogues();
+    loadPuzzles();
 });
 
 function initializeDOMElements() {
@@ -34,21 +39,34 @@ function initializeDOMElements() {
     userInputEl = document.getElementById("user-input");
     sendInputBtnEl = document.getElementById("send-input-btn");
     btnYangEl = document.getElementById("btn-yang");
+    btnPuzzleEl = document.getElementById("btn-puzzle");
     toggleMenuBtnEl = document.getElementById("toggle-menu-btn");
     toggleDarkBtnEl = document.getElementById("toggle-dark-btn");
     sidebarEl = document.getElementById("sidebar");
     mainHeaderEl = document.querySelector("#main-content > header"); // Use querySelector for specificity
+    puzzleBoxEl = document.getElementById("puzzle-box");
+    puzzleMessagesEl = document.getElementById("puzzle-messages");
+    puzzleInputAreaEl = document.getElementById("puzzle-input-area");
+    puzzleInputEl = document.getElementById("puzzle-input");
+    puzzleSendBtnEl = document.getElementById("puzzle-send-btn");
 }
 
 function bindEventListeners() {
     if (toggleMenuBtnEl) toggleMenuBtnEl.addEventListener("click", toggleMenu);
     if (toggleDarkBtnEl) toggleDarkBtnEl.addEventListener("click", toggleDarkMode);
+    if (btnPuzzleEl) btnPuzzleEl.addEventListener('click', startPuzzle);
+    if (puzzleSendBtnEl) puzzleSendBtnEl.addEventListener('click', handlePuzzleInput);
     if (userInputEl) {
         userInputEl.addEventListener('keypress', function (e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 handleUserInput();
             }
+        });
+    }
+    if (puzzleInputEl) {
+        puzzleInputEl.addEventListener('keypress', function(e){
+            if(e.key === 'Enter') { e.preventDefault(); handlePuzzleInput(); }
         });
     }
 }
@@ -73,6 +91,13 @@ function loadDialogues() {
       }
       disableInteractionButtons(true);
     });
+}
+
+function loadPuzzles() {
+  fetch("data/puzzles.json")
+    .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
+    .then(data => { if (Array.isArray(data)) allPuzzles = data; })
+    .catch(err => { console.error("Puzzle load error", err); });
 }
 
 function displayInitialRandomAnalect() {
@@ -198,11 +223,13 @@ function resetInteractionState() {
 function enableInteractionButtons() {
     if (currentAnalect && btnYangEl) btnYangEl.disabled = false;
     if (sendInputBtnEl) sendInputBtnEl.disabled = false;
+    if (btnPuzzleEl) btnPuzzleEl.disabled = false;
     isWaitingForAI = false;
 }
 function disableInteractionButtons(permanently = false) {
     if (btnYangEl) btnYangEl.disabled = true;
     if (sendInputBtnEl) sendInputBtnEl.disabled = true;
+    if (btnPuzzleEl) btnPuzzleEl.disabled = true;
     if (!permanently) { isWaitingForAI = true; }
 }
 
@@ -417,6 +444,73 @@ function handleUserInput() {
         addMessage(aiAnswer, isError ? 'system' : 'confucius', isError);
         if (userInputEl && !isError) userInputEl.focus();
     });
+}
+
+// ----- Puzzle Mode -----
+function startPuzzle() {
+    if (!allPuzzles || allPuzzles.length === 0 || !puzzleBoxEl) return;
+    puzzleState.current = allPuzzles[Math.floor(Math.random() * allPuzzles.length)];
+    puzzleState.questionCount = 0;
+    puzzleState.hintIndex = 0;
+    if(puzzleMessagesEl) {
+        puzzleMessagesEl.innerHTML = '';
+        puzzleAddMessage(`**謎句**：${puzzleState.current.quote}`);
+        puzzleAddMessage(puzzleState.current.scenario);
+        puzzleAddMessage(`可提問${puzzleState.max}次，是非或直接猜答案。輸入hint查看提示。`);
+    }
+    if(puzzleBoxEl) puzzleBoxEl.style.display = 'flex';
+    if(puzzleInputAreaEl) puzzleInputAreaEl.style.display = 'flex';
+}
+
+function handlePuzzleInput() {
+    if(!puzzleInputEl || !puzzleState.current) return;
+    const text = puzzleInputEl.value.trim();
+    if(!text) return;
+    puzzleAddMessage(text, 'user');
+    puzzleInputEl.value = '';
+    puzzleState.questionCount++;
+
+    if(/^hint$/i.test(text) || text === '提示') {
+        const hint = puzzleState.current.hints[puzzleState.hintIndex];
+        if(hint) {
+            puzzleAddMessage(`提示：${hint}`);
+            puzzleState.hintIndex++;
+        } else {
+            puzzleAddMessage('沒有更多提示了');
+        }
+        puzzleState.questionCount--; // don't count hint
+        return;
+    }
+
+    if(text.includes(puzzleState.current.solution)) {
+        puzzleAddMessage('答對了！');
+        puzzleAddMessage(`<a href="#" onclick="displayChapter(${puzzleState.current.sourceChapter})">前往章節</a>`);
+        endPuzzle();
+        return;
+    }
+
+    const ans = Math.random() < 0.5 ? '是' : '否';
+    puzzleAddMessage(ans);
+
+    if(puzzleState.questionCount >= puzzleState.max) {
+        puzzleAddMessage(`次數用盡，答案是：${puzzleState.current.solution}`);
+        puzzleAddMessage(`<a href="#" onclick="displayChapter(${puzzleState.current.sourceChapter})">前往章節</a>`);
+        endPuzzle();
+    }
+}
+
+function puzzleAddMessage(text, sender='system') {
+    if(!puzzleMessagesEl) return;
+    const div = document.createElement('div');
+    div.classList.add('message-container', sender);
+    div.innerHTML = formatMessageText(text);
+    puzzleMessagesEl.appendChild(div);
+    puzzleMessagesEl.scrollTop = puzzleMessagesEl.scrollHeight;
+}
+
+function endPuzzle() {
+    puzzleState.current = null;
+    if(puzzleInputAreaEl) puzzleInputAreaEl.style.display = 'none';
 }
 
 

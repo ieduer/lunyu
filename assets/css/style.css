@@ -256,6 +256,50 @@ footer a:hover { color: var(--ghibli-accent-blue-dark); }
   margin-top: 1rem;
 }
 
+/* --- 謎語框 --- */
+#puzzle-box {
+  padding: 1.5rem;
+  background: var(--ghibli-dialogue-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--ghibli-border-darker);
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+}
+
+#puzzle-messages {
+  flex-grow: 1;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding-right: 8px;
+}
+
+#puzzle-input-area {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+#puzzle-input-area input {
+  flex-grow: 1;
+  padding: 0.8rem;
+  font-size: 1.1rem;
+  border: 1px solid var(--ghibli-border);
+  border-radius: 10px;
+  background-color: #fff;
+  color: var(--ghibli-text);
+}
+#puzzle-input-area input:focus {
+  border-color: var(--ghibli-accent-blue);
+  outline: none;
+  box-shadow: 0 0 5px rgba(160, 216, 239, 0.4);
+}
+
 #messages {
   /* --- REMOVED --- min-height: 150px; Not strictly needed if dialogue-box grows */
   flex-grow: 1; /* Let messages fill available space within dialogue-box */
@@ -379,6 +423,7 @@ body.dark-mode .sub-chapter-link:hover { background-color: var(--ghibli-dark-sub
 
 /* Dark Dialogue Box & Messages */
 body.dark-mode #dialogue-box { background: var(--ghibli-dark-dialogue-bg); border-color: var(--ghibli-dark-border-lighter); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); }
+body.dark-mode #puzzle-box { background: var(--ghibli-dark-dialogue-bg); border-color: var(--ghibli-dark-border-lighter); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); }
 body.dark-mode .message-container.system, body.dark-mode .message-container.initial { background-color: rgba(40, 40, 40, 0.7); color: var(--ghibli-dark-text-light); }
 body.dark-mode .message-container.system strong, body.dark-mode .message-container.initial strong { color: var(--ghibli-dark-text); }
 body.dark-mode .message-container.chapter-display { background-color: rgba(50, 50, 50, 0.8); }
@@ -395,6 +440,8 @@ body.dark-mode #user-input-area textarea { background-color: var(--ghibli-dark-s
 body.dark-mode #user-input-area textarea:focus { border-color: var(--ghibli-dark-border-lighter); box-shadow: 0 0 5px rgba(119, 119, 119, 0.4); }
 body.dark-mode #user-input-area .send-button { background-color: #388e3c; color: #e8f5e9; }
 body.dark-mode #user-input-area .send-button:hover { background-color: #4caf50; }
+body.dark-mode #puzzle-input-area input { background-color: var(--ghibli-dark-subitem-bg); color: var(--ghibli-dark-text); border-color: var(--ghibli-dark-border); }
+body.dark-mode #puzzle-input-area input:focus { border-color: var(--ghibli-dark-border-lighter); box-shadow: 0 0 5px rgba(119,119,119,0.4); }
 
 
 /* --- 響應式設計 --- */

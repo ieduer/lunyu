@@ -47,12 +47,21 @@
         <!-- Input area only contains the Yang button now -->
         <div id="input-area">
           <button id="btn-yang" onclick="handleYangAnnotationClick()" class="ghibli-button interaction-button" disabled>楊伯峻「論語譯註」</button>
+          <button id="btn-puzzle" onclick="startPuzzle()" class="ghibli-button interaction-button">聖人微言</button>
         </div>
          <!-- 用戶輸入區域 (預設隱藏) -->
          <div id="user-input-area" style="display:none;" class="ghibli-input-area">
             <textarea id="user-input" placeholder="請輸入你的問題，與孔子深入對話..." rows="3"></textarea>
             <button id="send-input-btn" onclick="handleUserInput()" class="ghibli-button send-button">發送</button>
           </div>
+      </section>
+      <!-- 謎語模式 -->
+      <section id="puzzle-box" class="ghibli-dialogue" style="display:none;">
+        <div id="puzzle-messages"></div>
+        <div id="puzzle-input-area" class="ghibli-input-area" style="display:none;">
+          <input id="puzzle-input" type="text" placeholder="提出問題或直接猜答案" />
+          <button id="puzzle-send-btn" class="ghibli-button send-button">送出</button>
+        </div>
       </section>
     </div> <!-- End #main-content -->
   </div> <!-- End #container -->
