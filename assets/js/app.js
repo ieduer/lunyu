@@ -13,10 +13,15 @@ let currentLoadingElement = null;
 // ----- DOM 元素引用 -----
 let chapterMenuEl, messagesEl, inputAreaEl, userInputAreaEl, userInputEl,
     sendInputBtnEl, btnYangEl, toggleMenuBtnEl, toggleDarkBtnEl,
-    sidebarEl, mainHeaderEl;
+    sidebarEl, mainHeaderEl, bookmarkBtnEl;
 
 // ----- Constants -----
-const animals = ['🐶', '🐱', '🐷', '🦊', '🐻', '🐨', '🐼', '🐰', '🐯', '🦁', '🐬', '🐳', '🦉', '🦋']; // More animals
+const animals = ['🐶', '🐱', '🐷', '🦊', '🐻', '🐨', '🐼', '🐰', '🐯', '🦁', '🐬', '🐳', '🦉', '🦋'];
+const STORAGE_KEYS = {
+    READ_PROGRESS: 'lunyu_read_progress',
+    BOOKMARKS: 'lunyu_bookmarks',
+    DARK_MODE: 'darkMode'
+};
 
 /* ========== 初始化 ========== */
 document.addEventListener("DOMContentLoaded", () => {
@@ -24,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeDOMElements();
     bindEventListeners();
     loadDialogues();
+    updateProgressDisplay();
 });
 
 function initializeDOMElements() {
@@ -37,7 +43,8 @@ function initializeDOMElements() {
     toggleMenuBtnEl = document.getElementById("toggle-menu-btn");
     toggleDarkBtnEl = document.getElementById("toggle-dark-btn");
     sidebarEl = document.getElementById("sidebar");
-    mainHeaderEl = document.querySelector("#main-content > header"); // Use querySelector for specificity
+    mainHeaderEl = document.querySelector("#main-content > header");
+    bookmarkBtnEl = document.getElementById("bookmark-btn");
 }
 
 function bindEventListeners() {
@@ -55,24 +62,30 @@ function bindEventListeners() {
 
 /* ========== 數據載入與目錄生成 ========== */
 function loadDialogues() {
-  fetch("data/dialogues.json")
-    .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
-    .then(data => {
-      if (!Array.isArray(data) || data.length === 0) throw new Error("dialogues.json empty/invalid");
-      allChapters = data;
-      groupChapters();
-      renderChapterMenu();
-      displayInitialRandomAnalect();
-      if(btnYangEl) btnYangEl.disabled = true;
-    })
-    .catch(err => {
-      console.error("Init Error:", err);
-      if (messagesEl) {
-          messagesEl.innerHTML = '';
-          addMessage(`錯誤：無法載入論語數據。\n(${err.message})`, 'system', true);
-      }
-      disableInteractionButtons(true);
-    });
+    // 顯示載入狀態
+    if (messagesEl) {
+        messagesEl.innerHTML = '<div class="message-container system"><p>正在載入論語數據...</p></div>';
+    }
+
+    fetch("data/dialogues.json")
+        .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
+        .then(data => {
+            if (!Array.isArray(data) || data.length === 0) throw new Error("dialogues.json empty/invalid");
+            allChapters = data;
+            groupChapters();
+            renderChapterMenu();
+            displayInitialRandomAnalect();
+            if (btnYangEl) btnYangEl.disabled = true;
+            updateProgressDisplay();
+        })
+        .catch(err => {
+            console.error("Init Error:", err);
+            if (messagesEl) {
+                messagesEl.innerHTML = '';
+                addMessage(`錯誤：無法載入論語數據。\n(${err.message})`, 'system', true);
+            }
+            disableInteractionButtons(true);
+        });
 }
 
 function displayInitialRandomAnalect() {
@@ -101,16 +114,16 @@ function groupChapters() {
             const numMatch = item.title.match(/^(\d+)\.(\d+)$/);
             if (numMatch) {
                 const major = parseInt(numMatch[1], 10); const minor = parseInt(numMatch[2], 10);
-                 if (isNaN(major) || major < 1 || major > 20) return;
-                 if (!groupedChapters[major]) groupedChapters[major] = { chapters: [] };
-                 groupedChapters[major].chapters.push({...item, major: major, minor: minor});
+                if (isNaN(major) || major < 1 || major > 20) return;
+                if (!groupedChapters[major]) groupedChapters[major] = { chapters: [] };
+                groupedChapters[major].chapters.push({ ...item, major: major, minor: minor });
             } else { console.warn(`Cannot parse title: ${item.title}`); return; }
         } else {
-             const chapterName = match[1]; const major = parseInt(match[2], 10); const minor = parseInt(match[3], 10);
-             if (isNaN(major) || major < 1 || major > 20) return;
-             if (!groupedChapters[major]) { groupedChapters[major] = { name: chapterName, chapters: [] }; }
-             else if (chapterName && !groupedChapters[major].name) { groupedChapters[major].name = chapterName; }
-             groupedChapters[major].chapters.push({...item, major: major, minor: minor});
+            const chapterName = match[1]; const major = parseInt(match[2], 10); const minor = parseInt(match[3], 10);
+            if (isNaN(major) || major < 1 || major > 20) return;
+            if (!groupedChapters[major]) { groupedChapters[major] = { name: chapterName, chapters: [] }; }
+            else if (chapterName && !groupedChapters[major].name) { groupedChapters[major].name = chapterName; }
+            groupedChapters[major].chapters.push({ ...item, major: major, minor: minor });
         }
     });
     for (const major in groupedChapters) { groupedChapters[major].chapters.sort((a, b) => a.minor - b.minor); }
@@ -133,7 +146,7 @@ function renderChapterMenu() {
 
 function toggleSubChapterMenu(major, container, button) {
     if (activeSubMenu && activeSubMenu.container !== container) {
-        if(activeSubMenu.container.contains(activeSubMenu.element)) { activeSubMenu.container.removeChild(activeSubMenu.element); }
+        if (activeSubMenu.container.contains(activeSubMenu.element)) { activeSubMenu.container.removeChild(activeSubMenu.element); }
         activeSubMenu.button.classList.remove('active'); activeSubMenu = null;
     }
     const existingSubMenu = container.querySelector('.sub-menu-container');
@@ -148,8 +161,10 @@ function renderSubChapterMenu(major, container) {
     subChapters.forEach(item => {
         const a = document.createElement("a"); a.href = "#"; a.textContent = `${item.major}.${item.minor}`;
         a.classList.add('ghibli-button', 'sub-chapter-link');
-        a.onclick = (e) => { e.preventDefault(); displayChapter(item.id);
-             if (window.innerWidth <= 768 && chapterMenuEl && chapterMenuEl.style.display !== 'none') { toggleMenu(); } };
+        a.onclick = (e) => {
+            e.preventDefault(); displayChapter(item.id);
+            if (window.innerWidth <= 768 && chapterMenuEl && chapterMenuEl.style.display !== 'none') { toggleMenu(); }
+        };
         subMenuContainer.appendChild(a);
     });
     container.appendChild(subMenuContainer);
@@ -159,25 +174,28 @@ function renderSubChapterMenu(major, container) {
 
 // 顯示指定 ID 的論語內容到對話框
 function displayChapter(id) {
-  const chapter = allChapters.find(ch => ch.id == id);
-  if (!chapter) {
-    console.error("Chapter not found:", id);
-    addMessage(`錯誤：找不到 ID 為 ${id} 的章節。`, 'system', true);
-    return;
-  }
-  currentAnalect = chapter;
+    const chapter = allChapters.find(ch => ch.id == id);
+    if (!chapter) {
+        console.error("Chapter not found:", id);
+        addMessage(`錯誤：找不到 ID 為 ${id} 的章節。`, 'system', true);
+        return;
+    }
+    currentAnalect = chapter;
 
-  resetInteractionState(); // Clear messages, history, reset button states
+    resetInteractionState(); // Clear messages, history, reset button states
 
-  // Add the chapter title/text with a specific class for styling
-  const chapterMessage = addMessage(`**${chapter.title}**\n\n${chapter.text}`, 'system');
-  if (chapterMessage) {
-      chapterMessage.classList.add('chapter-display'); // Add class
-  }
+    // 記錄閱讀進度
+    markAsRead(id);
 
-  // Enable the Yang button and show its area
-  if(btnYangEl) btnYangEl.disabled = false;
-  if (inputAreaEl) inputAreaEl.style.display = 'flex';
+    // Add the chapter title/text with a specific class for styling
+    const chapterMessage = addMessage(`**${chapter.title}**\n\n${chapter.text}`, 'system');
+    if (chapterMessage) {
+        chapterMessage.classList.add('chapter-display'); // Add class
+    }
+
+    // Enable the Yang button and show its area
+    if (btnYangEl) btnYangEl.disabled = false;
+    if (inputAreaEl) inputAreaEl.style.display = 'flex';
 
 }
 
@@ -190,8 +208,8 @@ function resetInteractionState() {
     if (userInputEl) userInputEl.value = "";
     if (btnYangEl) btnYangEl.textContent = "楊伯峻「論語譯註」";
     if (inputAreaEl) inputAreaEl.style.display = 'flex';
-    if(btnYangEl) btnYangEl.disabled = !currentAnalect;
-    if(sendInputBtnEl) sendInputBtnEl.disabled = false;
+    if (btnYangEl) btnYangEl.disabled = !currentAnalect;
+    if (sendInputBtnEl) sendInputBtnEl.disabled = false;
 }
 
 // Enable/Disable Buttons
@@ -295,50 +313,60 @@ function formatHistoryForAI(history) {
 }
 
 
-// Ask Gemini Helper
-function askGemini(prompt, callback) {
-    if (isWaitingForAI) {
+// Ask Gemini Helper with Retry
+function askGemini(prompt, callback, retryCount = 0) {
+    const MAX_RETRIES = 2;
+
+    if (isWaitingForAI && retryCount === 0) {
         console.warn("AI processing...");
-        // Maybe add a brief non-loading system message?
-        // addMessage("AI正在處理上一個請求...", "system");
         return;
     }
-    disableInteractionButtons();
-    // Loading message is added *before* calling this function
+    if (retryCount === 0) disableInteractionButtons();
 
     fetch(CLOUD_FLARE_WORKER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: prompt })
     })
-    .then(response => {
-        if (!response.ok) {
-            // Try to parse error JSON from CF Worker
-            return response.json().then(errData => {
-                 throw new Error(`AI請求失敗 (${response.status}): ${errData.error || response.statusText}`);
-            }).catch(() => {
-                // Fallback if parsing error JSON fails
-                throw new Error(`AI請求失敗 (${response.status}): ${response.statusText}`);
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        removeLoadingMessage(); // Remove the externally added loading message
-        enableInteractionButtons();
-        callback(data.answer || "AI 未能提供有效回答。", false); // Success
-    })
-    .catch(error => {
-        console.error("AI Error:", error);
-        removeLoadingMessage(); // Remove the externally added loading message
-        enableInteractionButtons();
-        // Provide more user-friendly error messages
-        let displayError = `唉，思緒略有阻塞，未能回應。`;
-        if (error.message.includes("429")) displayError += " (似乎請求過於頻繁，請稍後再試)";
-        else if (error.message.includes("502")) displayError += " (後端服務暫時無法連接)";
-        else displayError += ` (${error.message})`; // Include specific error
-        callback(displayError, true); // Error
-    });
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errData => {
+                    throw new Error(`AI請求失敗 (${response.status}): ${errData.error || response.statusText}`);
+                }).catch(() => {
+                    throw new Error(`AI請求失敗 (${response.status}): ${response.statusText}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            removeLoadingMessage();
+            enableInteractionButtons();
+            callback(data.answer || "AI 未能提供有效回答。", false);
+        })
+        .catch(error => {
+            console.error("AI Error:", error);
+
+            // 重試機制
+            if (retryCount < MAX_RETRIES && !error.message.includes("429")) {
+                console.log(`Retrying... attempt ${retryCount + 1}`);
+                setTimeout(() => {
+                    askGemini(prompt, callback, retryCount + 1);
+                }, 1000 * (retryCount + 1)); // 指數退避
+                return;
+            }
+
+            removeLoadingMessage();
+            enableInteractionButtons();
+
+            // 更友好的錯誤訊息
+            let displayError = `唉，思緒略有阻塞，未能回應。`;
+            if (error.message.includes("429")) displayError += " (似乎請求過於頻繁，請稍後再試)";
+            else if (error.message.includes("502") || error.message.includes("503")) displayError += " (後端服務暫時無法連接)";
+            else if (error.message.includes("network") || error.message.includes("Failed to fetch")) displayError += " (網絡連接問題，請檢查網絡)";
+            else displayError += ` (${error.message})`;
+
+            callback(displayError, true);
+        });
 }
 
 // 孔子語氣指令 (Keep full)
@@ -385,7 +413,7 @@ function handleYangAnnotationClick() {
             // Re-add chapter text if reset happened
             if (currentAnalect) {
                 const chapterMessage = addMessage(`**${currentAnalect.title}**\n\n${currentAnalect.text}`, 'system');
-                if(chapterMessage) chapterMessage.classList.add('chapter-display');
+                if (chapterMessage) chapterMessage.classList.add('chapter-display');
             }
         }
     });
@@ -428,25 +456,130 @@ function toggleMenu() {
     const isHidden = chapterMenuEl.style.display === "none";
     chapterMenuEl.style.display = isHidden ? "flex" : "none"; // Use flex display
     toggleMenuBtnEl.textContent = isHidden ? "隱藏目錄" : "顯示目錄";
+    // 更新 aria-expanded 屬性
+    toggleMenuBtnEl.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
     // Close any open sub-menu when hiding the main menu
     if (!isHidden && activeSubMenu) {
-         if (activeSubMenu.container.contains(activeSubMenu.element)) {
-              activeSubMenu.container.removeChild(activeSubMenu.element);
-         }
-         activeSubMenu.button.classList.remove('active');
-         activeSubMenu = null;
+        if (activeSubMenu.container.contains(activeSubMenu.element)) {
+            activeSubMenu.container.removeChild(activeSubMenu.element);
+        }
+        activeSubMenu.button.classList.remove('active');
+        activeSubMenu = null;
     }
 }
 
 // Toggle Dark Mode
 function toggleDarkMode() {
     document.body.classList.toggle("dark-mode");
-    localStorage.setItem("darkMode", document.body.classList.contains("dark-mode") ? "enabled" : "disabled");
+    localStorage.setItem(STORAGE_KEYS.DARK_MODE, document.body.classList.contains("dark-mode") ? "enabled" : "disabled");
 }
 
 // Apply Dark Mode Preference on Load
 function applyDarkModePreference() {
-    if (localStorage.getItem("darkMode") === "enabled") {
+    if (localStorage.getItem(STORAGE_KEYS.DARK_MODE) === "enabled") {
         document.body.classList.add("dark-mode");
     }
+}
+
+/* ========== 進度記錄功能 ========== */
+
+// 獲取已讀章節列表
+function getReadProgress() {
+    try {
+        const progress = localStorage.getItem(STORAGE_KEYS.READ_PROGRESS);
+        return progress ? JSON.parse(progress) : [];
+    } catch (e) {
+        console.error("Error reading progress:", e);
+        return [];
+    }
+}
+
+// 標記章節為已讀
+function markAsRead(chapterId) {
+    try {
+        const progress = getReadProgress();
+        if (!progress.includes(chapterId)) {
+            progress.push(chapterId);
+            localStorage.setItem(STORAGE_KEYS.READ_PROGRESS, JSON.stringify(progress));
+            updateProgressDisplay();
+            updateChapterMenuReadStatus();
+        }
+    } catch (e) {
+        console.error("Error saving progress:", e);
+    }
+}
+
+// 更新進度顯示
+function updateProgressDisplay() {
+    const progress = getReadProgress();
+    const total = allChapters.length || 500; // 論語共約500則
+    const readCount = progress.length;
+
+    // 更新頁面標題顯示進度
+    const baseTitle = "AI論語";
+    if (readCount > 0) {
+        document.title = `${baseTitle} (已讀 ${readCount}/${total})`;
+    }
+}
+
+// 更新目錄中已讀狀態
+function updateChapterMenuReadStatus() {
+    const progress = getReadProgress();
+    const subLinks = document.querySelectorAll('.sub-chapter-link');
+    subLinks.forEach(link => {
+        const text = link.textContent;
+        const chapter = allChapters.find(ch => ch.title.includes(text));
+        if (chapter && progress.includes(chapter.id)) {
+            link.classList.add('read');
+        }
+    });
+}
+
+/* ========== 書籤功能 ========== */
+
+// 獲取書籤列表
+function getBookmarks() {
+    try {
+        const bookmarks = localStorage.getItem(STORAGE_KEYS.BOOKMARKS);
+        return bookmarks ? JSON.parse(bookmarks) : [];
+    } catch (e) {
+        console.error("Error reading bookmarks:", e);
+        return [];
+    }
+}
+
+// 切換書籤狀態
+function toggleBookmark(chapterId) {
+    try {
+        const bookmarks = getBookmarks();
+        const index = bookmarks.indexOf(chapterId);
+        if (index === -1) {
+            bookmarks.push(chapterId);
+        } else {
+            bookmarks.splice(index, 1);
+        }
+        localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(bookmarks));
+        return index === -1; // 返回是否添加了書籤
+    } catch (e) {
+        console.error("Error toggling bookmark:", e);
+        return false;
+    }
+}
+
+// 檢查是否已收藏
+function isBookmarked(chapterId) {
+    return getBookmarks().includes(chapterId);
+}
+
+// 獲取統計信息
+function getStats() {
+    const progress = getReadProgress();
+    const bookmarks = getBookmarks();
+    const total = allChapters.length || 500;
+    return {
+        readCount: progress.length,
+        bookmarkCount: bookmarks.length,
+        totalChapters: total,
+        readPercentage: total > 0 ? Math.round((progress.length / total) * 100) : 0
+    };
 }

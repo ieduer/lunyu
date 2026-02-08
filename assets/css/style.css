@@ -2,58 +2,61 @@
 @font-face {
   font-family: 'HuWenMingChaoTi';
   src: url('../fonts/HuWenMingChaoTi.woff2') format('woff2'),
-       url('../fonts/HuWenMingChaoTi.woff') format('woff');
+    url('../fonts/HuWenMingChaoTi.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
 
 /* Global Variables & Reset */
 :root {
-    --footer-height: 35px; /* Slightly reduced footer height */
-    /* Ghibli Color Palette (Example - Needs refinement) */
-    --ghibli-bg: #f9f5e7;
-    --ghibli-text: #3d322b;
-    --ghibli-text-light: #6b5f55;
-    --ghibli-border: #e0d8cc;
-    --ghibli-border-darker: #d8cfc0;
-    --ghibli-accent-blue: #a0d8ef;
-    --ghibli-accent-blue-dark: #3d5a66;
-    --ghibli-accent-yellow: #f6e4a8;
-    --ghibli-accent-yellow-dark: #7b6a4c;
-    --ghibli-accent-green: #c8e6c9;
-    --ghibli-accent-green-dark: #556B2F;
-    --ghibli-accent-orange: #ffcc80;
-    --ghibli-accent-orange-dark: #8f5d00;
-    --ghibli-accent-pink: #f8c8dc;
-    --ghibli-accent-pink-dark: #8b5f6f;
-    --ghibli-white-semi: rgba(255, 255, 255, 0.8);
-    --ghibli-white-lighter: rgba(255, 255, 255, 0.6);
-    --ghibli-dialogue-bg: rgba(245, 240, 230, 0.9);
-    --ghibli-header-bg: rgba(249, 245, 231, 0.85); /* Header BG same as footer */
+  --footer-height: 35px;
+  /* Slightly reduced footer height */
+  /* Ghibli Color Palette (Example - Needs refinement) */
+  --ghibli-bg: #f9f5e7;
+  --ghibli-text: #3d322b;
+  --ghibli-text-light: #6b5f55;
+  --ghibli-border: #e0d8cc;
+  --ghibli-border-darker: #d8cfc0;
+  --ghibli-accent-blue: #a0d8ef;
+  --ghibli-accent-blue-dark: #3d5a66;
+  --ghibli-accent-yellow: #f6e4a8;
+  --ghibli-accent-yellow-dark: #7b6a4c;
+  --ghibli-accent-green: #c8e6c9;
+  --ghibli-accent-green-dark: #556B2F;
+  --ghibli-accent-orange: #ffcc80;
+  --ghibli-accent-orange-dark: #8f5d00;
+  --ghibli-accent-pink: #f8c8dc;
+  --ghibli-accent-pink-dark: #8b5f6f;
+  --ghibli-white-semi: rgba(255, 255, 255, 0.8);
+  --ghibli-white-lighter: rgba(255, 255, 255, 0.6);
+  --ghibli-dialogue-bg: rgba(245, 240, 230, 0.9);
+  --ghibli-header-bg: rgba(249, 245, 231, 0.85);
+  /* Header BG same as footer */
 
-    /* Dark Mode Colors */
-    --ghibli-dark-bg: #1f1d1b;
-    --ghibli-dark-text: #dcdcdc;
-    --ghibli-dark-text-light: #a0a0a0;
-    --ghibli-dark-border: #444;
-    --ghibli-dark-border-lighter: #555;
-    --ghibli-dark-accent-blue: #2c3e50;
-    --ghibli-dark-accent-blue-light: #ecf0f1;
-    --ghibli-dark-accent-yellow: #4a4a4a;
-    --ghibli-dark-accent-yellow-light: #e0e0e0;
-    --ghibli-dark-accent-green: #2a5a2a;
-    --ghibli-dark-accent-green-light: #c8e6c9;
-    --ghibli-dark-accent-orange: #5a5a5a;
-    --ghibli-dark-accent-orange-light: #e0e0e0;
-    --ghibli-dark-dialogue-bg: rgba(30, 30, 30, 0.9);
-    --ghibli-dark-menu-bg: rgba(42, 42, 42, 0.8);
-    --ghibli-dark-menu-item-bg: #3a3a3a;
-    --ghibli-dark-menu-item-hover: #4a4a4a;
-    --ghibli-dark-submenu-bg: rgba(30, 30, 30, 0.7);
-    --ghibli-dark-subitem-bg: #444;
-    --ghibli-dark-subitem-hover: #555;
-    --ghibli-dark-subitem-text: #a0d8ef;
-    --ghibli-dark-header-bg: rgba(30, 30, 30, 0.9); /* Dark Header BG */
+  /* Dark Mode Colors */
+  --ghibli-dark-bg: #1f1d1b;
+  --ghibli-dark-text: #dcdcdc;
+  --ghibli-dark-text-light: #a0a0a0;
+  --ghibli-dark-border: #444;
+  --ghibli-dark-border-lighter: #555;
+  --ghibli-dark-accent-blue: #2c3e50;
+  --ghibli-dark-accent-blue-light: #ecf0f1;
+  --ghibli-dark-accent-yellow: #4a4a4a;
+  --ghibli-dark-accent-yellow-light: #e0e0e0;
+  --ghibli-dark-accent-green: #2a5a2a;
+  --ghibli-dark-accent-green-light: #c8e6c9;
+  --ghibli-dark-accent-orange: #5a5a5a;
+  --ghibli-dark-accent-orange-light: #e0e0e0;
+  --ghibli-dark-dialogue-bg: rgba(30, 30, 30, 0.9);
+  --ghibli-dark-menu-bg: rgba(42, 42, 42, 0.8);
+  --ghibli-dark-menu-item-bg: #3a3a3a;
+  --ghibli-dark-menu-item-hover: #4a4a4a;
+  --ghibli-dark-submenu-bg: rgba(30, 30, 30, 0.7);
+  --ghibli-dark-subitem-bg: #444;
+  --ghibli-dark-subitem-hover: #555;
+  --ghibli-dark-subitem-text: #a0d8ef;
+  --ghibli-dark-header-bg: rgba(30, 30, 30, 0.9);
+  /* Dark Header BG */
 }
 
 html {
@@ -61,7 +64,12 @@ html {
   /* --- MODIFIED --- Prevent page scroll on desktop */
   overflow: hidden;
 }
-*, *:before, *:after { box-sizing: inherit; }
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
 
 body {
   font-family: 'HuWenMingChaoTi', "Noto Serif TC", serif;
@@ -75,12 +83,15 @@ body {
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-  background-attachment: fixed; /* Keep fixed background */
+  background-attachment: fixed;
+  /* Keep fixed background */
   /* --- MODIFIED --- Set explicit height and prevent body scroll on desktop */
   height: 100vh;
   overflow: hidden;
-  display: flex; /* Keep flex for centering container */
-  justify-content: center; /* Keep centering container */
+  display: flex;
+  /* Keep flex for centering container */
+  justify-content: center;
+  /* Keep centering container */
   /* --- ADDED --- Align container to top */
   align-items: flex-start;
 }
@@ -93,8 +104,10 @@ body {
   padding: 15px;
   align-items: flex-start;
   /* --- MODIFIED --- Take full available height minus padding */
-  height: 100vh; /* Let container fill viewport height */
-  padding-bottom: calc(var(--footer-height) + 15px); /* Add padding to prevent content overlap with fixed footer */
+  height: 100vh;
+  /* Let container fill viewport height */
+  padding-bottom: calc(var(--footer-height) + 15px);
+  /* Add padding to prevent content overlap with fixed footer */
 }
 
 #sidebar {
@@ -103,24 +116,30 @@ body {
   flex-shrink: 0;
   /* --- REMOVED --- max-height, overflow-y, position: sticky, top */
   /* --- ADDED --- Ensure it doesn't exceed container height if content is very long, but don't force scroll */
-  max-height: calc(100vh - var(--footer-height) - 30px); /* Optional: Prevent extreme overflow */
+  max-height: calc(100vh - var(--footer-height) - 30px);
+  /* Optional: Prevent extreme overflow */
   padding-top: 0;
   /* --- ADDED --- Let sidebar scroll IF its content exceeds max-height */
-  overflow-y: auto; /* Restore scrolling for sidebar itself if needed */
+  overflow-y: auto;
+  /* Restore scrolling for sidebar itself if needed */
 }
 
 /* Toggle button moved inside sidebar */
 #toggle-menu-btn {
-    width: 100%; /* Take full width of sidebar */
-    padding: 0.5rem 1rem;
-    font-size: 0.95rem;
-    margin-bottom: 1rem; /* Space below button, above menu */
-    /* Inherit ghibli-button styles */
-    background-color: var(--ghibli-accent-yellow); /* Explicitly set color */
-    color: var(--ghibli-accent-yellow-dark);
+  width: 100%;
+  /* Take full width of sidebar */
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  /* Space below button, above menu */
+  /* Inherit ghibli-button styles */
+  background-color: var(--ghibli-accent-yellow);
+  /* Explicitly set color */
+  color: var(--ghibli-accent-yellow-dark);
 }
+
 #toggle-menu-btn:hover {
-    background-color: #f4d992;
+  background-color: #f4d992;
 }
 
 
@@ -134,121 +153,288 @@ body {
   height: 100%;
   /* --- MODIFIED --- Make this the scrolling container */
   overflow-y: auto;
-  position: relative; /* Keep for potential absolute children */
+  position: relative;
+  /* Keep for potential absolute children */
   /* --- REMOVED --- min-height */
 }
 
 /* Sticky Header within Main Content */
-#main-content > header {
-    position: sticky; /* Stick to top of main-content scrolling container */
-    top: 0; /* Stick right at the top */
-    background: var(--ghibli-header-bg); /* Use variable */
-    backdrop-filter: blur(8px);
-    z-index: 10; /* Needs to be above content within main-content */
-    padding: 10px 15px; /* Padding inside header */
-    /* --- REMOVED --- margin-bottom: 1rem; Let dialogue box handle its own top margin/padding */
-    border-bottom: 1px solid rgba(216, 207, 192, 0.6); /* Match footer */
+#main-content>header {
+  position: sticky;
+  /* Stick to top of main-content scrolling container */
+  top: 0;
+  /* Stick right at the top */
+  background: var(--ghibli-header-bg);
+  /* Use variable */
+  backdrop-filter: blur(8px);
+  z-index: 10;
+  /* Needs to be above content within main-content */
+  padding: 10px 15px;
+  /* Padding inside header */
+  /* --- REMOVED --- margin-bottom: 1rem; Let dialogue box handle its own top margin/padding */
+  border-bottom: 1px solid rgba(216, 207, 192, 0.6);
+  /* Match footer */
 
-    /* Flex layout for title and button */
-    display: flex;
-    align-items: center;
-    justify-content: center; /* Center title by default */
-    position: relative; /* For absolute positioning moon button */
-    flex-shrink: 0; /* --- ADDED --- Prevent header from shrinking */
+  /* Flex layout for title and button */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Center title by default */
+  position: relative;
+  /* For absolute positioning moon button */
+  flex-shrink: 0;
+  /* --- ADDED --- Prevent header from shrinking */
 }
 
-#main-content > header h1 {
-    flex-grow: 1; /* Allow title to take space */
-    text-align: center; /* Ensure centering */
-    margin: 0;
-    font-size: 1.8em;
-    font-weight: 600;
-    color: var(--ghibli-text);
-    padding: 0 40px; /* Add padding so title doesn't overlap button */
+#main-content>header h1 {
+  flex-grow: 1;
+  /* Allow title to take space */
+  text-align: center;
+  /* Ensure centering */
+  margin: 0;
+  font-size: 1.8em;
+  font-weight: 600;
+  color: var(--ghibli-text);
+  padding: 0 40px;
+  /* Add padding so title doesn't overlap button */
 }
 
-#main-content > header #toggle-dark-btn {
-    position: absolute; /* Position relative to header */
-    right: 15px; /* Position to the right */
-    top: 50%; /* Center vertically */
-    transform: translateY(-50%); /* Fine-tune vertical centering */
-    width: auto;
-    padding: 0.3rem 0.6rem;
-    margin: 0; /* Reset margin */
-    /* Inherit icon button styles */
+#main-content>header #toggle-dark-btn {
+  position: absolute;
+  /* Position relative to header */
+  right: 15px;
+  /* Position to the right */
+  top: 50%;
+  /* Center vertically */
+  transform: translateY(-50%);
+  /* Fine-tune vertical centering */
+  width: auto;
+  padding: 0.3rem 0.6rem;
+  margin: 0;
+  /* Reset margin */
+  /* Inherit icon button styles */
 }
 
 
 /* Footer Styles (Unchanged - Fixed position works fine) */
 footer {
-  position: fixed; bottom: 0; left: 0; width: 100%; height: var(--footer-height);
-  background: var(--ghibli-header-bg); backdrop-filter: blur(8px); color: var(--ghibli-text-light);
-  font-size: 0.85em; text-align: center; line-height: var(--footer-height); padding: 0 10px;
-  border-top: 1px solid rgba(216, 207, 192, 0.6); z-index: 1000; overflow: hidden; white-space: nowrap;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--footer-height);
+  background: var(--ghibli-header-bg);
+  backdrop-filter: blur(8px);
+  color: var(--ghibli-text-light);
+  font-size: 0.85em;
+  text-align: center;
+  line-height: var(--footer-height);
+  padding: 0 10px;
+  border-top: 1px solid rgba(216, 207, 192, 0.6);
+  z-index: 1000;
+  overflow: hidden;
+  white-space: nowrap;
 }
-footer p { margin: 0; line-height: inherit; }
-footer a { color: var(--ghibli-text); text-decoration: none; }
-footer a:hover { color: var(--ghibli-accent-blue-dark); }
+
+footer p {
+  margin: 0;
+  line-height: inherit;
+}
+
+footer a {
+  color: var(--ghibli-text);
+  text-decoration: none;
+}
+
+footer a:hover {
+  color: var(--ghibli-accent-blue-dark);
+}
 
 
 /* --- Ghibli 風格按鈕 --- */
 .ghibli-button {
-  font-family: 'HuWenMingChaoTi', "Noto Serif TC", serif; border: none; border-radius: 10px;
-  background-color: var(--ghibli-accent-blue); color: var(--ghibli-accent-blue-dark);
-  padding: 0.6rem 1.2rem; font-size: 1rem; cursor: pointer;
+  font-family: 'HuWenMingChaoTi', "Noto Serif TC", serif;
+  border: none;
+  border-radius: 10px;
+  background-color: var(--ghibli-accent-blue);
+  color: var(--ghibli-accent-blue-dark);
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
   transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
-  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1); margin: 0.2rem; text-align: center;
-  display: block; width: 100%;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+  margin: 0.2rem;
+  text-align: center;
+  display: block;
+  width: 100%;
 }
-.ghibli-button:hover:not(:disabled) { background-color: #87ceeb; box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15); }
-.ghibli-button:active:not(:disabled) { transform: translateY(1px); box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); }
-.ghibli-button:disabled { background-color: #d0e0f0; color: #a0b0c0; cursor: not-allowed; box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05); }
+
+.ghibli-button:hover:not(:disabled) {
+  background-color: #87ceeb;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.ghibli-button:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.ghibli-button:disabled {
+  background-color: #d0e0f0;
+  color: #a0b0c0;
+  cursor: not-allowed;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+}
+
 .icon-button {
-  font-size: 1.5rem; padding: 0.3rem 0.6rem; background: none; box-shadow: none;
-  color: var(--ghibli-text-light); width: auto; flex-shrink: 0; border-radius: 50%;
+  font-size: 1.5rem;
+  padding: 0.3rem 0.6rem;
+  background: none;
+  box-shadow: none;
+  color: var(--ghibli-text-light);
+  width: auto;
+  flex-shrink: 0;
+  border-radius: 50%;
 }
-.icon-button:hover { background: rgba(0, 0, 0, 0.05); color: var(--ghibli-text); box-shadow: none; }
-.icon-button:active { transform: scale(0.95) translateY(0); }
+
+.icon-button:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--ghibli-text);
+  box-shadow: none;
+}
+
+.icon-button:active {
+  transform: scale(0.95) translateY(0);
+}
 
 
 /* --- 目錄樣式 --- */
-#chapter-menu { display: flex; flex-direction: column; gap: 0.5rem; }
+#chapter-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .major-chapter-container {
-    border: 1px solid var(--ghibli-border); border-radius: 8px; background: var(--ghibli-white-semi);
-    backdrop-filter: blur(3px); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 0.5rem;
+  border: 1px solid var(--ghibli-border);
+  border-radius: 8px;
+  background: var(--ghibli-white-semi);
+  backdrop-filter: blur(3px);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-bottom: 0.5rem;
 }
+
 .major-chapter-btn {
-    color: var(--ghibli-text); padding: 0.7rem 1rem; font-size: 1.05rem; font-weight: 500; border-radius: 0; margin: 0;
-    border-bottom: 1px solid rgba(224, 216, 204, 0); width: 100%; text-align: left; box-shadow: none;
-    transition: background-color 0.2s ease, border-color 0.2s ease, filter 0.2s ease;
+  color: var(--ghibli-text);
+  padding: 0.7rem 1rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+  border-radius: 0;
+  margin: 0;
+  border-bottom: 1px solid rgba(224, 216, 204, 0);
+  width: 100%;
+  text-align: left;
+  box-shadow: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease, filter 0.2s ease;
 }
-.major-chapter-btn:hover { filter: brightness(95%); }
-.major-chapter-btn.active { filter: brightness(92%); border-bottom-color: var(--ghibli-border-darker); }
-.major-chapter-container:nth-of-type(6n+1) .major-chapter-btn { background-color: #a0d8ef; color: #3d5a66; }
-.major-chapter-container:nth-of-type(6n+2) .major-chapter-btn { background-color: #c8e6c9; color: #556B2F; }
-.major-chapter-container:nth-of-type(6n+3) .major-chapter-btn { background-color: #f6e4a8; color: #7b6a4c; }
-.major-chapter-container:nth-of-type(6n+4) .major-chapter-btn { background-color: #ffcc80; color: #8f5d00; }
-.major-chapter-container:nth-of-type(6n+5) .major-chapter-btn { background-color: #f8c8dc; color: #8b5f6f; }
-.major-chapter-container:nth-of-type(6n+6) .major-chapter-btn { background-color: #d7ccc8; color: #5d4037; }
+
+.major-chapter-btn:hover {
+  filter: brightness(95%);
+}
+
+.major-chapter-btn.active {
+  filter: brightness(92%);
+  border-bottom-color: var(--ghibli-border-darker);
+}
+
+.major-chapter-container:nth-of-type(6n+1) .major-chapter-btn {
+  background-color: #a0d8ef;
+  color: #3d5a66;
+}
+
+.major-chapter-container:nth-of-type(6n+2) .major-chapter-btn {
+  background-color: #c8e6c9;
+  color: #556B2F;
+}
+
+.major-chapter-container:nth-of-type(6n+3) .major-chapter-btn {
+  background-color: #f6e4a8;
+  color: #7b6a4c;
+}
+
+.major-chapter-container:nth-of-type(6n+4) .major-chapter-btn {
+  background-color: #ffcc80;
+  color: #8f5d00;
+}
+
+.major-chapter-container:nth-of-type(6n+5) .major-chapter-btn {
+  background-color: #f8c8dc;
+  color: #8b5f6f;
+}
+
+.major-chapter-container:nth-of-type(6n+6) .major-chapter-btn {
+  background-color: #d7ccc8;
+  color: #5d4037;
+}
 
 /* Sub-Menu */
 .sub-menu-container {
-    padding: 0.5rem 0.8rem; background: var(--ghibli-white-lighter); display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); gap: 0.5rem; max-height: 250px; overflow-y: auto;
+  padding: 0.5rem 0.8rem;
+  background: var(--ghibli-white-lighter);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  gap: 0.5rem;
+  max-height: 250px;
+  overflow-y: auto;
 }
+
 .sub-chapter-link {
-    padding: 0.4rem; font-size: 0.9rem; background-color: #fff; color: var(--ghibli-accent-blue-dark); text-decoration: none;
-    border-radius: 6px; border: 1px solid var(--ghibli-border); box-shadow: 1px 1px 2px rgba(0,0,0,0.05);
-    width: auto; text-align: center; transition: background-color 0.2s ease, border-color 0.2s ease;
+  padding: 0.4rem;
+  font-size: 0.9rem;
+  background-color: #fff;
+  color: var(--ghibli-accent-blue-dark);
+  text-decoration: none;
+  border-radius: 6px;
+  border: 1px solid var(--ghibli-border);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+  width: auto;
+  text-align: center;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
-.sub-chapter-link:hover { background-color: #f0f8ff; border-color: var(--ghibli-accent-blue); }
+
+.sub-chapter-link:hover {
+  background-color: #f0f8ff;
+  border-color: var(--ghibli-accent-blue);
+}
+
+/* 已讀章節標記 */
+.sub-chapter-link.read {
+  position: relative;
+  background-color: #e8f5e9;
+  border-color: var(--ghibli-accent-green);
+}
+
+.sub-chapter-link.read::after {
+  content: '✓';
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 0.7em;
+  color: var(--ghibli-accent-green-dark);
+}
 
 
 /* --- 對話框 --- */
 #dialogue-box {
-  padding: 1.5rem; background: var(--ghibli-dialogue-bg); backdrop-filter: blur(10px); border: 1px solid var(--ghibli-border-darker);
-  border-radius: 12px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-  flex-grow: 1; /* Allow dialogue box to fill remaining space in main-content */
+  padding: 1.5rem;
+  background: var(--ghibli-dialogue-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--ghibli-border-darker);
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  flex-grow: 1;
+  /* Allow dialogue box to fill remaining space in main-content */
   display: flex;
   flex-direction: column;
   /* --- REMOVED --- overflow: hidden; Parent (#main-content) now handles scroll */
@@ -258,252 +444,612 @@ footer a:hover { color: var(--ghibli-accent-blue-dark); }
 
 #messages {
   /* --- REMOVED --- min-height: 150px; Not strictly needed if dialogue-box grows */
-  flex-grow: 1; /* Let messages fill available space within dialogue-box */
+  flex-grow: 1;
+  /* Let messages fill available space within dialogue-box */
   /* --- REMOVED --- overflow-y: auto; Parent (#main-content) handles scroll */
   margin-bottom: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
-  padding-right: 8px; /* Keep padding for potential scrollbar space from parent */
+  padding-right: 8px;
+  /* Keep padding for potential scrollbar space from parent */
 }
+
 /* --- REMOVED --- Scrollbar styles for #messages, as it no longer scrolls independently */
 
 
 /* Message Bubbles (Unchanged) */
 .message-container {
-  padding: 0.8rem 1.2rem; border-radius: 15px; max-width: 85%; word-wrap: break-word; font-size: 1.15rem;
-  line-height: 1.6; box-shadow: 1px 1px 3px rgba(0,0,0,0.07);
+  padding: 0.8rem 1.2rem;
+  border-radius: 15px;
+  max-width: 85%;
+  word-wrap: break-word;
+  font-size: 1.15rem;
+  line-height: 1.6;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.07);
 }
-.message-container p { margin-bottom: 0.5em; line-height: 1.6; }
-.message-container p:last-child { margin-bottom: 0; }
-.message-container strong { font-weight: 600; color: var(--ghibli-text); }
+
+.message-container p {
+  margin-bottom: 0.5em;
+  line-height: 1.6;
+}
+
+.message-container p:last-child {
+  margin-bottom: 0;
+}
+
+.message-container strong {
+  font-weight: 600;
+  color: var(--ghibli-text);
+}
 
 /* System & Initial Message (Unchanged) */
-.message-container.system, .message-container.initial {
-    background-color: rgba(230, 230, 230, 0.7); color: var(--ghibli-text-light); font-style: italic; max-width: 95%;
-    text-align: center; margin-left: auto; margin-right: auto; border-radius: 8px; font-size: 1.05rem;
+.message-container.system,
+.message-container.initial {
+  background-color: rgba(230, 230, 230, 0.7);
+  color: var(--ghibli-text-light);
+  font-style: italic;
+  max-width: 95%;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 8px;
+  font-size: 1.05rem;
 }
-.message-container.system strong, .message-container.initial strong {
-    color: var(--ghibli-text); font-size: 1.1em; display: block; margin-bottom: 0.3em; font-style: normal;
+
+.message-container.system strong,
+.message-container.initial strong {
+  color: var(--ghibli-text);
+  font-size: 1.1em;
+  display: block;
+  margin-bottom: 0.3em;
+  font-style: normal;
 }
-.message-container.initial p { font-style: normal; }
-.message-container.initial p:last-of-type { font-style: italic; }
+
+.message-container.initial p {
+  font-style: normal;
+}
+
+.message-container.initial p:last-of-type {
+  font-style: italic;
+}
 
 /* --- Style for Enlarged Chapter Text --- (Unchanged) */
 .message-container.chapter-display {
-    background-color: rgba(255, 250, 240, 0.8); text-align: left; font-style: normal;
-    max-width: 100%; border-radius: 10px;
+  background-color: rgba(255, 250, 240, 0.8);
+  text-align: left;
+  font-style: normal;
+  max-width: 100%;
+  border-radius: 10px;
 }
+
 .message-container.chapter-display strong {
-    font-size: 1.3em; color: var(--ghibli-text); display: block; margin-bottom: 0.6em;
+  font-size: 1.3em;
+  color: var(--ghibli-text);
+  display: block;
+  margin-bottom: 0.6em;
 }
+
 .message-container.chapter-display p {
-    font-size: 1.8rem; line-height: 1.8; color: var(--ghibli-text); font-style: normal;
+  font-size: 1.8rem;
+  line-height: 1.8;
+  color: var(--ghibli-text);
+  font-style: normal;
 }
 
 /* AI/Confucius Message (Unchanged) */
-.message-container.ai, .message-container.confucius {
-  background-color: #ffffff; color: var(--ghibli-text); margin-right: auto; border-top-left-radius: 5px; text-align: left;
+.message-container.ai,
+.message-container.confucius {
+  background-color: #ffffff;
+  color: var(--ghibli-text);
+  margin-right: auto;
+  border-top-left-radius: 5px;
+  text-align: left;
 }
+
 /* Loading Message (Unchanged) */
 .loading-message {
-    font-style: italic; color: var(--ghibli-accent-orange-dark); animation: blink 1.5s linear infinite;
-    background-color: rgba(255, 230, 200, 0.7); text-align: center; margin-left: auto; margin-right: auto;
-    border-radius: 10px; max-width: 90%;
+  font-style: italic;
+  color: var(--ghibli-accent-orange-dark);
+  animation: blink 1.5s linear infinite;
+  background-color: rgba(255, 230, 200, 0.7);
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 10px;
+  max-width: 90%;
 }
-@keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
 /* User Message (Unchanged) */
 .message-container.user {
-  background-color: var(--ghibli-accent-green); color: var(--ghibli-accent-green-dark); margin-left: auto;
-  border-top-right-radius: 5px; text-align: left;
+  background-color: var(--ghibli-accent-green);
+  color: var(--ghibli-accent-green-dark);
+  margin-left: auto;
+  border-top-right-radius: 5px;
+  text-align: left;
 }
 
 /* Interaction Button Area (Unchanged within dialogue-box) */
-#input-area { display: flex; gap: 0.8rem; margin-bottom: 1rem; justify-content: center; flex-shrink: 0; }
-#input-area .interaction-button {
-  flex-grow: 0; min-width: 200px; max-width: 300px; padding: 0.7rem 1rem; font-size: 1.05rem;
-  background-color: var(--ghibli-accent-orange); color: var(--ghibli-accent-orange-dark);
+#input-area {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+  justify-content: center;
+  flex-shrink: 0;
 }
-#input-area .interaction-button:hover:not(:disabled) { background-color: #ffb74d; }
+
+#input-area .interaction-button {
+  flex-grow: 0;
+  min-width: 200px;
+  max-width: 300px;
+  padding: 0.7rem 1rem;
+  font-size: 1.05rem;
+  background-color: var(--ghibli-accent-orange);
+  color: var(--ghibli-accent-orange-dark);
+}
+
+#input-area .interaction-button:hover:not(:disabled) {
+  background-color: #ffb74d;
+}
 
 /* User Input Area (Unchanged within dialogue-box) */
-#user-input-area { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem; align-items: flex-end; flex-shrink: 0; }
+#user-input-area {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1rem;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
 #user-input-area textarea {
-  width: 100%; padding: 0.8rem; font-size: 1.1rem; font-family: inherit; border: 1px solid var(--ghibli-border);
-  border-radius: 10px; box-sizing: border-box; resize: vertical; background-color: #fff; color: var(--ghibli-text); min-height: 60px;
+  width: 100%;
+  padding: 0.8rem;
+  font-size: 1.1rem;
+  font-family: inherit;
+  border: 1px solid var(--ghibli-border);
+  border-radius: 10px;
+  box-sizing: border-box;
+  resize: vertical;
+  background-color: #fff;
+  color: var(--ghibli-text);
+  min-height: 60px;
 }
-#user-input-area textarea:focus { border-color: var(--ghibli-accent-blue); outline: none; box-shadow: 0 0 5px rgba(160, 216, 239, 0.4); }
+
+#user-input-area textarea:focus {
+  border-color: var(--ghibli-accent-blue);
+  outline: none;
+  box-shadow: 0 0 5px rgba(160, 216, 239, 0.4);
+}
+
 #user-input-area .send-button {
-  padding: 0.6rem 1.5rem; font-size: 1rem; background-color: #81c784; color: #1b5e20;
-  min-width: 100px; align-self: flex-end; width: auto;
+  padding: 0.6rem 1.5rem;
+  font-size: 1rem;
+  background-color: #81c784;
+  color: #1b5e20;
+  min-width: 100px;
+  align-self: flex-end;
+  width: auto;
 }
-#user-input-area .send-button:hover { background-color: #66bb6a; }
+
+#user-input-area .send-button:hover {
+  background-color: #66bb6a;
+}
 
 
 /* --- 夜晚模式 --- */
-body.dark-mode { background-color: var(--ghibli-dark-bg); background-image: none; color: var(--ghibli-dark-text); }
+body.dark-mode {
+  background-color: var(--ghibli-dark-bg);
+  background-image: none;
+  color: var(--ghibli-dark-text);
+}
 
 /* Dark Sticky Header */
-body.dark-mode #main-content > header { background: var(--ghibli-dark-header-bg); border-bottom-color: rgba(68, 68, 68, 0.6); }
-body.dark-mode #main-content > header h1 { color: var(--ghibli-dark-text); }
-body.dark-mode #main-content > header #toggle-dark-btn { color: var(--ghibli-dark-text-light); }
-body.dark-mode #main-content > header #toggle-dark-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--ghibli-dark-text); }
+body.dark-mode #main-content>header {
+  background: var(--ghibli-dark-header-bg);
+  border-bottom-color: rgba(68, 68, 68, 0.6);
+}
+
+body.dark-mode #main-content>header h1 {
+  color: var(--ghibli-dark-text);
+}
+
+body.dark-mode #main-content>header #toggle-dark-btn {
+  color: var(--ghibli-dark-text-light);
+}
+
+body.dark-mode #main-content>header #toggle-dark-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--ghibli-dark-text);
+}
 
 /* Dark Footer */
-body.dark-mode footer { background: var(--ghibli-dark-header-bg); color: var(--ghibli-dark-text-light); border-top-color: rgba(68, 68, 68, 0.6); }
-body.dark-mode footer a { color: var(--ghibli-dark-text); }
-body.dark-mode footer a:hover { color: var(--ghibli-dark-accent-blue-light); }
+body.dark-mode footer {
+  background: var(--ghibli-dark-header-bg);
+  color: var(--ghibli-dark-text-light);
+  border-top-color: rgba(68, 68, 68, 0.6);
+}
+
+body.dark-mode footer a {
+  color: var(--ghibli-dark-text);
+}
+
+body.dark-mode footer a:hover {
+  color: var(--ghibli-dark-accent-blue-light);
+}
 
 /* Dark Ghibli Buttons */
-body.dark-mode .ghibli-button { background-color: var(--ghibli-dark-accent-blue); color: var(--ghibli-dark-accent-blue-light); box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4); }
-body.dark-mode .ghibli-button:hover:not(:disabled) { background-color: #34495e; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5); }
-body.dark-mode .ghibli-button:active:not(:disabled) { box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4); }
-body.dark-mode .ghibli-button:disabled { background-color: #3a4a5a; color: #7f8c8d; }
-body.dark-mode #toggle-menu-btn { background-color: var(--ghibli-dark-accent-yellow); color: var(--ghibli-dark-accent-yellow-light); }
-body.dark-mode #toggle-menu-btn:hover { background-color: #5a5a5a; }
+body.dark-mode .ghibli-button {
+  background-color: var(--ghibli-dark-accent-blue);
+  color: var(--ghibli-dark-accent-blue-light);
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .ghibli-button:hover:not(:disabled) {
+  background-color: #34495e;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .ghibli-button:active:not(:disabled) {
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .ghibli-button:disabled {
+  background-color: #3a4a5a;
+  color: #7f8c8d;
+}
+
+body.dark-mode #toggle-menu-btn {
+  background-color: var(--ghibli-dark-accent-yellow);
+  color: var(--ghibli-dark-accent-yellow-light);
+}
+
+body.dark-mode #toggle-menu-btn:hover {
+  background-color: #5a5a5a;
+}
 
 /* Dark Menu */
-body.dark-mode .major-chapter-container { border-color: var(--ghibli-dark-border); background: var(--ghibli-dark-menu-bg); box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-body.dark-mode .major-chapter-btn { color: var(--ghibli-dark-text); border-bottom-color: rgba(68, 68, 68, 0); }
-body.dark-mode .major-chapter-btn:hover { filter: brightness(110%); }
-body.dark-mode .major-chapter-btn.active { filter: brightness(115%); border-bottom-color: var(--ghibli-dark-border-lighter); }
-body.dark-mode .major-chapter-container:nth-of-type(6n+1) .major-chapter-btn { background-color: #2c3e50; color: #ecf0f1; }
-body.dark-mode .major-chapter-container:nth-of-type(6n+2) .major-chapter-btn { background-color: #27ae60; color: #e8f5e9; }
-body.dark-mode .major-chapter-container:nth-of-type(6n+3) .major-chapter-btn { background-color: #f39c12; color: #fef9e7; }
-body.dark-mode .major-chapter-container:nth-of-type(6n+4) .major-chapter-btn { background-color: #e67e22; color: #fdf3e6; }
-body.dark-mode .major-chapter-container:nth-of-type(6n+5) .major-chapter-btn { background-color: #8e44ad; color: #f4ecf7; }
-body.dark-mode .major-chapter-container:nth-of-type(6n+6) .major-chapter-btn { background-color: #795548; color: #efebe9; }
-body.dark-mode .sub-menu-container { background: var(--ghibli-dark-submenu-bg); }
-body.dark-mode .sub-chapter-link { background-color: var(--ghibli-dark-subitem-bg); color: var(--ghibli-dark-subitem-text); border-color: var(--ghibli-dark-border); box-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
-body.dark-mode .sub-chapter-link:hover { background-color: var(--ghibli-dark-subitem-hover); border-color: var(--ghibli-dark-subitem-text); }
+body.dark-mode .major-chapter-container {
+  border-color: var(--ghibli-dark-border);
+  background: var(--ghibli-dark-menu-bg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .major-chapter-btn {
+  color: var(--ghibli-dark-text);
+  border-bottom-color: rgba(68, 68, 68, 0);
+}
+
+body.dark-mode .major-chapter-btn:hover {
+  filter: brightness(110%);
+}
+
+body.dark-mode .major-chapter-btn.active {
+  filter: brightness(115%);
+  border-bottom-color: var(--ghibli-dark-border-lighter);
+}
+
+body.dark-mode .major-chapter-container:nth-of-type(6n+1) .major-chapter-btn {
+  background-color: #2c3e50;
+  color: #ecf0f1;
+}
+
+body.dark-mode .major-chapter-container:nth-of-type(6n+2) .major-chapter-btn {
+  background-color: #27ae60;
+  color: #e8f5e9;
+}
+
+body.dark-mode .major-chapter-container:nth-of-type(6n+3) .major-chapter-btn {
+  background-color: #f39c12;
+  color: #fef9e7;
+}
+
+body.dark-mode .major-chapter-container:nth-of-type(6n+4) .major-chapter-btn {
+  background-color: #e67e22;
+  color: #fdf3e6;
+}
+
+body.dark-mode .major-chapter-container:nth-of-type(6n+5) .major-chapter-btn {
+  background-color: #8e44ad;
+  color: #f4ecf7;
+}
+
+body.dark-mode .major-chapter-container:nth-of-type(6n+6) .major-chapter-btn {
+  background-color: #795548;
+  color: #efebe9;
+}
+
+body.dark-mode .sub-menu-container {
+  background: var(--ghibli-dark-submenu-bg);
+}
+
+body.dark-mode .sub-chapter-link {
+  background-color: var(--ghibli-dark-subitem-bg);
+  color: var(--ghibli-dark-subitem-text);
+  border-color: var(--ghibli-dark-border);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .sub-chapter-link:hover {
+  background-color: var(--ghibli-dark-subitem-hover);
+  border-color: var(--ghibli-dark-subitem-text);
+}
+
+/* 深色模式已讀章節標記 */
+body.dark-mode .sub-chapter-link.read {
+  background-color: var(--ghibli-dark-accent-green);
+  border-color: var(--ghibli-dark-accent-green-light);
+}
+
+body.dark-mode .sub-chapter-link.read::after {
+  color: var(--ghibli-dark-accent-green-light);
+}
 
 /* Dark Dialogue Box & Messages */
-body.dark-mode #dialogue-box { background: var(--ghibli-dark-dialogue-bg); border-color: var(--ghibli-dark-border-lighter); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); }
-body.dark-mode .message-container.system, body.dark-mode .message-container.initial { background-color: rgba(40, 40, 40, 0.7); color: var(--ghibli-dark-text-light); }
-body.dark-mode .message-container.system strong, body.dark-mode .message-container.initial strong { color: var(--ghibli-dark-text); }
-body.dark-mode .message-container.chapter-display { background-color: rgba(50, 50, 50, 0.8); }
-body.dark-mode .message-container.chapter-display strong { color: var(--ghibli-dark-text); }
-body.dark-mode .message-container.chapter-display p { color: var(--ghibli-dark-text); }
-body.dark-mode .message-container.ai, body.dark-mode .message-container.confucius { background-color: var(--ghibli-dark-menu-item-bg); color: var(--ghibli-dark-text); box-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
-body.dark-mode .message-container.user { background-color: var(--ghibli-dark-accent-green); color: var(--ghibli-dark-accent-green-light); box-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
-body.dark-mode .loading-message { color: var(--ghibli-accent-orange-light); background-color: rgba(90, 90, 90, 0.7); }
+body.dark-mode #dialogue-box {
+  background: var(--ghibli-dark-dialogue-bg);
+  border-color: var(--ghibli-dark-border-lighter);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .message-container.system,
+body.dark-mode .message-container.initial {
+  background-color: rgba(40, 40, 40, 0.7);
+  color: var(--ghibli-dark-text-light);
+}
+
+body.dark-mode .message-container.system strong,
+body.dark-mode .message-container.initial strong {
+  color: var(--ghibli-dark-text);
+}
+
+body.dark-mode .message-container.chapter-display {
+  background-color: rgba(50, 50, 50, 0.8);
+}
+
+body.dark-mode .message-container.chapter-display strong {
+  color: var(--ghibli-dark-text);
+}
+
+body.dark-mode .message-container.chapter-display p {
+  color: var(--ghibli-dark-text);
+}
+
+body.dark-mode .message-container.ai,
+body.dark-mode .message-container.confucius {
+  background-color: var(--ghibli-dark-menu-item-bg);
+  color: var(--ghibli-dark-text);
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .message-container.user {
+  background-color: var(--ghibli-dark-accent-green);
+  color: var(--ghibli-dark-accent-green-light);
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .loading-message {
+  color: var(--ghibli-accent-orange-light);
+  background-color: rgba(90, 90, 90, 0.7);
+}
 
 /* Dark Input Area */
-body.dark-mode #input-area .interaction-button { background-color: var(--ghibli-dark-accent-orange); color: var(--ghibli-dark-accent-orange-light); }
-body.dark-mode #input-area .interaction-button:hover:not(:disabled) { background-color: #6a6a6a; }
-body.dark-mode #user-input-area textarea { background-color: var(--ghibli-dark-subitem-bg); color: var(--ghibli-dark-text); border-color: var(--ghibli-dark-border); }
-body.dark-mode #user-input-area textarea:focus { border-color: var(--ghibli-dark-border-lighter); box-shadow: 0 0 5px rgba(119, 119, 119, 0.4); }
-body.dark-mode #user-input-area .send-button { background-color: #388e3c; color: #e8f5e9; }
-body.dark-mode #user-input-area .send-button:hover { background-color: #4caf50; }
+body.dark-mode #input-area .interaction-button {
+  background-color: var(--ghibli-dark-accent-orange);
+  color: var(--ghibli-dark-accent-orange-light);
+}
+
+body.dark-mode #input-area .interaction-button:hover:not(:disabled) {
+  background-color: #6a6a6a;
+}
+
+body.dark-mode #user-input-area textarea {
+  background-color: var(--ghibli-dark-subitem-bg);
+  color: var(--ghibli-dark-text);
+  border-color: var(--ghibli-dark-border);
+}
+
+body.dark-mode #user-input-area textarea:focus {
+  border-color: var(--ghibli-dark-border-lighter);
+  box-shadow: 0 0 5px rgba(119, 119, 119, 0.4);
+}
+
+body.dark-mode #user-input-area .send-button {
+  background-color: #388e3c;
+  color: #e8f5e9;
+}
+
+body.dark-mode #user-input-area .send-button:hover {
+  background-color: #4caf50;
+}
 
 
 /* --- 響應式設計 --- */
 @media (max-width: 768px) {
+
   /* --- MODIFIED --- Allow page scroll on mobile */
-  html { overflow: auto; }
+  html {
+    overflow: auto;
+  }
+
   body {
-      /* --- MODIFIED --- Allow natural height and page scroll */
-      height: auto;
-      overflow: auto;
-      /* --- ADDED --- Restore padding-bottom for footer space */
-      padding-bottom: var(--footer-height);
+    /* --- MODIFIED --- Allow natural height and page scroll */
+    height: auto;
+    overflow: auto;
+    /* --- ADDED --- Restore padding-bottom for footer space */
+    padding-bottom: var(--footer-height);
   }
 
   #container {
-      flex-direction: column;
-      padding: 10px;
-      /* --- MODIFIED --- Allow natural height */
-      height: auto;
-      padding-bottom: 10px; /* Reset container padding */
+    flex-direction: column;
+    padding: 10px;
+    /* --- MODIFIED --- Allow natural height */
+    height: auto;
+    padding-bottom: 10px;
+    /* Reset container padding */
   }
 
   #sidebar {
-      width: 100%;
-      margin-right: 0;
-      margin-left: 0; /* --- ADDED --- Reset desktop margin */
-      margin-bottom: 1rem;
-      /* --- MODIFIED --- Restore max-height and overflow for mobile */
-      max-height: 40vh;
-      overflow-y: auto;
-      /* --- MODIFIED --- Ensure correct stacking order */
-      order: 2;
-      padding-top: 0;
+    width: 100%;
+    margin-right: 0;
+    margin-left: 0;
+    /* --- ADDED --- Reset desktop margin */
+    margin-bottom: 1rem;
+    /* --- MODIFIED --- Restore max-height and overflow for mobile */
+    max-height: 40vh;
+    overflow-y: auto;
+    /* --- MODIFIED --- Ensure correct stacking order */
+    order: 2;
+    padding-top: 0;
   }
 
-  #toggle-menu-btn { margin-bottom: 0.8rem; }
+  #toggle-menu-btn {
+    margin-bottom: 0.8rem;
+  }
 
   #main-content {
-      /* --- MODIFIED --- Allow natural height and remove forced scroll */
-      height: auto;
-      overflow-y: visible; /* Let page scroll handle content */
-      /* --- REMOVED --- max-width: 100%; (already default) */
-      min-height: auto; /* Already set, but confirm */
-      /* --- MODIFIED --- Ensure correct stacking order */
-      order: 1;
+    /* --- MODIFIED --- Allow natural height and remove forced scroll */
+    height: auto;
+    overflow-y: visible;
+    /* Let page scroll handle content */
+    /* --- REMOVED --- max-width: 100%; (already default) */
+    min-height: auto;
+    /* Already set, but confirm */
+    /* --- MODIFIED --- Ensure correct stacking order */
+    order: 1;
   }
 
-  #main-content > header {
-      padding: 8px 10px;
-      /* --- ADDED --- Make header static on mobile (or keep sticky if preferred relative to viewport) */
-      position: static; /* Simpler for mobile */
-      /* --- ADDED --- Restore margin-bottom */
-      margin-bottom: 0.8rem;
+  #main-content>header {
+    padding: 8px 10px;
+    /* --- ADDED --- Make header static on mobile (or keep sticky if preferred relative to viewport) */
+    position: static;
+    /* Simpler for mobile */
+    /* --- ADDED --- Restore margin-bottom */
+    margin-bottom: 0.8rem;
   }
-  #main-content > header h1 { font-size: 1.3em; padding: 0 35px; }
-  #main-content > header #toggle-dark-btn { font-size: 1.2rem; padding: 0.2rem 0.5rem; right: 10px; }
+
+  #main-content>header h1 {
+    font-size: 1.3em;
+    padding: 0 35px;
+  }
+
+  #main-content>header #toggle-dark-btn {
+    font-size: 1.2rem;
+    padding: 0.2rem 0.5rem;
+    right: 10px;
+  }
 
   footer {
-      /* --- MODIFIED --- Ensure footer is fixed or static depending on desired mobile behavior. Fixed is usually fine. */
-      height: var(--footer-height);
-      line-height: var(--footer-height);
-      font-size: 0.75em;
-      padding: 0 8px;
+    /* --- MODIFIED --- Ensure footer is fixed or static depending on desired mobile behavior. Fixed is usually fine. */
+    height: var(--footer-height);
+    line-height: var(--footer-height);
+    font-size: 0.75em;
+    padding: 0 8px;
   }
 
   #dialogue-box {
-      padding: 0.8rem;
-      border-radius: 10px;
-      /* --- ADDED --- Reset margin-top if header is static */
-      margin-top: 0;
+    padding: 0.8rem;
+    border-radius: 10px;
+    /* --- ADDED --- Reset margin-top if header is static */
+    margin-top: 0;
   }
 
   #messages {
-      /* --- REMOVED --- min-height: 100px; */
-      padding-right: 5px;
-      gap: 0.6rem;
-      /* --- REMOVED --- overflow-y: visible; Let page scroll */
+    /* --- REMOVED --- min-height: 100px; */
+    padding-right: 5px;
+    gap: 0.6rem;
+    /* --- REMOVED --- overflow-y: visible; Let page scroll */
   }
 
   /* Other mobile adjustments remain the same */
-  .message-container { padding: 0.6rem 1rem; font-size: 1.0rem; max-width: 90%; border-radius: 12px; }
-  .message-container.system, .message-container.initial { font-size: 0.85rem; }
-  .message-container.chapter-display p { font-size: 1.4rem; line-height: 1.7; }
-  .message-container.chapter-display strong { font-size: 1.1em; margin-bottom: 0.4em;}
-  #input-area { gap: 0.5rem; margin-bottom: 0.8rem; }
-  #input-area .interaction-button { min-width: 180px; font-size: 0.9rem; padding: 0.5rem 0.7rem; }
-  #user-input-area textarea { font-size: 0.95rem; min-height: 45px; }
-  #user-input-area .send-button { padding: 0.4rem 1rem; font-size: 0.9rem; }
+  .message-container {
+    padding: 0.6rem 1rem;
+    font-size: 1.0rem;
+    max-width: 90%;
+    border-radius: 12px;
+  }
+
+  .message-container.system,
+  .message-container.initial {
+    font-size: 0.85rem;
+  }
+
+  .message-container.chapter-display p {
+    font-size: 1.4rem;
+    line-height: 1.7;
+  }
+
+  .message-container.chapter-display strong {
+    font-size: 1.1em;
+    margin-bottom: 0.4em;
+  }
+
+  #input-area {
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+  }
+
+  #input-area .interaction-button {
+    min-width: 180px;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.7rem;
+  }
+
+  #user-input-area textarea {
+    font-size: 0.95rem;
+    min-height: 45px;
+  }
+
+  #user-input-area .send-button {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+  }
 }
 
 /* Styling for the copy button in message containers */
 .message-container .copy-btn {
-  font-size: 16px; /* Adjust as needed */
-  margin-left: 8px; /* Space between message text and button */
-  vertical-align: middle; /* Align with text */
+  font-size: 16px;
+  /* Adjust as needed */
+  margin-left: 8px;
+  /* Space between message text and button */
+  vertical-align: middle;
+  /* Align with text */
   display: inline-flex;
-  align-items: center; /* Vertically center text */
+  align-items: center;
+  /* Vertically center text */
   cursor: pointer;
 }
 
 /* Adjustments for message content when a copy button is present */
-.message-container > span[id^="message-content-"] {
-  display: inline-block; /* Or 'flex-grow: 1' if message-container is flex */
-  max-width: calc(100% - 30px); /* Adjust 30px based on button size + margin */
+.message-container>span[id^="message-content-"] {
+  display: inline-block;
+  /* Or 'flex-grow: 1' if message-container is flex */
+  max-width: calc(100% - 30px);
+  /* Adjust 30px based on button size + margin */
 }
 
 /* Ensure message container can hold content and button */
-.message-container.ai, .message-container.confucius, .message-container.user {
-  display: flex; /* Use flexbox for better alignment */
-  align-items: flex-start; /* Align items to the start of the cross axis */
-  justify-content: space-between; /* Puts space between message and button */
+.message-container.ai,
+.message-container.confucius,
+.message-container.user {
+  display: flex;
+  /* Use flexbox for better alignment */
+  align-items: flex-start;
+  /* Align items to the start of the cross axis */
+  justify-content: space-between;
+  /* Puts space between message and button */
 }

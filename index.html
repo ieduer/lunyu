@@ -1,24 +1,40 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="https://raw.githubusercontent.com/gptv/suen/main/images/Avatar-small.jpeg" type="image/jpeg">
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="AI論語 - 與孔子對話學習《論語》，結合楊伯峻《論語譯注》與 Gemini AI，創新國學學習方式。" />
+  <meta name="keywords" content="論語,孔子,AI,國學,高考,楊伯峻,論語譯注,經典,儒學" />
+  <meta name="author" content="Suen" />
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="AI論語 - 與孔子對話學習《論語》" />
+  <meta property="og:description" content="結合楊伯峻《論語譯注》與 Gemini AI，創新國學學習方式。" />
+  <meta property="og:url" content="https://kz.bdfz.net/" />
+  <meta property="og:image" content="https://raw.githubusercontent.com/gptv/suen/main/images/Avatar-small.jpeg" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="AI論語" />
+  <meta name="twitter:description" content="與孔子對話學習《論語》" />
   <!-- Favicons -->
+  <link rel="icon" href="https://raw.githubusercontent.com/gptv/suen/main/images/Avatar-small.jpeg" type="image/jpeg">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <title>AI論語</title>
+  <title>AI論語 - 與孔子對話學習《論語》</title>
   <link rel="stylesheet" href="assets/css/style.css" />
   <script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    (function (c, l, a, r, i, t, y) {
+      c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+      t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+      y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
     })(window, document, "clarity", "script", "qylozkdaeh");
-</script>
+  </script>
   <script type="module" src="assets/js/copy-button.js"></script>
 </head>
+
 <body>
 
   <!-- Main Container -->
@@ -26,9 +42,9 @@
     <!-- 左側：側邊欄 -->
     <aside id="sidebar">
       <!-- Toggle Button MOVED HERE -->
-      <button id="toggle-menu-btn" class="ghibli-button">顯示目錄</button>
+      <button id="toggle-menu-btn" class="ghibli-button" aria-label="切換目錄顯示" aria-expanded="false">顯示目錄</button>
       <!-- 目錄容器 (Level 1 items added by JS) -->
-      <nav id="chapter-menu"></nav>
+      <nav id="chapter-menu" role="navigation" aria-label="論語章節目錄"></nav>
     </aside>
 
     <!-- 右側：主要內容 -->
@@ -36,23 +52,25 @@
       <!-- Header is now the first element here, will be sticky -->
       <header>
         <h1>AI論語</h1>
-        <button id="toggle-dark-btn" title="切換夜晚模式" class="ghibli-button icon-button">🌓</button>
+        <button id="toggle-dark-btn" title="切換夜晚模式" class="ghibli-button icon-button" aria-label="切換深色/淺色模式">🌓</button>
       </header>
 
       <!-- 互動對話窗口 -->
-      <section id="dialogue-box" class="ghibli-dialogue">
-        <div id="messages">
-            <!-- Initial content added by JS -->
+      <section id="dialogue-box" class="ghibli-dialogue" role="main" aria-label="論語內容與 AI 對話區">
+        <div id="messages" role="log" aria-live="polite" aria-label="對話內容">
+          <!-- Initial content added by JS -->
         </div>
         <!-- Input area only contains the Yang button now -->
         <div id="input-area">
-          <button id="btn-yang" onclick="handleYangAnnotationClick()" class="ghibli-button interaction-button" disabled>楊伯峻「論語譯註」</button>
+          <button id="btn-yang" onclick="handleYangAnnotationClick()" class="ghibli-button interaction-button" disabled
+            aria-label="查看楊伯峻論語譯註並與 AI 對話">楊伯峻「論語譯註」</button>
         </div>
-         <!-- 用戶輸入區域 (預設隱藏) -->
-         <div id="user-input-area" style="display:none;" class="ghibli-input-area">
-            <textarea id="user-input" placeholder="請輸入你的問題，與孔子深入對話..." rows="3"></textarea>
-            <button id="send-input-btn" onclick="handleUserInput()" class="ghibli-button send-button">發送</button>
-          </div>
+        <!-- 用戶輸入區域 (預設隱藏) -->
+        <div id="user-input-area" style="display:none;" class="ghibli-input-area">
+          <textarea id="user-input" placeholder="請輸入你的問題，與孔子深入對話..." rows="3" aria-label="輸入問題"></textarea>
+          <button id="send-input-btn" onclick="handleUserInput()" class="ghibli-button send-button"
+            aria-label="發送問題">發送</button>
+        </div>
       </section>
     </div> <!-- End #main-content -->
   </div> <!-- End #container -->
@@ -63,4 +81,5 @@
 
   <script src="assets/js/app.js"></script>
 </body>
+
 </html>
