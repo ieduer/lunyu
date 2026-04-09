@@ -17,14 +17,59 @@ let chapterMenuEl, messagesEl, inputAreaEl, userInputAreaEl, userInputEl,
 
 // ----- Constants -----
 const animals = ['🐶', '🐱', '🐷', '🦊', '🐻', '🐨', '🐼', '🐰', '🐯', '🦁', '🐬', '🐳', '🦉', '🦋'];
+const SITE_KEY = 'kz';
 const STORAGE_KEYS = {
     READ_PROGRESS: 'lunyu_read_progress',
     BOOKMARKS: 'lunyu_bookmarks',
     DARK_MODE: 'darkMode'
 };
 
+function getIdentity() {
+    return window.BdfzIdentity || null;
+}
+
+function mountIdentity() {
+    getIdentity()?.mount({ siteKey: SITE_KEY });
+}
+
+function trackChapterProgress(chapter, state = 'done') {
+    if (!chapter) return;
+    getIdentity()?.syncProgress({
+        siteKey: SITE_KEY,
+        itemKey: `chapter-${chapter.id}`,
+        itemTitle: chapter.title || '論語章節',
+        itemGroup: '阅读',
+        itemType: 'chapter',
+        state,
+        progressPercent: state === 'done' ? 100 : 30,
+        meta: {
+            chapterId: chapter.id,
+            major: chapter.major || null,
+            minor: chapter.minor || null,
+        },
+    }).catch(() => {});
+}
+
+function trackDialogue(chapter, message) {
+    if (!chapter || !message) return;
+    getIdentity()?.syncProgress({
+        siteKey: SITE_KEY,
+        itemKey: `dialogue-${chapter.id}`,
+        itemTitle: `${chapter.title || '論語章節'} 对话`,
+        itemGroup: '问答',
+        itemType: 'discussion',
+        state: 'in_progress',
+        progressPercent: 60,
+        meta: {
+            chapterId: chapter.id,
+            messageLength: String(message).length,
+        },
+    }).catch(() => {});
+}
+
 /* ========== 初始化 ========== */
 document.addEventListener("DOMContentLoaded", () => {
+    mountIdentity();
     applyDarkModePreference();
     initializeDOMElements();
     bindEventListeners();
@@ -186,6 +231,7 @@ function displayChapter(id) {
 
     // 記錄閱讀進度
     markAsRead(id);
+    trackChapterProgress(chapter);
 
     // Add the chapter title/text with a specific class for styling
     const chapterMessage = addMessage(`**${chapter.title}**\n\n${chapter.text}`, 'system');
@@ -429,6 +475,7 @@ function handleUserInput() {
     // 1. Add user message
     addMessage(userText, 'user');
     userInputEl.value = "";
+    trackDialogue(currentAnalect, userText);
 
     // 2. ADD specific animal loading message
     const randomAnimal = animals[Math.floor(Math.random() * animals.length)];
