@@ -9,6 +9,7 @@ let currentInteractionType = null; // 'yang' or null
 let isWaitingForAI = false;
 let activeSubMenu = null;
 let currentLoadingElement = null;
+let conversationSessionKey = '';
 
 // ----- DOM 元素引用 -----
 let chapterMenuEl, messagesEl, inputAreaEl, userInputAreaEl, userInputEl,
@@ -67,9 +68,36 @@ function trackDialogue(chapter, message) {
     }).catch(() => {});
 }
 
+function resetConversationSession() {
+    conversationSessionKey = getIdentity()?.createSessionKey?.(`${SITE_KEY}-chat`) || `${SITE_KEY}-chat-${Date.now().toString(36)}`;
+}
+
+function syncConversationArchive(reason = 'update') {
+    if (!conversationHistory.length) return;
+    if (!conversationSessionKey) resetConversationSession();
+    getIdentity()?.recordConversation({
+        siteKey: SITE_KEY,
+        sessionKey: conversationSessionKey,
+        title: (currentAnalect?.title || '論語').slice(0, 80),
+        summary: conversationHistory[conversationHistory.length - 1]?.content?.slice(0, 120) || '論語對話',
+        sourceUrl: window.location.href,
+        messages: conversationHistory.map((message, index) => ({
+            id: String(index + 1),
+            role: message.role === 'user' ? 'user' : 'assistant',
+            content: message.content,
+        })),
+        meta: {
+            reason,
+            chapterId: currentAnalect?.id || '',
+            interactionType: currentInteractionType || '',
+        },
+    }).catch(() => {});
+}
+
 /* ========== 初始化 ========== */
 document.addEventListener("DOMContentLoaded", () => {
     mountIdentity();
+    resetConversationSession();
     applyDarkModePreference();
     initializeDOMElements();
     bindEventListeners();
@@ -247,7 +275,7 @@ function displayChapter(id) {
 
 // 重置對話狀態
 function resetInteractionState() {
-    conversationHistory = []; currentInteractionType = null; isWaitingForAI = false;
+    conversationHistory = []; currentInteractionType = null; isWaitingForAI = false; resetConversationSession();
     removeLoadingMessage();
     if (messagesEl) messagesEl.innerHTML = ""; // Always clear messages
     if (userInputAreaEl) userInputAreaEl.style.display = "none";
@@ -334,6 +362,7 @@ function addMessage(messageText, sender = "system", isError = false) {
     // Make sure to push the original messageText, not the HTML content
     if (sender === 'user' || sender === 'ai' || sender === 'confucius') {
         conversationHistory.push({ role: sender, content: messageText });
+        syncConversationArchive(sender === 'user' ? 'user-message' : 'assistant-message');
     }
     return messageContainer;
 }
