@@ -408,20 +408,77 @@ footer a:hover {
   border-color: var(--ghibli-accent-blue);
 }
 
-/* 已讀章節標記 */
+/* 已讀章節標記：左側綠色強調條 + 右側圓形勾選徽章 */
 .sub-chapter-link.read {
   position: relative;
-  background-color: #e8f5e9;
-  border-color: var(--ghibli-accent-green);
+  background-color: #eef7ee;
+  border-color: var(--ghibli-accent-green-dark);
+  color: var(--ghibli-accent-green-dark);
+  padding-left: 0.9rem;
+  padding-right: 1.9rem;
+  font-weight: 500;
+}
+
+.sub-chapter-link.read::before {
+  /* 左側強調條：整行掃視時一眼能看到已讀狀態 */
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--ghibli-accent-green-dark);
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
 }
 
 .sub-chapter-link.read::after {
-  content: '✓';
+  /* 右側圓形徽章：深綠底 + 白色勾；大小可縮放，不再是擠在角落的裸字符 */
+  content: '';
   position: absolute;
-  top: 2px;
-  right: 4px;
-  font-size: 0.7em;
-  color: var(--ghibli-accent-green-dark);
+  top: 50%;
+  right: 6px;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><circle cx='10' cy='10' r='9' fill='%23556B2F'/><path d='M6 10.2 L8.6 12.8 L14 7.6' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/contain no-repeat;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.12));
+  transition: transform 0.15s ease;
+}
+
+.sub-chapter-link.read:hover::after {
+  transform: translateY(-50%) scale(1.08);
+}
+
+/* 進行中（未讀完）：空心環，暗示可繼續 */
+.sub-chapter-link.reading {
+  position: relative;
+  padding-left: 0.9rem;
+  padding-right: 1.9rem;
+  border-color: var(--ghibli-accent-blue);
+}
+
+.sub-chapter-link.reading::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--ghibli-accent-blue);
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.sub-chapter-link.reading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><circle cx='10' cy='10' r='8' fill='none' stroke='%234a90c2' stroke-width='2'/><circle cx='10' cy='10' r='3' fill='%234a90c2'/></svg>") center/contain no-repeat;
 }
 
 
@@ -789,14 +846,19 @@ body.dark-mode .sub-chapter-link:hover {
   border-color: var(--ghibli-dark-subitem-text);
 }
 
-/* 深色模式已讀章節標記 */
+/* 深色模式已讀章節標記：勾選徽章改用淺綠底 + 深色勾，提升對比 */
 body.dark-mode .sub-chapter-link.read {
   background-color: var(--ghibli-dark-accent-green);
   border-color: var(--ghibli-dark-accent-green-light);
+  color: var(--ghibli-dark-accent-green-light);
+}
+
+body.dark-mode .sub-chapter-link.read::before {
+  background: var(--ghibli-dark-accent-green-light);
 }
 
 body.dark-mode .sub-chapter-link.read::after {
-  color: var(--ghibli-dark-accent-green-light);
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><circle cx='10' cy='10' r='9' fill='%23b5d89a'/><path d='M6 10.2 L8.6 12.8 L14 7.6' fill='none' stroke='%231f2b16' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/contain no-repeat;
 }
 
 /* Dark Dialogue Box & Messages */

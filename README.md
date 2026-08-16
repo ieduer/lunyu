@@ -28,3 +28,19 @@ Gemini AI會跟你長長長長說下ta的看法。
 
 > 以上為說明文字1.0，更新說明會在：<a href="https://bdfz.net/posts/lunyu" target="_blank" rel="noopener noreferrer">AI論語</a>
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## A+ 學習證據
+
+- 541 條真實《論語》內容由 `data/dialogues.json` 重建成 `data/learning-manifest.json`；30% 門檻為 163 條。
+- 選章、頁面瀏覽、隨機展示不算完成。只有使用者主動點擊「楊伯峻《論語譯註》」，實際顯示譯文與現有注釋後，才在本機標記完成。
+- 只有已登入 User Center 的使用者會先經同源
+  `/api/learning/complete` 呼叫 `KzGrowthEvidence` 來源 RPC；取得精確
+  `resourceKey`／`manifestVersion` 回執後，才寫入穩定
+  `chapter-<id>` legacy progress 與 event。匿名使用者不產生任何完成
+  證據。
+- Function 強制核對同源 `Origin`、`bdfz_uc_session`、當前 manifest
+  版本及結構正確的 `chapter-<id>`；瀏覽器自報的分數、正誤或完成比例
+  會直接被拒絕，不能用來刷入正式證據。
+- 對話與 AI 提問是 `journey_only`，不能代替章節完成；本站沒有作答／判錯流程，不虛構「答錯」資料。
+
+完整契約、驗證與回滾見 [`docs/VERIFICATION.md`](docs/VERIFICATION.md)。

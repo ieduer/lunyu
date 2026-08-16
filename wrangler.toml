@@ -1,0 +1,8 @@
+name = "lunyu"
+pages_build_output_dir = "."
+compatibility_date = "2025-03-23"
+
+[[services]]
+binding = "GROWTH_EVIDENCE"
+service = "bdfz-user-center"
+entrypoint = "KzGrowthEvidence"

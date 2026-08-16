@@ -10,6 +10,7 @@ let isWaitingForAI = false;
 let activeSubMenu = null;
 let currentLoadingElement = null;
 let conversationSessionKey = '';
+let learningManifest = null;
 
 // ----- DOM 元素引用 -----
 let chapterMenuEl, messagesEl, inputAreaEl, userInputAreaEl, userInputEl,
@@ -20,7 +21,7 @@ let chapterMenuEl, messagesEl, inputAreaEl, userInputAreaEl, userInputEl,
 const animals = ['🐶', '🐱', '🐷', '🦊', '🐻', '🐨', '🐼', '🐰', '🐯', '🦁', '🐬', '🐳', '🦉', '🦋'];
 const SITE_KEY = 'kz';
 const STORAGE_KEYS = {
-    READ_PROGRESS: 'lunyu_read_progress',
+    READ_PROGRESS: 'lunyu_learning_completed_v1',
     BOOKMARKS: 'lunyu_bookmarks',
     DARK_MODE: 'darkMode'
 };
@@ -33,27 +34,35 @@ function mountIdentity() {
     getIdentity()?.mount({ siteKey: SITE_KEY });
 }
 
-function trackChapterProgress(chapter, state = 'done') {
-    if (!chapter) return;
-    getIdentity()?.syncProgress({
-        siteKey: SITE_KEY,
-        itemKey: `chapter-${chapter.id}`,
-        itemTitle: chapter.title || '論語章節',
-        itemGroup: '阅读',
-        itemType: 'chapter',
-        state,
-        progressPercent: state === 'done' ? 100 : 30,
-        meta: {
-            chapterId: chapter.id,
-            major: chapter.major || null,
-            minor: chapter.minor || null,
-        },
-    }).catch(() => {});
+async function getAuthenticatedIdentity() {
+    const evidence = window.KzLearningEvidence;
+    if (!evidence?.authenticatedIdentity) return null;
+    return evidence.authenticatedIdentity(getIdentity());
 }
 
-function trackDialogue(chapter, message) {
+function createOpaqueEventId(chapter) {
+    const prefix = `kz-chapter-${chapter?.id || 'unknown'}`;
+    return getIdentity()?.createSessionKey?.(prefix)
+        || window.crypto?.randomUUID?.()
+        || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+async function syncCompletedChapter(chapter) {
+    if (!chapter || !learningManifest || !window.KzLearningEvidence?.syncChapterCompletion) return null;
+    return window.KzLearningEvidence.syncChapterCompletion({
+        identity: getIdentity(),
+        manifest: learningManifest,
+        chapter,
+        eventId: createOpaqueEventId(chapter),
+        sourceUrl: `${window.location.origin}${window.location.pathname}`,
+    });
+}
+
+async function trackDialogue(chapter, message) {
     if (!chapter || !message) return;
-    getIdentity()?.syncProgress({
+    const identity = await getAuthenticatedIdentity();
+    if (!identity) return;
+    identity.syncProgress({
         siteKey: SITE_KEY,
         itemKey: `dialogue-${chapter.id}`,
         itemTitle: `${chapter.title || '論語章節'} 对话`,
@@ -62,6 +71,9 @@ function trackDialogue(chapter, message) {
         state: 'in_progress',
         progressPercent: 60,
         meta: {
+            source: 'lunyu',
+            evidenceRole: 'journey_only',
+            result: 'discussion',
             chapterId: chapter.id,
             messageLength: String(message).length,
         },
@@ -72,21 +84,25 @@ function resetConversationSession() {
     conversationSessionKey = getIdentity()?.createSessionKey?.(`${SITE_KEY}-chat`) || `${SITE_KEY}-chat-${Date.now().toString(36)}`;
 }
 
-function syncConversationArchive(reason = 'update') {
+async function syncConversationArchive(reason = 'update') {
     if (!conversationHistory.length) return;
+    const identity = await getAuthenticatedIdentity();
+    if (!identity) return;
     if (!conversationSessionKey) resetConversationSession();
-    getIdentity()?.recordConversation({
+    identity.recordConversation({
         siteKey: SITE_KEY,
         sessionKey: conversationSessionKey,
         title: (currentAnalect?.title || '論語').slice(0, 80),
         summary: conversationHistory[conversationHistory.length - 1]?.content?.slice(0, 120) || '論語對話',
-        sourceUrl: window.location.href,
+        sourceUrl: `${window.location.origin}${window.location.pathname}`,
         messages: conversationHistory.map((message, index) => ({
             id: String(index + 1),
             role: message.role === 'user' ? 'user' : 'assistant',
             content: message.content,
         })),
+        contentFormat: 'kz-conversation-v1',
         meta: {
+            evidenceRole: 'journey_only',
             reason,
             chapterId: currentAnalect?.id || '',
             interactionType: currentInteractionType || '',
@@ -140,16 +156,24 @@ function loadDialogues() {
         messagesEl.innerHTML = '<div class="message-container system"><p>正在載入論語數據...</p></div>';
     }
 
-    fetch("data/dialogues.json")
-        .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
-        .then(data => {
+    Promise.all([
+        fetch("data/dialogues.json").then(res => { if (!res.ok) throw new Error(`dialogues HTTP ${res.status}`); return res.json(); }),
+        fetch("data/learning-manifest.json", { cache: 'no-store' }).then(res => { if (!res.ok) throw new Error(`manifest HTTP ${res.status}`); return res.json(); }),
+    ])
+        .then(([data, manifest]) => {
             if (!Array.isArray(data) || data.length === 0) throw new Error("dialogues.json empty/invalid");
+            if (manifest?.schemaVersion !== 1 || manifest?.siteKey !== SITE_KEY || manifest?.itemCount !== data.length) {
+                throw new Error("learning-manifest.json mismatch");
+            }
+            learningManifest = manifest;
             allChapters = data;
             groupChapters();
             renderChapterMenu();
             displayInitialRandomAnalect();
             if (btnYangEl) btnYangEl.disabled = true;
             updateProgressDisplay();
+            // 菜單渲染完成後，從用戶系統拉一次遠端進度並合併，失敗靜默降級
+            hydrateReadProgressFromIdentity();
         })
         .catch(err => {
             console.error("Init Error:", err);
@@ -256,10 +280,6 @@ function displayChapter(id) {
     currentAnalect = chapter;
 
     resetInteractionState(); // Clear messages, history, reset button states
-
-    // 記錄閱讀進度
-    markAsRead(id);
-    trackChapterProgress(chapter);
 
     // Add the chapter title/text with a specific class for styling
     const chapterMessage = addMessage(`**${chapter.title}**\n\n${chapter.text}`, 'system');
@@ -444,8 +464,8 @@ function askGemini(prompt, callback, retryCount = 0) {
         });
 }
 
-// 孔子語氣指令 (Keep full)
-const confuciusPersonaInstruction = "你現在扮演中國古代的聖人孔子。請使用文雅、古典、蘊含哲理的語言風格回答問題，如同《論語》中的口吻。稱呼提問者為“汝”或“君”。論述時，務必旁徵博引，結合《論語》全文思想及歷代注疏（如集解、正義、集注等）精髓。可以在對話的第三輪後使用現代網絡用語或過於口語化的表達。回答需分點或分段，條理清晰。除非必要，不使用繁體中文。";
+// AI 導師指令：避免角色扮演誘發文言腔，優先保證可讀性與語義準確。
+const confuciusPersonaInstruction = "你是 AI论语的现代语文阅读导师，陪读者一起研读《论语》。不要扮演孔子本人，也不要模拟古人口吻。请一律用现代白话文回答，语言要平实、清楚、准确，让今天的中学生一读就懂：禁止使用文言或半文半白的腔调，避免堆砌生僻典故，避免为了仿古而产生歧义或误读。可以保持温和、耐心、循循善诱的老师风格，亲切地称呼提问者为“你”。讲解要立足《论语》原文和杨伯峻译注，并可吸收历代注疏（如集解、正义、集注等）的可靠观点，但都要用今天的话把意思和道理说明白。先讲结论，再分点展开；遇到不确定或多种解释时要明确说明，不要编造。篇幅适中，不啰嗦。请使用简体中文。";
 
 
 /* ========== 按鈕點擊處理 ========== */
@@ -467,11 +487,19 @@ function handleYangAnnotationClick() {
     addMessage(`**譯文**\n${translation}`, 'confucius');
     addMessage(`**注釋**\n${annotations}`, 'confucius');
 
+    // 顯式查看譯文與注釋才是本產品的學習完成動作；選章、導航與自動隨機展示均不計完成。
+    const revealedChapter = currentAnalect;
+    syncCompletedChapter(revealedChapter)
+        .then((result) => {
+            if (result?.status === 'synced' || result?.status === 'partial') markAsRead(revealedChapter.id);
+        })
+        .catch(() => {});
+
     // 2. ADD specific loading message
     addMessage("Gemini正在和你一起分析這則內容⋯耐個心吧 🐶⋯", 'loading');
 
     // 3. Build Prompt
-    const prompt = `${confuciusPersonaInstruction}\n\n吾觀此章 (${currentAnalect.title}):\n原文：${currentAnalect.text}\n譯文：${translation}\n註疏：${annotations}\n\n請基於《論語》全文思想及歷代注疏，對此章進行深入分析，闡述其微言大義。`;
+    const prompt = `${confuciusPersonaInstruction}\n\n本章 (${currentAnalect.title}):\n原文：${currentAnalect.text}\n譯文：${translation}\n註疏：${annotations}\n\n请结合《论语》全文思想和历代注疏，用现代白话把这一章的意思和道理讲清楚、讲透彻，帮助读者真正读懂。`;
 
     // 4. Call AI
     askGemini(prompt, (aiAnswer, isError) => {
@@ -513,7 +541,7 @@ function handleUserInput() {
     // 3. Build Prompt
     const historyString = formatHistoryForAI(conversationHistory); // History now includes user/ai msgs
     let contextInfo = `當前討論之章節 (${currentAnalect.title}):\n原文：${currentAnalect.text}\n譯文與注釋已閱。`;
-    const prompt = `${confuciusPersonaInstruction}\n\n${contextInfo}\n\n--- 對話歷史 ---\n${historyString}\n\n--- 請繼續以孔子身份，針對用戶最新提問進行回應 ---`;
+    const prompt = `${confuciusPersonaInstruction}\n\n${contextInfo}\n\n--- 對話歷史 ---\n${historyString}\n\n--- 请针对用户最新的提问继续作答，保持现代白话、清楚准确，不要改成文言腔 ---`;
 
     // 4. Call AI
     askGemini(prompt, (aiAnswer, isError) => {
@@ -563,7 +591,8 @@ function applyDarkModePreference() {
 function getReadProgress() {
     try {
         const progress = localStorage.getItem(STORAGE_KEYS.READ_PROGRESS);
-        return progress ? JSON.parse(progress) : [];
+        const parsed = progress ? JSON.parse(progress) : [];
+        return Array.isArray(parsed) ? Array.from(new Set(parsed.map(id => String(id)))) : [];
     } catch (e) {
         console.error("Error reading progress:", e);
         return [];
@@ -574,8 +603,9 @@ function getReadProgress() {
 function markAsRead(chapterId) {
     try {
         const progress = getReadProgress();
-        if (!progress.includes(chapterId)) {
-            progress.push(chapterId);
+        const normalizedId = String(chapterId);
+        if (!progress.includes(normalizedId)) {
+            progress.push(normalizedId);
             localStorage.setItem(STORAGE_KEYS.READ_PROGRESS, JSON.stringify(progress));
             updateProgressDisplay();
             updateChapterMenuReadStatus();
@@ -588,7 +618,7 @@ function markAsRead(chapterId) {
 // 更新進度顯示
 function updateProgressDisplay() {
     const progress = getReadProgress();
-    const total = allChapters.length || 500; // 論語共約500則
+    const total = learningManifest?.itemCount || allChapters.length || 541;
     const readCount = progress.length;
 
     // 更新頁面標題顯示進度
@@ -601,14 +631,78 @@ function updateProgressDisplay() {
 // 更新目錄中已讀狀態
 function updateChapterMenuReadStatus() {
     const progress = getReadProgress();
+    const inProgress = getInProgressChapters();
     const subLinks = document.querySelectorAll('.sub-chapter-link');
     subLinks.forEach(link => {
         const text = link.textContent;
         const chapter = allChapters.find(ch => ch.title.includes(text));
-        if (chapter && progress.includes(chapter.id)) {
+        if (!chapter) return;
+        if (progress.includes(String(chapter.id))) {
             link.classList.add('read');
+            link.classList.remove('reading');
+        } else if (inProgress.includes(String(chapter.id))) {
+            link.classList.add('reading');
+            link.classList.remove('read');
+        } else {
+            link.classList.remove('read');
+            link.classList.remove('reading');
         }
     });
+}
+
+// 進行中章節（僅記憶體緩存，server 為 source of truth）
+let inProgressChapterCache = [];
+function getInProgressChapters() {
+    return inProgressChapterCache.slice();
+}
+
+// 從 BdfzIdentity（用戶系統）拉取已同步的閱讀進度，
+// 與本地 localStorage 合併。server 是權威 source，本地作為離線 fallback。
+// 不會破壞原有 syncProgress 寫入鏈路；僅額外做一次 GET 讀取。
+async function hydrateReadProgressFromIdentity() {
+    const identity = await getAuthenticatedIdentity();
+    if (!identity || typeof identity.api !== 'function') return;
+    try {
+        const payload = await identity.api(`/api/progress?site=${encodeURIComponent(SITE_KEY)}`);
+        const items = Array.isArray(payload?.items) ? payload.items : [];
+        if (!items.length) { updateChapterMenuReadStatus(); return; }
+
+        const localDone = new Set(getReadProgress());
+        const serverDone = [];
+        const serverInProgress = [];
+
+        const manifestKeys = new Set((learningManifest?.items || []).map(item => item.resourceKey));
+        items.forEach(item => {
+            const key = String(item?.itemKey || '');
+            const meta = item?.meta && typeof item.meta === 'object' ? item.meta : {};
+            if (!manifestKeys.has(key)
+                || meta.evidenceSchema !== 'kz-learning-evidence-v1'
+                || meta.manifestVersion !== learningManifest?.manifestVersion
+                || meta.resourceKeySha256 !== learningManifest?.resourceKeySha256
+                || meta.resourceKey !== key
+                || meta.completionKind !== 'annotation_revealed'
+                || meta.result !== 'completed') return;
+            const chapterId = key.slice('chapter-'.length);
+            if (['done', 'completed'].includes(String(item.state || '').toLowerCase()) && Number(item.progressPercent) >= 100) {
+                serverDone.push(chapterId);
+            }
+        });
+
+        // 合併：server done ∪ local done
+        const merged = Array.from(new Set([...localDone, ...serverDone]));
+        try {
+            localStorage.setItem(STORAGE_KEYS.READ_PROGRESS, JSON.stringify(merged));
+        } catch (e) { /* quota or private mode */ }
+
+        inProgressChapterCache = serverInProgress.filter(id => !merged.includes(id));
+
+        updateProgressDisplay();
+        updateChapterMenuReadStatus();
+    } catch (e) {
+        // 未登入 / 離線 / API 異常都靜默降級到本地模式
+        console.debug('[lunyu] hydrateReadProgressFromIdentity skipped:', e?.message || e);
+        updateChapterMenuReadStatus();
+    }
 }
 
 /* ========== 書籤功能 ========== */
@@ -651,7 +745,7 @@ function isBookmarked(chapterId) {
 function getStats() {
     const progress = getReadProgress();
     const bookmarks = getBookmarks();
-    const total = allChapters.length || 500;
+    const total = learningManifest?.itemCount || allChapters.length || 541;
     return {
         readCount: progress.length,
         bookmarkCount: bookmarks.length,

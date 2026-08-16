@@ -1,0 +1,14 @@
+{
+  "name": "lunyu",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build_learning_manifest.mjs",
+    "build:learning-manifest": "node scripts/build_learning_manifest.mjs",
+    "check:learning-manifest": "node scripts/build_learning_manifest.mjs --check",
+    "test:growth-evidence": "node scripts/test_growth_evidence_function.mjs",
+    "test": "node scripts/test_learning_evidence.mjs && node scripts/test_source_contract.mjs && npm run test:growth-evidence",
+    "check": "npm run check:learning-manifest && node --check assets/js/learning-evidence.js && node --check assets/js/app.js && node --check functions/api/learning/complete.js && node --check functions/api/learning/health.js && npm test"
+  }
+}
