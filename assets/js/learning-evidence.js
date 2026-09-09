@@ -87,7 +87,15 @@
             }),
         });
         const payload = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(payload.error || `source completion ${response.status}`);
+        if (!response.ok) {
+            const error = new Error(typeof payload.error === 'string' ? payload.error : `source completion ${response.status}`);
+            error.status = response.status;
+            if (response.status === 429 && ['RATE_LIMIT_MINUTE', 'RATE_LIMIT_DAY'].includes(payload.errorCode)) {
+                error.code = payload.errorCode;
+                error.retryAfterSeconds = payload.errorCode === 'RATE_LIMIT_MINUTE' ? 60 : 86400;
+            }
+            throw error;
+        }
         if (payload?.ok !== true
             || payload.sourceSiteKey !== 'kz'
             || payload.resourceKey !== item.resourceKey

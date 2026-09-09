@@ -13,6 +13,7 @@ let conversationSessionKey = '';
 let learningManifest = null;
 let hydratedReadProgressCache = [];
 let displayCatalogue = null;
+const pendingCompletionAttempts = new Map();
 
 // ----- DOM 元素引用 -----
 let chapterMenuEl, messagesEl, inputAreaEl, userInputAreaEl, userInputEl,
@@ -49,15 +50,100 @@ function createOpaqueEventId(chapter) {
         || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function pendingCompletion(chapter) {
+    const key = `lunyu_pending_completion_v1:${learningManifest.manifestVersion}:${chapter.id}`;
+    let pending = pendingCompletionAttempts.get(key);
+    if (!pending) {
+        try {
+            const saved = JSON.parse(window.sessionStorage.getItem(key));
+            if (/^[A-Za-z0-9:_-]{12,100}$/.test(saved?.eventId || '')
+                && Number.isFinite(saved.notBefore) && saved.notBefore >= 0
+                && saved.notBefore <= Date.now() + 86400000) pending = saved;
+        } catch {}
+    }
+    return { key, pending };
+}
+
 async function syncCompletedChapter(chapter) {
     if (!chapter || !learningManifest || !window.KzLearningEvidence?.syncChapterCompletion) return null;
-    return window.KzLearningEvidence.syncChapterCompletion({
-        identity: getIdentity(),
-        manifest: learningManifest,
-        chapter,
-        eventId: createOpaqueEventId(chapter),
-        sourceUrl: `${window.location.origin}${window.location.pathname}`,
+    if (!window.KzLearningEvidence.manifestItem(learningManifest, chapter)) return null;
+    const attempt = pendingCompletion(chapter);
+    const key = attempt.key;
+    let pending = attempt.pending;
+    pending ||= { eventId: createOpaqueEventId(chapter), notBefore: 0 };
+    const save = () => {
+        pendingCompletionAttempts.set(key, pending);
+        try { window.sessionStorage.setItem(key, JSON.stringify(pending)); } catch {}
+    };
+    save();
+    if (pending.notBefore > Date.now()) {
+        const error = new Error('閱讀進度暫未同步，請稍後重試。');
+        error.status = 429;
+        error.retryAfterSeconds = Math.ceil((pending.notBefore - Date.now()) / 1000);
+        throw error;
+    }
+    try {
+        const result = await window.KzLearningEvidence.syncChapterCompletion({
+            identity: getIdentity(),
+            manifest: learningManifest,
+            chapter,
+            eventId: pending.eventId,
+            sourceUrl: `${window.location.origin}${window.location.pathname}`,
+        });
+        if (result?.status === 'synced' || result?.status === 'skipped') {
+            pendingCompletionAttempts.delete(key);
+            try { window.sessionStorage.removeItem(key); } catch {}
+        }
+        return result;
+    } catch (error) {
+        if (error?.status === 429 && Number.isFinite(error.retryAfterSeconds)) {
+            pending.notBefore = Date.now() + Math.min(86400, Math.max(1, error.retryAfterSeconds)) * 1000;
+            save();
+        }
+        throw error;
+    }
+}
+
+function showCompletionRetry(chapter, error) {
+    addMessage(`${chapter.title}：${error?.status === 429 ? error.message : '閱讀進度暫未同步，請重試。'}`, 'system');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = '重試同步';
+    const delay = error?.status === 429 ? Math.min(86400, Math.max(1, error.retryAfterSeconds || 60)) * 1000 : 0;
+    button.disabled = delay > 0;
+    if (delay) setTimeout(() => { button.disabled = false; }, delay);
+    button.addEventListener('click', async () => {
+        button.disabled = true;
+        try {
+            const result = await syncCompletedChapter(chapter);
+            if (result?.status === 'synced') {
+                markAsRead(chapter.id);
+                button.remove();
+                addMessage('本章閱讀進度已保存。', 'system');
+            } else if (result?.status === 'partial') {
+                markAsRead(chapter.id);
+                button.disabled = false;
+                addMessage('閱讀完成已保存，用戶中心尚未同步完成，請重試。', 'system');
+            } else {
+                button.disabled = false;
+                addMessage('請先登入，再重試同步。', 'system');
+            }
+        } catch (retryError) {
+            button.remove();
+            showCompletionRetry(chapter, retryError);
+        }
     });
+    messagesEl.appendChild(button);
+}
+
+function restoreCompletionRetry(chapter) {
+    if (!learningManifest || !window.KzLearningEvidence?.manifestItem(learningManifest, chapter)) return;
+    const { pending } = pendingCompletion(chapter);
+    if (!pending) return;
+    const seconds = Math.ceil((pending.notBefore - Date.now()) / 1000);
+    showCompletionRetry(chapter, seconds > 0
+        ? { status: 429, retryAfterSeconds: seconds, message: '閱讀進度暫未同步，請稍後重試。' }
+        : null);
 }
 
 async function trackDialogue(chapter, message) {
@@ -347,6 +433,7 @@ function displayChapter(id) {
     if (btnYangEl) btnYangEl.disabled = false;
     if (inputAreaEl) inputAreaEl.style.display = 'flex';
 
+    restoreCompletionRetry(chapter);
 }
 
 // 重置對話狀態
@@ -548,8 +635,9 @@ function handleYangAnnotationClick() {
     syncCompletedChapter(revealedChapter)
         .then((result) => {
             if (result?.status === 'synced' || result?.status === 'partial') markAsRead(revealedChapter.id);
+            if (result?.status === 'partial') showCompletionRetry(revealedChapter, null);
         })
-        .catch(() => {});
+        .catch((error) => showCompletionRetry(revealedChapter, error));
 
     // 2. ADD specific loading message
     addMessage("Gemini正在和你一起分析這則內容⋯耐個心吧 🐶⋯", 'loading');

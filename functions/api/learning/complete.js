@@ -1,14 +1,27 @@
 const SITE_KEY = "kz";
 const COMPLETION_KIND = "annotation_revealed";
 
-function json(data, status = 200) {
+function json(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
       "content-type": "application/json; charset=utf-8",
       "cache-control": "no-store",
+      ...extraHeaders,
     },
   });
+}
+
+function rateLimitResponse(code) {
+  const minute = code === "RATE_LIMIT_MINUTE";
+  const retryAfterSeconds = minute ? 60 : 86400;
+  return json({
+    ok: false,
+    error: minute ? "閱讀進度暫未同步，請於 1 分鐘後重試。" : "已達 24 小時同步上限，請稍後重試。",
+    errorCode: code,
+    retryable: minute,
+    retryAfterSeconds,
+  }, 429, { "retry-after": String(retryAfterSeconds) });
 }
 
 function text(value, max = 220) {
@@ -71,7 +84,13 @@ export async function onRequestPost(context) {
     const receipt = await context.env.GROWTH_EVIDENCE.recordCompletion(
       cookieHeader,
       { resourceKey, manifestVersion, eventNonce, completionKind: COMPLETION_KIND },
+      { typedCompletionRateLimit: true },
     );
+    if (receipt?.ok === false && receipt.sourceSiteKey === SITE_KEY
+      && receipt.status === "rate_limited" && receipt.httpStatus === 429
+      && ["RATE_LIMIT_MINUTE", "RATE_LIMIT_DAY"].includes(receipt.error?.code)) {
+      return rateLimitResponse(receipt.error.code);
+    }
     if (receipt?.ok !== true
       || receipt.sourceSiteKey !== SITE_KEY
       || receipt.resourceKey !== resourceKey
@@ -80,6 +99,15 @@ export async function onRequestPost(context) {
     }
     return json(receipt);
   } catch (error) {
+    const message = String(error?.message || "");
+    // The accepted predecessor throws these fixed errors. Keep code rollback
+    // compatible while only the opted-in KZ caller adopts structured results.
+    if (/growth(?:_| )completion(?:_| )rate(?:_| )limit(?:_minute| exceeded: minute)/i.test(message)) {
+      return rateLimitResponse("RATE_LIMIT_MINUTE");
+    }
+    if (/growth(?:_| )completion(?:_| )rate(?:_| )limit(?:_day| exceeded: day)/i.test(message)) {
+      return rateLimitResponse("RATE_LIMIT_DAY");
+    }
     return json({ error: text(error?.message || "completion failed", 240) }, 503);
   }
 }

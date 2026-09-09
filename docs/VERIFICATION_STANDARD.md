@@ -1,3 +1,16 @@
+# Current verification standard: KZ rate-limit recovery
+
+This section supersedes older transaction-specific commands/anchors below.
+
+1. Source authority: published GitHub main with exact live version readback; UC base0c3a19b8 and KZ basecc5468b7. Run `git status --short` and workspace git-deploy-gate before release. No generated corpus change.
+2. Structural checks: UC exact `/api/version`, anonymous `/api/session`, public script/root; KZ static data/script hashes. Never call source health, APIS health, ZK triggers or data-changing probes.
+3. Contract checks: KZ `npm run check`; UC `npm run verify:student-growth`, `npm run test:current`, `npm run build:dry-run`. Source429 must not project; manual same-event retry must wait and survive reload; old/new caller compatibility and unknown errors must remain covered.
+4. Deployment: UC exact main through reviewed task-scoped `uc-kz-rate-limit-control.mjs` in private E7, stages0/1/5/100; KZ Git branch→Pages preview→main production. No old controller replay, raw migration/deploy bypass or parallel publisher.
+5. Related projects:149-current-relation receipt, unchanged other callers/auth/scoring/manifests/config. Real normal completion and My ordinary reload remain required for paired acceptance. Device flows are not claimed from desktop.
+6. Backup/restore: no data migration or production rewrite; retain forward data and existing restore authorities. Exact source/corpus bytes recover from private canonical Git; E7 evidence retain_hot with review2026-09-16.
+7. Rollback: UC6cbc3f62@100 via current owner-checked control; KZ Pages0001fce8 rollback only after current deployment ownership readback. Independent code rollbacks preserve data and pair compatibility.
+8. Last verified23:19Z: UC89focused,616ordinary,60support/one existing skip, growth checks and strict build passed. KZ full check includes7new recovery tests passed. Live release, normal authenticated paired flow and natural error reduction pending; do not infer these from tests.
+
 # KZ executable verification standard
 
 Owner suen / current executor codex-my-architecture-serial7. Source readiness and actual authenticated acceptance are separate.
