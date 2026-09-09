@@ -137,7 +137,7 @@ test('late and reopened book20 menus restore authenticated chapter540 without a 
     f.readOnly();
 });
 
-test('every one of541 original IDs isolates its own menu marker', () => {
+test('all541 original progress IDs project to the correct512 display identities without rewriting history', () => {
     const f = fixture();
     // Keep all books mounted to exercise identical and substring labels together.
     for (let major = 1; major <= 20; major++) {
@@ -146,42 +146,60 @@ test('every one of541 original IDs isolates its own menu marker', () => {
         f.run('renderSubChapterMenu(major, container)');
     }
     const links = f.links();
-    assert.equal(links.length, 541);
-    assert.equal(new Set(links.map(link => link.dataset.chapterId)).size, 541);
+    assert.equal(links.length, 512);
+    assert.equal(new Set(links.map(link => link.dataset.chapterId)).size, 512);
     for (const chapter of dialogues) {
         const id = String(chapter.id);
         f.storage.set(storageKey, JSON.stringify([id]));
         f.run('updateChapterMenuReadStatus()');
-        assert.deepEqual(links.filter(link => link.classList.contains('read')).map(link => link.dataset.chapterId), [id]);
+        assert.deepEqual(links.filter(link => link.classList.contains('read')).map(link => link.dataset.chapterId), [String(chapter.displayAliasOf ?? chapter.id)]);
+        assert.deepEqual(f.readIds(), [id]);
+        assert.deepEqual(JSON.parse(f.storage.get(storageKey)), [id]);
     }
     f.readOnly();
 });
 
-test('duplicate265 and268 retain independent read, reading, and click identities', () => {
+test('265 and268 share one display marker while their raw progress and explicit IDs remain distinct', () => {
     const f = fixture({ saved: ['265'] });
     f.run("inProgressChapterCache = ['268']");
     f.open(10);
     const first = f.links().find(link => link.dataset.chapterId === '265');
-    const second = f.links().find(link => link.dataset.chapterId === '268');
+    assert.equal(f.links().some(link => link.dataset.chapterId === '268'), false);
     assert.equal(first.classList.contains('read'), true);
-    assert.equal(second.classList.contains('read'), false);
-    assert.equal(second.classList.contains('reading'), true);
+    assert.equal(first.classList.contains('reading'), false);
+    f.storage.set(storageKey, '[]');
+    f.run('updateChapterMenuReadStatus()');
+    assert.equal(first.classList.contains('reading'), true);
     f.storage.set(storageKey, JSON.stringify(['268']));
     f.run('updateChapterMenuReadStatus()');
-    assert.equal(first.classList.contains('read'), false);
-    assert.equal(second.classList.contains('read'), true);
+    assert.equal(first.classList.contains('read'), true);
+    assert.equal(first.classList.contains('reading'), false);
+    assert.deepEqual(f.readIds(), ['268']);
     f.context.clicked = [];
     f.run('displayChapter = id => clicked.push(id)');
-    second.onclick({ preventDefault() {} });
-    assert.deepEqual(Array.from(f.context.clicked), [268]);
+    first.onclick({ preventDefault() {} });
+    assert.deepEqual(Array.from(f.context.clicked), [265]);
     // Rendering text is not authority, including misleading or missing labels.
-    second.textContent = '20.2';
+    first.textContent = '20.2';
     f.run('updateChapterMenuReadStatus()');
-    assert.equal(second.classList.contains('read'), true);
+    assert.equal(first.classList.contains('read'), true);
     delete first.dataset.chapterId;
     first.textContent = '10.25';
     f.run('updateChapterMenuReadStatus()');
     assert.equal(first.classList.contains('read'), false);
+    f.readOnly();
+});
+
+test('restoring a verified alias receipt keeps only the legacy ID and never submits canonical credit', async () => {
+    const f = fixture({ items: [serverRow(268)] });
+    await f.hydrate();
+    assert.deepEqual(f.readIds(), ['268']);
+    assert.equal(f.storage.get(storageKey), '["268"]');
+    f.open(10);
+    const read = f.links().filter(link => link.classList.contains('read'));
+    assert.deepEqual(read.map(link => link.dataset.chapterId), ['265']);
+    assert.deepEqual(f.calls.paths, ['/api/progress?site=kz']);
+    assert.equal(f.calls.api, 1);
     f.readOnly();
 });
 
@@ -254,7 +272,7 @@ test('anonymous, empty and failed progress reads preserve local history without 
         await f.hydrate();
         assert.deepEqual(f.readIds(), ['268']);
         f.open(10);
-        assert.equal(f.links().find(link => link.dataset.chapterId === '268').classList.contains('read'), true);
+        assert.equal(f.links().find(link => link.dataset.chapterId === '265').classList.contains('read'), true);
         if (options.authenticated === false) assert.equal(f.calls.api, 0);
         f.readOnly();
     }

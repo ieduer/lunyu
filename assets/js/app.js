@@ -12,6 +12,7 @@ let currentLoadingElement = null;
 let conversationSessionKey = '';
 let learningManifest = null;
 let hydratedReadProgressCache = [];
+let displayCatalogue = null;
 
 // ----- DOM 元素引用 -----
 let chapterMenuEl, messagesEl, inputAreaEl, userInputAreaEl, userInputEl,
@@ -151,14 +152,79 @@ function bindEventListeners() {
 }
 
 /* ========== 數據載入與目錄生成 ========== */
+function buildDisplayCatalogue(rows, manifest = null) {
+    const bookNames = ['學而', '為政', '八佾', '里仁', '公冶長', '雍也', '述而', '泰伯', '子罕', '鄉黨', '先進', '顏淵', '子路', '憲問', '衛靈公', '季氏', '陽貨', '微子', '子張', '堯曰'];
+    const bookCounts = [16, 24, 26, 26, 28, 30, 38, 21, 31, 27, 26, 24, 30, 44, 42, 14, 26, 11, 25, 3];
+    const keyHash = '79b9c5647108bc9be8fea0f23e9585cff24e0083e70cadbaf52629e54fdfe6ca';
+    if (!Array.isArray(rows) || rows.length !== 541) throw new Error('expected 541 legacy dialogue records');
+    if (manifest && (manifest.schemaVersion !== 1 || manifest.siteKey !== 'kz'
+        || manifest.itemCount !== 541 || manifest.completionThreshold !== 163
+        || manifest.resourceKeySha256 !== keyHash || manifest.manifestVersion !== `kz-${keyHash.slice(0, 16)}`
+        || !Array.isArray(manifest.items) || manifest.items.length !== 541)) {
+        throw new Error('learning manifest identity mismatch');
+    }
+    const firstIds = new Map();
+    const parsed = rows.map((row, index) => {
+        const id = row?.id;
+        if (!Number.isInteger(id) || id !== index + 1) throw new Error('dialogue ID/order mismatch');
+        const match = typeof row.title === 'string' && row.title.match(/^(\S+) ([1-9]\d*)\.([1-9]\d*)$/);
+        const major = Number(match?.[2]), minor = Number(match?.[3]);
+        if (!match || match[1] !== bookNames[major - 1] || minor > bookCounts[major - 1]) {
+            throw new Error('noncanonical dialogue title');
+        }
+        if (typeof row.text !== 'string' || !row.text.trim()
+            || typeof row.translation !== 'string' || !row.translation.trim()
+            || typeof row.annotations !== 'string') throw new Error('invalid dialogue learning content');
+        const expectedAlias = id >= 268 && id <= 270 ? id - 3 : id >= 297 && id <= 322 ? id - 26 : null;
+        if (expectedAlias === null ? Object.hasOwn(row, 'displayAliasOf') : row.displayAliasOf !== expectedAlias) {
+            throw new Error('display alias ledger mismatch');
+        }
+        const coordinate = `${major}.${minor}`;
+        if (!firstIds.has(coordinate)) firstIds.set(coordinate, id);
+        if (manifest) {
+            const item = manifest.items[index];
+            if (item?.resourceKey !== `chapter-${id}` || item.chapterId !== String(id)
+                || item.itemType !== 'chapter' || item.itemTitle !== row.title
+                || item.itemGroup !== bookNames[major - 1] || item.major !== major || item.minor !== minor) {
+                throw new Error('dialogue/manifest item mismatch');
+            }
+        }
+        return { id, title: row.title, bookName: bookNames[major - 1], major, minor };
+    });
+    const chapters = [], displayIds = new Map(), coordinates = new Set();
+    const actualCounts = Array(20).fill(0);
+    for (const entry of parsed) {
+        const row = rows[entry.id - 1], targetId = row.displayAliasOf ?? row.id;
+        const coordinate = `${entry.major}.${entry.minor}`;
+        if (Object.hasOwn(row, 'displayAliasOf')) {
+            const target = rows[targetId - 1];
+            if (!target || Object.hasOwn(target, 'displayAliasOf') || firstIds.get(coordinate) !== targetId
+                || ['title', 'text', 'translation', 'annotations'].some(field => row[field] !== target[field])) {
+                throw new Error('display alias content/target mismatch');
+            }
+        } else {
+            if (coordinates.has(coordinate)) throw new Error('undeclared duplicate display chapter');
+            coordinates.add(coordinate);
+            actualCounts[entry.major - 1]++;
+            chapters.push({ ...row, major: entry.major, minor: entry.minor });
+        }
+        displayIds.set(String(row.id), String(targetId));
+    }
+    if (chapters.length !== 512 || actualCounts.some((count, index) => count !== bookCounts[index])) {
+        throw new Error('display chapter coverage mismatch');
+    }
+    chapters.sort((a, b) => a.major - b.major || a.minor - b.minor);
+    return { chapters, displayIds, parsed };
+}
+
 function loadDialogues() {
     // 顯示載入狀態
     if (messagesEl) {
         messagesEl.innerHTML = '<div class="message-container system"><p>正在載入論語數據...</p></div>';
     }
 
-    Promise.all([
-        fetch("data/dialogues.json").then(res => { if (!res.ok) throw new Error(`dialogues HTTP ${res.status}`); return res.json(); }),
+    return Promise.all([
+        fetch("data/dialogues.json", { cache: 'no-store' }).then(res => { if (!res.ok) throw new Error(`dialogues HTTP ${res.status}`); return res.json(); }),
         fetch("data/learning-manifest.json", { cache: 'no-store' }).then(res => { if (!res.ok) throw new Error(`manifest HTTP ${res.status}`); return res.json(); }),
     ])
         .then(([data, manifest]) => {
@@ -187,9 +253,10 @@ function loadDialogues() {
 }
 
 function displayInitialRandomAnalect() {
-    if (!allChapters || allChapters.length === 0) return;
-    const randomIndex = Math.floor(Math.random() * allChapters.length);
-    const randomChapter = allChapters[randomIndex];
+    const chapters = displayCatalogue?.chapters || [];
+    if (chapters.length === 0) return;
+    const randomIndex = Math.floor(Math.random() * chapters.length);
+    const randomChapter = chapters[randomIndex];
     if (!randomChapter) return;
 
     const title = randomChapter.title;
@@ -205,26 +272,12 @@ function displayInitialRandomAnalect() {
 }
 
 function groupChapters() {
+    displayCatalogue = buildDisplayCatalogue(allChapters, learningManifest);
     groupedChapters = {};
-    allChapters.forEach(item => {
-        const match = item.title.match(/(?:(\S+)\s+)?(\d+)\.(\d+)/);
-        if (!match) {
-            const numMatch = item.title.match(/^(\d+)\.(\d+)$/);
-            if (numMatch) {
-                const major = parseInt(numMatch[1], 10); const minor = parseInt(numMatch[2], 10);
-                if (isNaN(major) || major < 1 || major > 20) return;
-                if (!groupedChapters[major]) groupedChapters[major] = { chapters: [] };
-                groupedChapters[major].chapters.push({ ...item, major: major, minor: minor });
-            } else { console.warn(`Cannot parse title: ${item.title}`); return; }
-        } else {
-            const chapterName = match[1]; const major = parseInt(match[2], 10); const minor = parseInt(match[3], 10);
-            if (isNaN(major) || major < 1 || major > 20) return;
-            if (!groupedChapters[major]) { groupedChapters[major] = { name: chapterName, chapters: [] }; }
-            else if (chapterName && !groupedChapters[major].name) { groupedChapters[major].name = chapterName; }
-            groupedChapters[major].chapters.push({ ...item, major: major, minor: minor });
-        }
+    displayCatalogue.chapters.forEach(item => {
+        if (!groupedChapters[item.major]) groupedChapters[item.major] = { name: item.title.split(' ')[0], chapters: [] };
+        groupedChapters[item.major].chapters.push(item);
     });
-    for (const major in groupedChapters) { groupedChapters[major].chapters.sort((a, b) => a.minor - b.minor); }
 }
 
 function renderChapterMenu() {
@@ -620,30 +673,39 @@ function markAsRead(chapterId) {
 }
 
 // 更新進度顯示
+function projectDisplayChapterIds(rawIds) {
+    if (!displayCatalogue || !Array.isArray(rawIds)) return [];
+    return Array.from(new Set(rawIds.map(id => {
+        if (typeof id !== 'number' && typeof id !== 'string') return null;
+        return displayCatalogue.displayIds.get(String(id)) || null;
+    }).filter(Boolean)));
+}
+
 function updateProgressDisplay() {
-    const progress = getReadProgress();
-    const total = learningManifest?.itemCount || allChapters.length || 541;
+    const progress = projectDisplayChapterIds(getReadProgress());
+    const total = displayCatalogue?.chapters.length || 0;
     const readCount = progress.length;
 
     // 更新頁面標題顯示進度
     const baseTitle = "AI論語";
-    if (readCount > 0) {
-        document.title = `${baseTitle} (已讀 ${readCount}/${total})`;
-    }
+    document.title = readCount > 0 && total > 0 ? `${baseTitle} (已讀 ${readCount}/${total})` : baseTitle;
 }
 
 // 更新目錄中已讀狀態
 function updateChapterMenuReadStatus() {
-    const progress = getReadProgress();
-    const inProgress = getInProgressChapters();
+    const progress = new Set(projectDisplayChapterIds(getReadProgress()));
+    const inProgress = new Set(projectDisplayChapterIds(getInProgressChapters()));
     const subLinks = document.querySelectorAll('.sub-chapter-link');
     subLinks.forEach(link => {
-        const chapter = allChapters.find(ch => String(ch.id) === link.dataset.chapterId);
-        if (!chapter) return;
-        if (progress.includes(String(chapter.id))) {
+        const chapterId = displayCatalogue?.displayIds.get(link.dataset.chapterId);
+        if (!chapterId) {
+            link.classList.remove('read', 'reading');
+            return;
+        }
+        if (progress.has(chapterId)) {
             link.classList.add('read');
             link.classList.remove('reading');
-        } else if (inProgress.includes(String(chapter.id))) {
+        } else if (inProgress.has(chapterId)) {
             link.classList.add('reading');
             link.classList.remove('read');
         } else {
@@ -752,9 +814,9 @@ function isBookmarked(chapterId) {
 
 // 獲取統計信息
 function getStats() {
-    const progress = getReadProgress();
-    const bookmarks = getBookmarks();
-    const total = learningManifest?.itemCount || allChapters.length || 541;
+    const progress = projectDisplayChapterIds(getReadProgress());
+    const bookmarks = projectDisplayChapterIds(getBookmarks());
+    const total = displayCatalogue?.chapters.length || 0;
     return {
         readCount: progress.length,
         bookmarkCount: bookmarks.length,
