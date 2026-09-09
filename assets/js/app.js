@@ -11,6 +11,7 @@ let activeSubMenu = null;
 let currentLoadingElement = null;
 let conversationSessionKey = '';
 let learningManifest = null;
+let hydratedReadProgressCache = [];
 
 // ----- DOM 元素引用 -----
 let chapterMenuEl, messagesEl, inputAreaEl, userInputAreaEl, userInputEl,
@@ -258,6 +259,7 @@ function renderSubChapterMenu(major, container) {
     subChapters.forEach(item => {
         const a = document.createElement("a"); a.href = "#"; a.textContent = `${item.major}.${item.minor}`;
         a.classList.add('ghibli-button', 'sub-chapter-link');
+        a.dataset.chapterId = String(item.id);
         a.onclick = (e) => {
             e.preventDefault(); displayChapter(item.id);
             if (window.innerWidth <= 768 && chapterMenuEl && chapterMenuEl.style.display !== 'none') { toggleMenu(); }
@@ -266,6 +268,7 @@ function renderSubChapterMenu(major, container) {
     });
     container.appendChild(subMenuContainer);
     activeSubMenu = { element: subMenuContainer, container: container, button: container.querySelector('.major-chapter-btn') };
+    updateChapterMenuReadStatus();
 }
 
 
@@ -592,10 +595,11 @@ function getReadProgress() {
     try {
         const progress = localStorage.getItem(STORAGE_KEYS.READ_PROGRESS);
         const parsed = progress ? JSON.parse(progress) : [];
-        return Array.isArray(parsed) ? Array.from(new Set(parsed.map(id => String(id)))) : [];
+        const localIds = Array.isArray(parsed) ? parsed.map(id => String(id)) : [];
+        return Array.from(new Set([...localIds, ...hydratedReadProgressCache]));
     } catch (e) {
         console.error("Error reading progress:", e);
-        return [];
+        return hydratedReadProgressCache.slice();
     }
 }
 
@@ -634,8 +638,7 @@ function updateChapterMenuReadStatus() {
     const inProgress = getInProgressChapters();
     const subLinks = document.querySelectorAll('.sub-chapter-link');
     subLinks.forEach(link => {
-        const text = link.textContent;
-        const chapter = allChapters.find(ch => ch.title.includes(text));
+        const chapter = allChapters.find(ch => String(ch.id) === link.dataset.chapterId);
         if (!chapter) return;
         if (progress.includes(String(chapter.id))) {
             link.classList.add('read');
@@ -674,8 +677,9 @@ async function hydrateReadProgressFromIdentity() {
         const manifestKeys = new Set((learningManifest?.items || []).map(item => item.resourceKey));
         items.forEach(item => {
             const key = String(item?.itemKey || '');
-            const meta = item?.meta && typeof item.meta === 'object' ? item.meta : {};
-            if (!manifestKeys.has(key)
+            const meta = item?.meta && typeof item.meta === 'object' && !Array.isArray(item.meta) ? item.meta : {};
+            if (item?.siteKey !== SITE_KEY || item?.itemType !== 'chapter'
+                || !manifestKeys.has(key)
                 || meta.evidenceSchema !== 'kz-learning-evidence-v1'
                 || meta.manifestVersion !== learningManifest?.manifestVersion
                 || meta.resourceKeySha256 !== learningManifest?.resourceKeySha256
@@ -683,12 +687,17 @@ async function hydrateReadProgressFromIdentity() {
                 || meta.completionKind !== 'annotation_revealed'
                 || meta.result !== 'completed') return;
             const chapterId = key.slice('chapter-'.length);
-            if (['done', 'completed'].includes(String(item.state || '').toLowerCase()) && Number(item.progressPercent) >= 100) {
+            // Current User Center listProgress returns the normalized percentage in meta.
+            const progressPercent = meta.progressPercent ?? item.progressPercent;
+            if (['done', 'completed'].includes(String(item.state || '').toLowerCase())
+                && Number.isFinite(progressPercent) && progressPercent === 100) {
                 serverDone.push(chapterId);
             }
         });
 
         // 合併：server done ∪ local done
+        // Preserve only validated remote IDs in memory when localStorage is unavailable.
+        hydratedReadProgressCache = Array.from(new Set(serverDone));
         const merged = Array.from(new Set([...localDone, ...serverDone]));
         try {
             localStorage.setItem(STORAGE_KEYS.READ_PROGRESS, JSON.stringify(merged));
