@@ -1,3 +1,17 @@
+## Current UC KZ release acceptance — 2026-09-10T07:39:05.192250+00:00
+
+This section supersedes the current-version claims in older checkpoints below; historical failures remain evidence. UC is `db98888d-6b08-412f-a698-2c0ec5f7e99c@100`, deployment `94b1b739-20a8-47c0-aed4-1879bb4917c2`, runtime source `cc9c58b42fc78dc71a4820d09ac7c66827854176`. KZ remains Pages `df8a3547-52d7-470e-aba1-c273a7555e67`, runtime `45224a8a19193e1979e284d2703328eeb722e4f0`. Retry3 adopted the existing immutable candidate without another upload, passed 0/1/5 and accepted 100; its controller is terminal and must not be replayed.
+
+One ordinary authenticated action on chapter-196 (泰伯 8.8), at 2026-09-10 07:24:32Z, returned recorded:true without duplicate or retry. Source markers increased 7→8 and My KZ records 6→7. My displayed the title and both ordinary reloads preserved the new record, all old KZ records and every other site's evidence. Exact joined server transaction 07:24:32.800–32.927 contains the server-authored evidence timestamp 32.878. The original helper incorrectly compared that server timestamp with the browser response clock (32.748); original failure and clock review are preserved. The replacement checks the same-request/same-trace server interval, without a tolerance or change to the controller, freshness, auth, rate, score or data gates.
+
+The final full-stage ABR1/count-matched window 07:23:03.769–07:36:04.030 contains 91 candidate invocations / 101 rows, zero hard failures and zero auth failures. The acceptance controller subsequently verified the exact current deployment and completed accepted_100. Earlier unclassified candidate401 and the separate retry2 expiry are not waived or reclassified. Local evidence remains 616 ordinary tests, 60 support tests with one existing skip, 89 overlapping focused tests and a successful build; these are not added into a misleading unique-test total.
+
+Acceptance boundary: this source→My→reload flow passes. Natural typed429 error reduction has not yet been demonstrated; the original missing-terminal root cause remains open except for the separately joined RATE_LIMIT_MINUTE case. The same ordinary KZ action made three AI requests whose final response was503; AI acceptance and the APIS/YW supplier fault remain open. All broader My/fleet purposes remain separately open.
+
+Rollback runtime: `6cbc3f62-6440-4d44-a3fa-36be924580e6@100`, using the existing project rollback procedure after checking current ownership. Preserve all forward D1 evidence, including chapter-196. KZ leaf rollback remains `0001fce8-9002-4ed6-8d5e-be11200597bc`. Any future reader-UI deployment must incorporate this accepted UC source and use db988 as its new baseline; do not deploy old reader candidate8811/46cf, which would remove the typed-rate fix.
+
+Evidence authority: `/Users/ylsuen/CF/_meta/reports/operations/.my-architecture-serial7-20260909/uc-kz-rate-limit-retry3-OUTCOME.md`, its listed immutable receipts and `uc-kz-rate-limit-retry3-control.jsonl`. Sources/evidence remain retain_hot under root owner codex-my-architecture-serial7, review 2026-09-16; temporary worktrees are still governed by the root manifest, not deletion-authorized by this release acceptance.
+
 # Current verification standard: KZ rate-limit recovery
 
 Current outcome: KZ5bbcf259/source45224a8 is published; UC db98888d100% was rejected and rolled back to6cbc3f62@100/deployment16ee1ac9. Maincc9c58b contains the unaccepted UC runtime change. This section supersedes older transaction-specific commands/anchors below.
