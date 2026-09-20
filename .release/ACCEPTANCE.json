@@ -1,0 +1,16 @@
+{
+  "at": "2026-09-20T05:58:02.729Z",
+  "scope": "release-channel control acceptance; project product/data acceptance remains distinct",
+  "repository": "ieduer/lunyu",
+  "branch": "main",
+  "targets": [
+    {
+      "target": "lunyu",
+      "mode": "guarded_automatic",
+      "deployment": "9b7558d2-6d62-475a-ab23-b3d6a74c1c22",
+      "source_commit": "ffa3962d1285d29ca4fb362c497318cce512ee55",
+      "artifacts": 10,
+      "policy_file": ".release/policies.json"
+    }
+  ]
+}
