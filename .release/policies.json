@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "guard_source": "ieduer/cf-ops-scripts@6aef139c359a50c38b5ac3d2522a481540a3daab",
+  "targets": [
+    {
+      "schema_version": 1,
+      "target": "lunyu",
+      "repository": "https://github.com/ieduer/lunyu",
+      "branch": "main",
+      "origin": "https://lunyu-6ky.pages.dev",
+      "baseline_commit": "ad66cdddaf009d64b0884a882e4aa3c41dad2fda",
+      "source_root": "",
+      "output": ".release-output/lunyu",
+      "stage_tracked_static": true,
+      "build_command": "",
+      "required_paths": [
+        "functions/api/learning/complete.js",
+        "functions/api/learning/health.js",
+        "index.html",
+        "assets/js/app.js",
+        "package.json"
+      ],
+      "required_artifacts": [
+        "index.html"
+      ],
+      "checks": [
+        [
+          "npm",
+          "test"
+        ]
+      ],
+      "bootstrap": {
+        "deployment_id": "df8a3547-52d7-470e-aba1-c273a7555e67",
+        "fingerprints": [
+          {
+            "path": "/",
+            "artifact": "index.html",
+            "sha256": "f53145faa96c2ebbeba951b9024e0eecb5b52567af7207efbb414976ae2e6eef"
+          },
+          {
+            "path": "/assets/css/style.css?v=20260707-ai-fixes",
+            "artifact": "assets/css/style.css",
+            "sha256": "70c5fd4117909922c4fd98377fe34437dbbb959c8c381181e1f5d0905ee26c27"
+          },
+          {
+            "path": "/assets/js/copy-button.js?v=20260707-ai-fixes",
+            "artifact": "assets/js/copy-button.js",
+            "sha256": "383335178ea5a76b761af3db3e0c6eba044a0c225be4a2fd07ade1a7b50435a4"
+          },
+          {
+            "path": "/assets/js/learning-evidence.js?v=20260714-aplus-evidence-v1",
+            "artifact": "assets/js/learning-evidence.js",
+            "sha256": "53350a3efeb240badfdd0661b05b624e731b717053783fcd32085fbdb6e82a37"
+          },
+          {
+            "path": "/assets/js/app.js?v=20260714-aplus-evidence-v1",
+            "artifact": "assets/js/app.js",
+            "sha256": "8c6464936f3e04a105b3d36b94a84fc9c73d7cec0eb633b13dea278a73427b57"
+          }
+        ]
+      }
+    }
+  ]
+}
