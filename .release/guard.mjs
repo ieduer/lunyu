@@ -41,7 +41,14 @@ export async function preflight(p,target,{live}={}){
  return {root,files,live:l,...validateSource(p,c)};
 }
 export function validateBootstrap(p,files){for(const f of p.bootstrap.fingerprints){const actual=files[f.artifact],expected=f.artifact_sha256||f.sha256;if(actual===expected)continue;const change=p.bootstrap.reviewed_changes?.find(c=>c.artifact===f.artifact&&c.before===expected&&c.after===actual&&c.reason?.trim()&&/^[a-f0-9]{40}$/.test(c.source_commit||''));if(!actual||!change)fail('First guarded build differs from verified live asset: '+f.artifact)}}
+export function validateOutputConfig(p, configurations){
+ for(const [name,text] of Object.entries(configurations)){
+  const match=name.endsWith('.toml')?text.match(/^\s*pages_build_output_dir\s*=\s*["']([^"']*)["']/m):text.match(/"pages_build_output_dir"\s*:\s*"([^"]*)"/);
+  if(match&&path.resolve(match[1])!==path.resolve(p.output))fail('Provider output conflicts with guarded artifact: '+name);
+ }
+}
 export async function build(p,target){
+ const configurations={};for(const name of ['wrangler.toml','wrangler.json','wrangler.jsonc'])if(fs.existsSync(name))configurations[name]=fs.readFileSync(name,'utf8');validateOutputConfig(p,configurations);
  const start=await preflight(p,target);
  for(const argv of p.checks||[]){if(!Array.isArray(argv)||!argv.length)fail('Invalid check');run(argv[0],argv.slice(1),{timeout:120000,stdio:'inherit'})}
  if(p.build_command)run('/bin/bash',['-euc',p.build_command],{timeout:600000,stdio:'inherit'});
