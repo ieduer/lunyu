@@ -10,6 +10,9 @@ let isWaitingForAI = false;
 let activeSubMenu = null;
 let currentLoadingElement = null;
 let conversationSessionKey = '';
+let lastLearningDraftId = '';
+let lastStudentOperationId = '';
+let learningRecordStatusEl = null;
 let learningManifest = null;
 let hydratedReadProgressCache = [];
 let displayCatalogue = null;
@@ -67,6 +70,9 @@ function pendingCompletion(chapter) {
 async function syncCompletedChapter(chapter) {
     if (!chapter || !learningManifest || !window.KzLearningEvidence?.syncChapterCompletion) return null;
     if (!window.KzLearningEvidence.manifestItem(learningManifest, chapter)) return null;
+    const recordContext = { ...learningContext(), chapterId: chapter.id, chapterTitle: chapter.title };
+    const capture = captureLearningOperation('completion.sync.request', { chapterId: chapter.id }, { actor:'system', status:'pending', contentOrigin:'completion_sync' }, recordContext);
+    if (capture) await capture.saved;
     const attempt = pendingCompletion(chapter);
     const key = attempt.key;
     let pending = attempt.pending;
@@ -94,8 +100,11 @@ async function syncCompletedChapter(chapter) {
             pendingCompletionAttempts.delete(key);
             try { window.sessionStorage.removeItem(key); } catch {}
         }
+        const completionResult = captureLearningOperation('completion.sync.result', { syncStatus: result?.status || 'unknown' }, { actor:'system', status:result?.status === 'synced' ? 'succeeded' : 'partial', parentOperationId:capture?.operation.operationId || '', contentOrigin:'completion_sync' }, recordContext);
+        if (completionResult) await completionResult.saved.catch(() => showLearningRecordState({status:'storage_error'}));
         return result;
     } catch (error) {
+        captureLearningOperation('completion.sync.failure', { httpStatus:error?.status || null, errorClass:error?.name || 'Error' }, { actor:'system', status:'failed', parentOperationId:capture?.operation.operationId || '', contentOrigin:'completion_sync' }, recordContext);
         if (error?.status === 429 && Number.isFinite(error.retryAfterSeconds)) {
             pending.notBefore = Date.now() + Math.min(86400, Math.max(1, error.retryAfterSeconds)) * 1000;
             save();
@@ -168,35 +177,50 @@ async function trackDialogue(chapter, message) {
     }).catch(() => {});
 }
 
+function learningContext() {
+    return { captureScope: window.KzLearningRecords?.scope || null, sessionKey: conversationSessionKey, chapterId: currentAnalect?.id || 'not-selected', chapterTitle: currentAnalect?.title || '', manifestVersion: learningManifest ? `${learningManifest.manifestVersion}:${learningManifest.sourceSha256 || 'content-digest-unavailable'}` : 'source-version-unavailable', interactionType: currentInteractionType || '' };
+}
+
+function captureLearningOperation(action, content, options = {}, context = learningContext()) {
+    const service = window.KzLearningRecords;
+    if (!service || !context.sessionKey) return null;
+    const operation = service.build(action, content, context, options);
+    // A rejection is visible through recorder state; never send raw content to console.
+    const saved = service.record(operation);
+    saved.catch(() => {});
+    return { operation, saved };
+}
+
+function showLearningRecordState(state) {
+    if (!learningRecordStatusEl) return;
+    const labels = { unattributed: '記錄已保存在此裝置；帳號未確認時的內容不會自動歸屬', saved: '學習記錄已保存', saved_locally: '學習記錄已保存在本機，等待同步', pending: '學習記錄等待同步', offline: '離線中，學習記錄保存在本機', storage_error: '學習記錄暫未保存，請保留此頁並重試', needs_attention: '學習記錄暫未同步，請保留此頁並重試' };
+    learningRecordStatusEl.textContent = state.code === 'LEARNING_LOGIN_REQUIRED' ? '請登入以保存完整學習記錄' : (labels[state.status] || '');
+}
+
 function resetConversationSession() {
+    lastLearningDraftId = ''; lastStudentOperationId = '';
     conversationSessionKey = getIdentity()?.createSessionKey?.(`${SITE_KEY}-chat`) || `${SITE_KEY}-chat-${Date.now().toString(36)}`;
 }
 
 async function syncConversationArchive(reason = 'update') {
     if (!conversationHistory.length) return;
-    const identity = await getAuthenticatedIdentity();
-    if (!identity) return;
     if (!conversationSessionKey) resetConversationSession();
-    identity.recordConversation({
-        siteKey: SITE_KEY,
-        sessionKey: conversationSessionKey,
-        title: (currentAnalect?.title || '論語').slice(0, 80),
+    const chapter = currentAnalect;
+    const snapshot = {
+        siteKey: SITE_KEY, sessionKey: conversationSessionKey,
+        title: (chapter?.title || '論語').slice(0, 80),
         summary: conversationHistory[conversationHistory.length - 1]?.content?.slice(0, 120) || '論語對話',
         sourceUrl: `${window.location.origin}${window.location.pathname}`,
-        messages: conversationHistory.map((message, index) => ({
-            id: String(index + 1),
-            role: message.role === 'user' ? 'user' : 'assistant',
-            content: message.content,
-        })),
-        contentFormat: 'kz-conversation-v1',
-        meta: {
-            evidenceRole: 'journey_only',
-            reason,
-            chapterId: currentAnalect?.id || '',
-            interactionType: currentInteractionType || '',
-        },
-    }).catch(() => {});
+        messages: conversationHistory.map(message => ({ id: message.id, role: message.role === 'user' ? 'user' : 'assistant', content: message.content, createdAt: message.createdAt })),
+        contentFormat: 'kz-conversation-v2',
+        meta: { evidenceRole: 'journey_only', reason, chapterId: chapter?.id || '', interactionType: currentInteractionType || '' },
+    };
+    const identity = await getAuthenticatedIdentity();
+    if (!identity) return;
+    // Full-fidelity operations are saved independently; this remains a legacy display projection.
+    return identity.recordConversation(snapshot).catch(() => showLearningRecordState({status:'pending'}));
 }
+
 
 /* ========== 初始化 ========== */
 document.addEventListener("DOMContentLoaded", () => {
@@ -205,6 +229,12 @@ document.addEventListener("DOMContentLoaded", () => {
     applyDarkModePreference();
     initializeDOMElements();
     bindEventListeners();
+    if (window.KzLearningRecords) {
+        learningRecordStatusEl = document.getElementById('learning-record-status');
+        window.KzLearningRecords.onState(showLearningRecordState);
+        window.KzLearningRecords.prepare().catch(() => {});
+        document.getElementById('learning-record-retry')?.addEventListener('click', () => window.KzLearningRecords.retry().catch(() => {}));
+    }
     loadDialogues();
     updateProgressDisplay();
 });
@@ -228,6 +258,10 @@ function bindEventListeners() {
     if (toggleMenuBtnEl) toggleMenuBtnEl.addEventListener("click", toggleMenu);
     if (toggleDarkBtnEl) toggleDarkBtnEl.addEventListener("click", toggleDarkMode);
     if (userInputEl) {
+        userInputEl.addEventListener('input', event => {
+            const captured = captureLearningOperation('draft.edit', { text: userInputEl.value, inputType: event.inputType || '', isComposing: Boolean(event.isComposing) }, { revisesOperationId: lastLearningDraftId });
+            if (captured) lastLearningDraftId = captured.operation.operationId;
+        });
         userInputEl.addEventListener('keypress', function (e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -349,6 +383,7 @@ function displayInitialRandomAnalect() {
     const text = randomChapter.text;
     const translation = randomChapter.translation || "（暫無譯文）";
     const annotations = randomChapter.annotations || "（暫無注釋）";
+    captureLearningOperation('chapter.exposure', { text, translation, annotations }, { actor:'system', contentOrigin:'source_text' }, { ...learningContext(), chapterId:randomChapter.id, chapterTitle:title });
 
     if (messagesEl) {
         messagesEl.innerHTML = ''; // Clear first
@@ -422,6 +457,7 @@ function displayChapter(id) {
     currentAnalect = chapter;
 
     resetInteractionState(); // Clear messages, history, reset button states
+    captureLearningOperation('chapter.open', { text: chapter.text, translationAvailable: Boolean(chapter.translation), annotationsAvailable: Boolean(chapter.annotations) }, { contentOrigin: 'source_text' });
 
     // Add the chapter title/text with a specific class for styling
     const chapterMessage = addMessage(`**${chapter.title}**\n\n${chapter.text}`, 'system');
@@ -486,7 +522,7 @@ function formatMessageText(text) {
 }
 
 // Add Message Helper
-function addMessage(messageText, sender = "system", isError = false) {
+function addMessage(messageText, sender = "system", isError = false, recordOptions = {}) {
     if (!messagesEl) return;
     const messageContainer = document.createElement("div");
     messageContainer.classList.add("message-container", sender);
@@ -524,7 +560,12 @@ function addMessage(messageText, sender = "system", isError = false) {
     // Add to history only if it's user or AI/Confucius response
     // Make sure to push the original messageText, not the HTML content
     if (sender === 'user' || sender === 'ai' || sender === 'confucius') {
-        conversationHistory.push({ role: sender, content: messageText });
+        const message = { id: recordOptions.operationId || window.KzLearningRecords?.id?.() || createOpaqueEventId(currentAnalect), role: sender, content: messageText, createdAt: recordOptions.occurredAt || new Date().toISOString() };
+        conversationHistory.push(message);
+        if (!recordOptions.alreadyRecorded) {
+            const captured = captureLearningOperation(sender === 'user' ? 'answer.submit' : recordOptions.action || 'assistant.reply', { text: messageText }, { operationId: message.id, occurredAt: message.createdAt, actor: sender === 'user' ? 'student' : recordOptions.contentOrigin === 'source_text' ? 'system' : 'assistant', status:'succeeded', parentOperationId: sender === 'user' ? lastLearningDraftId : lastStudentOperationId, contentOrigin: recordOptions.contentOrigin || (sender === 'user' ? 'student' : 'ai_reply') });
+            if (sender === 'user' && captured) lastStudentOperationId = captured.operation.operationId;
+        }
         syncConversationArchive(sender === 'user' ? 'user-message' : 'assistant-message');
     }
     return messageContainer;
@@ -552,8 +593,10 @@ function formatHistoryForAI(history) {
 
 
 // Ask Gemini Helper with Retry
-function askGemini(prompt, callback, retryCount = 0) {
+async function askGemini(prompt, callback, retryCount = 0, requestContext = learningContext()) {
     const MAX_RETRIES = 2;
+    if (requestContext.sessionKey !== conversationSessionKey) return;
+    requestContext = { ...requestContext, parentOperationId: requestContext.parentOperationId ?? lastStudentOperationId };
 
     if (isWaitingForAI && retryCount === 0) {
         console.warn("AI processing...");
@@ -561,34 +604,49 @@ function askGemini(prompt, callback, retryCount = 0) {
     }
     if (retryCount === 0) disableInteractionButtons();
 
-    fetch(CLOUD_FLARE_WORKER_URL, {
+    const attempt = captureLearningOperation('ai.request', { prompt, attemptNumber: retryCount + 1 }, { actor:'system', status:'pending', parentOperationId:requestContext.parentOperationId, contentOrigin:'request_context' }, requestContext);
+    // Persist the exact attempt before any provider request. Recording failures must
+    // never enter the provider retry path (which could issue an unrecorded request).
+    try {
+        if (!attempt) throw new Error('LEARNING_RECORDER_NOT_READY');
+        await attempt.saved;
+    } catch {
+        if (requestContext.sessionKey === conversationSessionKey) {
+            removeLoadingMessage();
+            enableInteractionButtons();
+            callback('學習記錄尚未可靠保存，請保留此頁，登入或恢復記錄服務後再試。', true);
+        }
+        return;
+    }
+    if (requestContext.sessionKey !== conversationSessionKey) return;
+    return fetch(CLOUD_FLARE_WORKER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: prompt })
     })
         .then(response => {
-            if (!response.ok) {
-                return response.json().then(errData => {
-                    throw new Error(`AI請求失敗 (${response.status}): ${errData.error || response.statusText}`);
-                }).catch(() => {
-                    throw new Error(`AI請求失敗 (${response.status}): ${response.statusText}`);
-                });
-            }
+            if (!response.ok) throw Object.assign(new Error(`AI請求失敗 (${response.status})`), {status:response.status});
             return response.json();
         })
-        .then(data => {
+        .then(async data => {
+            const reply = captureLearningOperation('assistant.reply', { text: data.answer || '' }, { actor:'assistant', status:typeof data.answer === 'string' && data.answer ? 'succeeded' : 'failed', parentOperationId:attempt?.operation.operationId || '', contentOrigin:'ai_reply', assessment:{ reportedModel: typeof data.model === 'string' ? data.model : null, modelProvenance: typeof data.model === 'string' ? 'response_declared' : 'not_reported' } }, requestContext);
+            // A storage error must not retry the provider or discard its completed reply.
+            try { if (!reply) throw new Error('LEARNING_RECORDER_NOT_READY'); await reply.saved; }
+            catch { showLearningRecordState({status:'storage_error'}); }
+            if (requestContext.sessionKey !== conversationSessionKey) return;
             removeLoadingMessage();
             enableInteractionButtons();
-            callback(data.answer || "AI 未能提供有效回答。", false);
+            callback(data.answer || "AI 未能提供有效回答。", !data.answer, { alreadyRecorded:true, operationId:reply?.operation.operationId, occurredAt:reply?.operation.occurredAt });
         })
         .catch(error => {
-            console.error("AI Error:", error);
+            captureLearningOperation('ai.failure', { errorClass:error.name || 'Error', httpStatus:error.status || null, attemptNumber:retryCount + 1 }, { actor:'system', status:'failed', parentOperationId:attempt?.operation.operationId || '', contentOrigin:'transport_result' }, requestContext);
+            if (requestContext.sessionKey !== conversationSessionKey) return;
 
             // 重試機制
             if (retryCount < MAX_RETRIES && !error.message.includes("429")) {
                 console.log(`Retrying... attempt ${retryCount + 1}`);
                 setTimeout(() => {
-                    askGemini(prompt, callback, retryCount + 1);
+                    askGemini(prompt, callback, retryCount + 1, requestContext);
                 }, 1000 * (retryCount + 1)); // 指數退避
                 return;
             }
@@ -627,8 +685,8 @@ function handleYangAnnotationClick() {
     const annotations = currentAnalect.annotations || "（暫無注釋）";
 
     // 1. Add translation and annotations
-    addMessage(`**譯文**\n${translation}`, 'confucius');
-    addMessage(`**注釋**\n${annotations}`, 'confucius');
+    addMessage(`**譯文**\n${translation}`, 'confucius', false, { contentOrigin:'source_text', action:'translation.reveal' });
+    addMessage(`**注釋**\n${annotations}`, 'confucius', false, { contentOrigin:'source_text', action:'annotations.reveal' });
 
     // 顯式查看譯文與注釋才是本產品的學習完成動作；選章、導航與自動隨機展示均不計完成。
     const revealedChapter = currentAnalect;
@@ -646,10 +704,10 @@ function handleYangAnnotationClick() {
     const prompt = `${confuciusPersonaInstruction}\n\n本章 (${currentAnalect.title}):\n原文：${currentAnalect.text}\n譯文：${translation}\n註疏：${annotations}\n\n请结合《论语》全文思想和历代注疏，用现代白话把这一章的意思和道理讲清楚、讲透彻，帮助读者真正读懂。`;
 
     // 4. Call AI
-    askGemini(prompt, (aiAnswer, isError) => {
+    askGemini(prompt, (aiAnswer, isError, recordOptions) => {
         // Loading message removed inside askGemini
         if (!isError) {
-            addMessage(aiAnswer, 'confucius');
+            addMessage(aiAnswer, 'confucius', false, recordOptions);
             // 5. Hide button area, show input area
             if (inputAreaEl) inputAreaEl.style.display = "none";
             if (userInputAreaEl) userInputAreaEl.style.display = "flex";
@@ -688,9 +746,9 @@ function handleUserInput() {
     const prompt = `${confuciusPersonaInstruction}\n\n${contextInfo}\n\n--- 對話歷史 ---\n${historyString}\n\n--- 请针对用户最新的提问继续作答，保持现代白话、清楚准确，不要改成文言腔 ---`;
 
     // 4. Call AI
-    askGemini(prompt, (aiAnswer, isError) => {
+    askGemini(prompt, (aiAnswer, isError, recordOptions) => {
         // Loading message removed inside askGemini
-        addMessage(aiAnswer, isError ? 'system' : 'confucius', isError);
+        addMessage(aiAnswer, isError ? 'system' : 'confucius', isError, recordOptions);
         if (userInputEl && !isError) userInputEl.focus();
     });
 }
@@ -888,6 +946,8 @@ function toggleBookmark(chapterId) {
             bookmarks.splice(index, 1);
         }
         localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(bookmarks));
+        const chapter = allChapters.find(item => String(item.id) === String(chapterId));
+        captureLearningOperation(index === -1 ? 'bookmark.add' : 'bookmark.remove', { chapterId }, { status:'succeeded' }, { ...learningContext(), chapterId, chapterTitle:chapter?.title || '' });
         return index === -1; // 返回是否添加了書籤
     } catch (e) {
         console.error("Error toggling bookmark:", e);

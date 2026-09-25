@@ -1,3 +1,7 @@
+## 2026-09-25 — Unreleased detailed learning-record candidate
+
+Append-only private journal, durable source capture and report extraction are under task-scoped validation. Existing scores and live releases are unchanged. Unconfirmed prelogin capture stays local and unowned; no later-account adoption. Exact candidate state, tests and unresolved production gates: /Users/ylsuen/CF/reports/operations/learning-records-validity-20260925/SUCCESSOR_PROGRESS.md. Do not call this candidate a deployed/full-coverage system.
+
 ## 2026-09-10 00:10Z — KZ published; UC candidate rejected and rolled back
 
 Current UC production is `6cbc3f62-6440-4d44-a3fa-36be924580e6@100`, deployment `16ee1ac9-2e67-4ec9-b13b-0b90751a9b8c`. Candidate `db98888d-6b08-412f-a698-2c0ec5f7e99c` is excluded from active traffic. PR99 merged source `cc9c58b42fc78dc71a4820d09ac7c66827854176` contains the unaccepted opt-in finite rate-limit result; a later release from main must explicitly account for this unpublished runtime change. Do not replay the terminal `rolled_back` controller journal.

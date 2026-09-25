@@ -61,6 +61,8 @@
           <!-- Initial content added by JS -->
         </div>
         <!-- Input area only contains the Yang button now -->
+        <p id="learning-record-status" role="status" aria-live="polite"></p>
+        <button type="button" id="learning-record-retry">同步學習記錄</button>
         <div id="input-area">
           <button id="btn-yang" onclick="handleYangAnnotationClick()" class="ghibli-button interaction-button" disabled
             aria-label="查看楊伯峻論語譯註並與 AI 對話">楊伯峻「論語譯註」</button>
@@ -81,6 +83,7 @@
 
   <script src="https://my.bdfz.net/site-auth.js" data-site-key="kz" data-auto-pageview="false"></script>
   <script src="assets/js/learning-evidence.js?v=20260714-aplus-evidence-v1"></script>
+  <script src="assets/js/learning-records.js?v=20260925-learning-records-v1"></script>
   <script src="assets/js/app.js?v=20260714-aplus-evidence-v1"></script>
 </body>
 

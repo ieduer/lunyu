@@ -71,6 +71,9 @@ function browser(storage = new Map(), clock = { now: 1000000 }) {
     },
   };
   const context = {
+    learningContext: () => ({sessionKey:'synthetic-session'}),
+    captureLearningOperation: () => ({operation:{operationId:'synthetic-capture-0001'},saved:Promise.resolve({ok:true})}),
+    showLearningRecordState: () => {},
     window, Date: class extends Date { static now() { return clock.now; } },
     fetch: async (_url, init) => { sourceCalls.push(JSON.parse(init.body)); return nextResponse(); },
     setTimeout: (callback, delay) => { timers.push({ callback, delay }); },

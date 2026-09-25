@@ -8,7 +8,7 @@
     "build:learning-manifest": "node scripts/build_learning_manifest.mjs",
     "check:learning-manifest": "node scripts/build_learning_manifest.mjs --check",
     "test:growth-evidence": "node scripts/test_growth_evidence_function.mjs",
-    "test": "node scripts/test_learning_evidence.mjs && node scripts/test_source_contract.mjs && npm run test:growth-evidence && node scripts/test_progress_restore.mjs && node scripts/test_chapter_catalogue.mjs && node --test scripts/test_completion_rate_limit.mjs",
+    "test": "node scripts/test_learning_evidence.mjs && node scripts/test_source_contract.mjs && npm run test:growth-evidence && node scripts/test_progress_restore.mjs && node scripts/test_chapter_catalogue.mjs && node --test scripts/test_completion_rate_limit.mjs && node --test scripts/test_learning_records.mjs",
     "check": "npm run check:learning-manifest && node --check assets/js/learning-evidence.js && node --check assets/js/app.js && node --check functions/api/learning/complete.js && node --check functions/api/learning/health.js && npm test"
   },
   "engines": {
