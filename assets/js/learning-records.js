@@ -1,11 +1,13 @@
 // Explicit learning content only. Unconfirmed identity is preserved locally, never adopted on login.
 (function(root){
+  const siteKey=root.document?.currentScript?.dataset?.siteKey || 'kz';
+  if(!/^[a-z0-9][a-z0-9_-]{0,59}$/.test(siteKey))throw new Error('LEARNING_SITE_INVALID');
   const failure=code=>Object.assign(new Error(code),{code});
   function createInbox(indexedDB=root.indexedDB){
     let opening;
     const open=()=>opening ||= new Promise((resolve,reject)=>{
       if(!indexedDB){reject(failure('LEARNING_STORAGE_UNAVAILABLE'));return;}
-      const req=indexedDB.open('kz-learning-capture-v1',1);
+      const req=indexedDB.open('bdfz-learning-capture-v1',1);
       req.onupgradeneeded=()=>req.result.createObjectStore('captures',{keyPath:'id'});
       req.onsuccess=()=>resolve(req.result);
       req.onerror=()=>{opening=null;reject(failure('LEARNING_STORAGE_UNAVAILABLE'));};
@@ -28,7 +30,7 @@
     let ready=null,recorder=null,draining=null,generation=0;
     const states=new Set(),bindings=new WeakMap();
     const notify=state=>{for(const fn of states){try{fn(state);}catch{}}};
-    const id=()=>root.crypto?.randomUUID?.() || `kz-op-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+    const id=()=>root.crypto?.randomUUID?.() || `${siteKey}-op-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
     async function drain(r){
       if(draining)return draining.then(()=>drain(r));
       draining=(async()=>{
@@ -57,7 +59,7 @@
           if(!identity?.createLearningRecorder)throw failure('LEARNING_RECORDER_NOT_READY');
           const session=await identity.getSession();
           if(!session?.authenticated)throw failure('LEARNING_LOGIN_REQUIRED');
-          const r=await identity.createLearningRecorder({siteKey:'kz',onState:notify});
+          const r=await identity.createLearningRecorder({siteKey,onState:notify});
           if(epoch!==generation){r.close();throw failure('LEARNING_IDENTITY_CHANGED');}
           recorder=r;
           await drain(r);void r.flush().catch(()=>{});return r;
@@ -66,7 +68,7 @@
       return ready;
     }
     function build(action,content,context={},options={}){
-      const operation={operationId:options.operationId||id(),sessionKey:context.sessionKey,resourceKey:`chapter:${context.chapterId}`,resourceVersion:context.manifestVersion||'source-version-unavailable',action,actor:options.actor||'student',status:options.status||'observed',occurredAt:options.occurredAt||new Date().toISOString(),parentOperationId:options.parentOperationId||'',revisesOperationId:options.revisesOperationId||'',content,context:{chapterTitle:context.chapterTitle||'',chapterId:String(context.chapterId||''),interactionType:context.interactionType||'',contentOrigin:options.contentOrigin||'student',sourceVersion:'kz-learning-records-v1'},assessment:options.assessment||{}};
+      const operation={operationId:options.operationId||id(),sessionKey:context.sessionKey,resourceKey:context.resourceKey||`chapter:${context.chapterId}`,resourceVersion:context.resourceVersion||context.manifestVersion||'source-version-unavailable',action,actor:options.actor||'student',status:options.status||'observed',occurredAt:options.occurredAt||new Date().toISOString(),parentOperationId:options.parentOperationId||'',revisesOperationId:options.revisesOperationId||'',content,context:{chapterTitle:context.chapterTitle||'',chapterId:String(context.chapterId||''),interactionType:context.interactionType||'',contentOrigin:options.contentOrigin||'student',sourceVersion:'learning-capture-v1',sourceContext:context.sourceContext||{}},assessment:options.assessment||{}};
       bindings.set(operation,Object.prototype.hasOwnProperty.call(context,'captureScope')?context.captureScope:recorder?.scope||null);
       return operation;
     }
@@ -83,9 +85,10 @@
     function invalidate(){generation++;recorder?.close();recorder=null;ready=null;}
     return {id,build,record,prepare,get scope(){return recorder?.scope||null;},pending:()=>inbox.list(),onState:fn=>{states.add(fn);return()=>states.delete(fn);},retry:async()=>{const r=await prepare();await drain(r);return r.retry();},invalidate,close:invalidate};
   }
-  root.KzLearningRecordsFactory={createService,createInbox};
-  root.KzLearningRecords=createService();
-  root.addEventListener?.('bdfz:session-invalidated',()=>root.KzLearningRecords.invalidate());
-  root.addEventListener?.('pagehide',()=>root.KzLearningRecords.invalidate());
-  root.addEventListener?.('focus',()=>{root.KzLearningRecords.invalidate();void root.KzLearningRecords.prepare().catch(()=>{});});
+  root.BdfzLearningRecordsFactory={createService,createInbox};
+  root.BdfzLearningRecords=createService();
+  if(siteKey==='kz'){root.KzLearningRecordsFactory=root.BdfzLearningRecordsFactory;root.KzLearningRecords=root.BdfzLearningRecords;}
+  root.addEventListener?.('bdfz:session-invalidated',()=>root.BdfzLearningRecords.invalidate());
+  root.addEventListener?.('pagehide',()=>root.BdfzLearningRecords.invalidate());
+  root.addEventListener?.('focus',()=>{root.BdfzLearningRecords.invalidate();void root.BdfzLearningRecords.prepare().catch(()=>{});});
 })(typeof window==='undefined'?globalThis:window);

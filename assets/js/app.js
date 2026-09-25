@@ -205,6 +205,8 @@ function resetConversationSession() {
 async function syncConversationArchive(reason = 'update') {
     if (!conversationHistory.length) return;
     if (!conversationSessionKey) resetConversationSession();
+    const captureScope=window.KzLearningRecords?.scope;
+    if(!captureScope || conversationHistory.some(message=>message.captureScope!==captureScope))return;
     const chapter = currentAnalect;
     const snapshot = {
         siteKey: SITE_KEY, sessionKey: conversationSessionKey,
@@ -216,7 +218,7 @@ async function syncConversationArchive(reason = 'update') {
         meta: { evidenceRole: 'journey_only', reason, chapterId: chapter?.id || '', interactionType: currentInteractionType || '' },
     };
     const identity = await getAuthenticatedIdentity();
-    if (!identity) return;
+    if (!identity || window.KzLearningRecords?.scope!==captureScope) return;
     // Full-fidelity operations are saved independently; this remains a legacy display projection.
     return identity.recordConversation(snapshot).catch(() => showLearningRecordState({status:'pending'}));
 }
@@ -560,7 +562,7 @@ function addMessage(messageText, sender = "system", isError = false, recordOptio
     // Add to history only if it's user or AI/Confucius response
     // Make sure to push the original messageText, not the HTML content
     if (sender === 'user' || sender === 'ai' || sender === 'confucius') {
-        const message = { id: recordOptions.operationId || window.KzLearningRecords?.id?.() || createOpaqueEventId(currentAnalect), role: sender, content: messageText, createdAt: recordOptions.occurredAt || new Date().toISOString() };
+        const message = { captureScope:Object.prototype.hasOwnProperty.call(recordOptions,'captureScope')?recordOptions.captureScope:window.KzLearningRecords?.scope||null, id: recordOptions.operationId || window.KzLearningRecords?.id?.() || createOpaqueEventId(currentAnalect), role: sender, content: messageText, createdAt: recordOptions.occurredAt || new Date().toISOString() };
         conversationHistory.push(message);
         if (!recordOptions.alreadyRecorded) {
             const captured = captureLearningOperation(sender === 'user' ? 'answer.submit' : recordOptions.action || 'assistant.reply', { text: messageText }, { operationId: message.id, occurredAt: message.createdAt, actor: sender === 'user' ? 'student' : recordOptions.contentOrigin === 'source_text' ? 'system' : 'assistant', status:'succeeded', parentOperationId: sender === 'user' ? lastLearningDraftId : lastStudentOperationId, contentOrigin: recordOptions.contentOrigin || (sender === 'user' ? 'student' : 'ai_reply') });
@@ -636,7 +638,7 @@ async function askGemini(prompt, callback, retryCount = 0, requestContext = lear
             if (requestContext.sessionKey !== conversationSessionKey) return;
             removeLoadingMessage();
             enableInteractionButtons();
-            callback(data.answer || "AI 未能提供有效回答。", !data.answer, { alreadyRecorded:true, operationId:reply?.operation.operationId, occurredAt:reply?.operation.occurredAt });
+            callback(data.answer || "AI 未能提供有效回答。", !data.answer, { alreadyRecorded:true, captureScope:requestContext.captureScope, operationId:reply?.operation.operationId, occurredAt:reply?.operation.occurredAt });
         })
         .catch(error => {
             captureLearningOperation('ai.failure', { errorClass:error.name || 'Error', httpStatus:error.status || null, attemptNumber:retryCount + 1 }, { actor:'system', status:'failed', parentOperationId:attempt?.operation.operationId || '', contentOrigin:'transport_result' }, requestContext);
