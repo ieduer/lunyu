@@ -83,12 +83,17 @@
       }catch(error){notify({status:'storage_error',code:error.code||'LEARNING_STORAGE_WRITE_FAILED'});throw error;}
     }
     function invalidate(){generation++;recorder?.close();recorder=null;ready=null;}
-    return {id,build,record,prepare,get scope(){return recorder?.scope||null;},pending:()=>inbox.list(),onState:fn=>{states.add(fn);return()=>states.delete(fn);},retry:async()=>{const r=await prepare();await drain(r);return r.retry();},invalidate,close:invalidate};
+    // Lifecycle recovery must drain both durable queues without resetting the retry budget.
+    async function resume(){const r=await prepare();await drain(r);return r.flush();}
+    return {id,build,record,prepare,resume,get scope(){return recorder?.scope||null;},pending:()=>inbox.list(),onState:fn=>{states.add(fn);return()=>states.delete(fn);},retry:async()=>{const r=await prepare();await drain(r);return r.retry();},invalidate,close:invalidate};
   }
   root.BdfzLearningRecordsFactory={createService,createInbox};
   root.BdfzLearningRecords=createService();
   if(siteKey==='kz'){root.KzLearningRecordsFactory=root.BdfzLearningRecordsFactory;root.KzLearningRecords=root.BdfzLearningRecords;}
   root.addEventListener?.('bdfz:session-invalidated',()=>root.BdfzLearningRecords.invalidate());
   root.addEventListener?.('pagehide',()=>root.BdfzLearningRecords.invalidate());
-  root.addEventListener?.('focus',()=>{root.BdfzLearningRecords.invalidate();void root.BdfzLearningRecords.prepare().catch(()=>{});});
+  const resume=()=>{void root.BdfzLearningRecords.resume().catch(()=>{});};
+  root.addEventListener?.('pageshow',event=>{if(event.persisted)resume();});
+  root.addEventListener?.('online',resume);
+  root.addEventListener?.('focus',()=>{root.BdfzLearningRecords.invalidate();resume();});
 })(typeof window==='undefined'?globalThis:window);

@@ -1,3 +1,9 @@
+## 2026-09-25 — Detailed learning capture candidate, not deployed
+
+The task-owned candidate preserves complete source operations and account ownership. Its shared capture wrapper now resumes both durable queues after persisted page return, online reconnect and focus without resetting the bounded automatic retry budget; the script cache version changed with it. Unknown and other-account originals are never reassigned. Existing scoring/content/completion contracts remain unchanged.
+
+Leaf publication and real leaf acceptance follow UC core acceptance and this week's observed activity order. Current source, core readiness, ownership and remaining full-site/report work: `/Users/ylsuen/CF/reports/operations/learning-records-validity-20260925/REPORT.md`. This candidate is not a production or full-coverage claim.
+
 ## 2026-09-25 — Unreleased detailed learning-record candidate
 
 Append-only private journal, durable source capture and report extraction are under task-scoped validation. Existing scores and live releases are unchanged. Unconfirmed prelogin capture stays local and unowned; no later-account adoption. Exact candidate state, tests and unresolved production gates: /Users/ylsuen/CF/reports/operations/learning-records-validity-20260925/SUCCESSOR_PROGRESS.md. Do not call this candidate a deployed/full-coverage system.
