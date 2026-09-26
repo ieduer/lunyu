@@ -1,3 +1,9 @@
+## 2026-09-26 — Full learning recorder production accepted
+
+Source `1a781813c6d597794f6ba03b474333ee66e08654`, merged PR6; native Pages `4f6952d2-d652-44be-a221-a0f676a73f3f`. All11 assets and both unchanged Functions match. Actual authenticated synthetic answer.submit/assistant.reply preserve independent times, full text, parent chain and exact central/reload/dedup. Native browser two-synthetic-account isolation and production wrong-scope409 pass. One bounded Functions health log is200/ok/zero exceptions; DNS-only zone analytics are inapplicable. Model calls0, grade writes0, notifications0. No natural student activity or server-side lost-reply capture claim.
+
+Authority: `/Users/ylsuen/CF/reports/operations/learning-records-validity-20260925/KZ_RELEASE.md` and `kz-native-accepted.json`. Rollback Pages `9b7558d2-6d62-475a-ab23-b3d6a74c1c22` / source `ffa3962d1285d29ca4fb362c497318cce512ee55`; preserve forward data. Earlier candidate-only entries below are historical. Documentation commit does not supersede accepted runtime source.
+
 ## 2026-09-25 — Detailed learning capture candidate, not deployed
 
 The task-owned candidate preserves complete source operations and account ownership. Its shared capture wrapper now resumes both durable queues after persisted page return, online reconnect and focus without resetting the bounded automatic retry budget; the script cache version changed with it. Unknown and other-account originals are never reassigned. Existing scoring/content/completion contracts remain unchanged.
