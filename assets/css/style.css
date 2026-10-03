@@ -868,6 +868,11 @@ body.dark-mode #dialogue-box {
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
 }
 
+/* Emphasis follows its message color in dark mode, including user replies. */
+body.dark-mode .message-container strong {
+  color: inherit;
+}
+
 body.dark-mode .message-container.system,
 body.dark-mode .message-container.initial {
   background-color: rgba(40, 40, 40, 0.7);
