@@ -1,7 +1,8 @@
 # Analects consolidation candidate
 
-This is a read-only reconciliation foundation, not a deployed merger or a
-grading authority. It uses the existing KZ, LY and Weibian sources; the generated
+The reconciliation tools remain read-only and are not a grading authority.
+A local reader navigation candidate now uses the existing runtime; the full
+four-site merger is not deployed or accepted. It uses the existing KZ, LY and Weibian sources; the generated
 registry is a display index, not an independently editable content catalogue.
 
 From this repository, with Node 24.18.0:

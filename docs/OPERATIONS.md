@@ -1,3 +1,11 @@
+## 2026-10-05 — Analects reading workspace candidate, not deployed
+
+The serial Analects consolidation now has a working reader navigation slice: exact legacy-ID/coordinate URLs, canonical chapter search, previous/next navigation, reload/back restoration and visible reading progress. All 541 historical IDs, 29 aliases, 512 displayed passages, corpus bytes, threshold163 and existing annotation-only completion remain unchanged. The display explicitly labels browser history and does not infer answer mastery or formal grades.
+
+Validation: pinned Node24.18.0 build and full `npm run check` passed, including five new route/search/history tests. Seven local browser scenarios passed at1440px/390px, with external requests blocked and synthetic local alias history; authenticated production acceptance has not been attempted. The historical source-contract test now recognizes the navigation options parameter and still rejects completion calls on chapter open. Local styles were corrected after screenshot inspection showed inherited full-width buttons compressing the search field.
+
+This is one incomplete slice of the authorized four-site integration. Fuzi dialogue, full LY game, Weibian/verified exam flow, cross-source authenticated progress and full293-day consumer adoption remain open. It is not a release candidate acceptance or a replacement for those modes. No notification, provider call, new grade, data migration or production change. Preserve the existing accepted deployment and all forward history. Authority/evidence: `/Users/ylsuen/CF/reports/operations/analects-consolidation-20261004/serial5/REPORT.md`.
+
 ## 2026-10-05 — Undeployed consolidation tooling
 
 The task-owned `scripts/consolidation/README.md` documents source-pinned,

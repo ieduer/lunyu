@@ -358,8 +358,21 @@ function loadDialogues() {
             allChapters = data;
             groupChapters();
             renderChapterMenu();
-            displayInitialRandomAnalect();
-            if (btnYangEl) btnYangEl.disabled = true;
+            const routed = window.KzReadingWorkspace?.initialize({
+                chapters: displayCatalogue.chapters, rows: allChapters,
+                aliases: displayCatalogue.displayIds, getProgress: getReadProgress,
+                openChapter: displayChapter,
+                showIntroduction: () => {
+                    currentAnalect = null;
+                    resetInteractionState();
+                    displayInitialRandomAnalect();
+                    if (btnYangEl) btnYangEl.disabled = true;
+                },
+            });
+            if (!routed) {
+                displayInitialRandomAnalect();
+                if (btnYangEl) btnYangEl.disabled = true;
+            }
             updateProgressDisplay();
             // 菜單渲染完成後，從用戶系統拉一次遠端進度並合併，失敗靜默降級
             hydrateReadProgressFromIdentity();
@@ -433,10 +446,11 @@ function renderSubChapterMenu(major, container) {
     if (!subChapters || subChapters.length === 0) return;
     const subMenuContainer = document.createElement("div"); subMenuContainer.className = "sub-menu-container";
     subChapters.forEach(item => {
-        const a = document.createElement("a"); a.href = "#"; a.textContent = `${item.major}.${item.minor}`;
+        const a = document.createElement("a"); a.href = `?chapter=${item.id}`; a.textContent = `${item.major}.${item.minor}`;
         a.classList.add('ghibli-button', 'sub-chapter-link');
         a.dataset.chapterId = String(item.id);
         a.onclick = (e) => {
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || (e.button && e.button !== 0)) return;
             e.preventDefault(); displayChapter(item.id);
             if (window.innerWidth <= 768 && chapterMenuEl && chapterMenuEl.style.display !== 'none') { toggleMenu(); }
         };
@@ -449,7 +463,7 @@ function renderSubChapterMenu(major, container) {
 
 
 // 顯示指定 ID 的論語內容到對話框
-function displayChapter(id) {
+function displayChapter(id, { updateHistory = true } = {}) {
     const chapter = allChapters.find(ch => ch.id == id);
     if (!chapter) {
         console.error("Chapter not found:", id);
@@ -472,6 +486,7 @@ function displayChapter(id) {
     if (inputAreaEl) inputAreaEl.style.display = 'flex';
 
     restoreCompletionRetry(chapter);
+    window.KzReadingWorkspace?.selected(chapter.id, { history: updateHistory });
 }
 
 // 重置對話狀態
@@ -837,6 +852,7 @@ function updateProgressDisplay() {
     // 更新頁面標題顯示進度
     const baseTitle = "AI論語";
     document.title = readCount > 0 && total > 0 ? `${baseTitle} (已讀 ${readCount}/${total})` : baseTitle;
+    window.KzReadingWorkspace?.refresh();
 }
 
 // 更新目錄中已讀狀態
