@@ -1,0 +1,142 @@
+{
+  "schema": "analects-exam-review-v1",
+  "groups": [
+    {
+      "groupId": "gk-2015-lunyu",
+      "sourceSha256": "ae651761f08288201b51a58b4fc4fb840d1762a2b9766939c82fbdbcea9d936d",
+      "originalQuestionIds": [
+        "q1",
+        "q2",
+        "q15",
+        "q16"
+      ],
+      "candidateAliases": [
+        [
+          "q1",
+          "q15"
+        ],
+        [
+          "q2",
+          "q16"
+        ]
+      ],
+      "reviewStatus": "original_paper_material_answer_and_attempt_review_required",
+      "mergeAllowed": false
+    },
+    {
+      "groupId": "gk-2018-lunyu",
+      "sourceSha256": "131013d526c5ff8364f36ae312db63066f1650f1ea636f87ac365d5843f87385",
+      "originalQuestionIds": [
+        "q1",
+        "q15"
+      ],
+      "candidateAliases": [
+        [
+          "q1",
+          "q15"
+        ]
+      ],
+      "reviewStatus": "original_paper_material_answer_and_attempt_review_required",
+      "mergeAllowed": false
+    },
+    {
+      "groupId": "gk-2018-weixiezuo-lunyu",
+      "sourceSha256": "2cb8176aafc6163d12d578b10698b59653f1413b99ebcafed37e2c0becc9100c",
+      "originalQuestionIds": [
+        "q3"
+      ],
+      "candidateAliases": [],
+      "reviewStatus": "original_paper_material_answer_and_attempt_review_required",
+      "mergeAllowed": false
+    },
+    {
+      "groupId": "gk-2019-lunyu",
+      "sourceSha256": "48b11a0daee5cadaf6dcc910bb58edf0678bbe803422ee06318dbf53fd6a87b6",
+      "originalQuestionIds": [
+        "q1",
+        "q2",
+        "q15",
+        "q16"
+      ],
+      "candidateAliases": [
+        [
+          "q1",
+          "q15"
+        ],
+        [
+          "q2",
+          "q16"
+        ]
+      ],
+      "reviewStatus": "original_paper_material_answer_and_attempt_review_required",
+      "mergeAllowed": false
+    },
+    {
+      "groupId": "gk-2020-lunyu",
+      "sourceSha256": "3995c056613d1149081cc6b67ba0b12f53a0e732d23b58f5e81981ad77fbb756",
+      "originalQuestionIds": [
+        "q1",
+        "q2",
+        "q16",
+        "q17"
+      ],
+      "candidateAliases": [
+        [
+          "q1",
+          "q16"
+        ],
+        [
+          "q2",
+          "q17"
+        ]
+      ],
+      "reviewStatus": "original_paper_material_answer_and_attempt_review_required",
+      "mergeAllowed": false
+    },
+    {
+      "groupId": "gk-2021-lunyu",
+      "sourceSha256": "bf821a28ae5799b9906b28d025b726c8dc8393c6b64c446c339acb69804eb10d",
+      "originalQuestionIds": [
+        "q1",
+        "q17"
+      ],
+      "candidateAliases": [
+        [
+          "q1",
+          "q17"
+        ]
+      ],
+      "reviewStatus": "original_paper_material_answer_and_attempt_review_required",
+      "mergeAllowed": false
+    },
+    {
+      "groupId": "gk-2023-lunyu",
+      "sourceSha256": "85329b23ac37b7238f5aec434d233c48f1d5c9aad8915259b1c5221c6b913e2e",
+      "originalQuestionIds": [
+        "q1",
+        "q2",
+        "q3",
+        "q15",
+        "q16",
+        "q17"
+      ],
+      "candidateAliases": [
+        [
+          "q1",
+          "q15"
+        ],
+        [
+          "q2",
+          "q16"
+        ],
+        [
+          "q3",
+          "q17"
+        ]
+      ],
+      "reviewStatus": "original_paper_material_answer_and_attempt_review_required",
+      "mergeAllowed": false
+    }
+  ],
+  "originalQuestions": 23
+}

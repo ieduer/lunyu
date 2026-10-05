@@ -1,3 +1,20 @@
+## 2026-10-05 — Analects consolidation foundation; not deployed
+
+Task `analects-consolidation-20261004` has a local, isolated candidate based on
+accepted KZ `69674ff161ff2272ab97f3aa3fda97a8c10a8fb4`. It adds the read-only
+541-to-512 reconciliation index, full daily-plan comparison and preservation
+review prerequisites in `scripts/consolidation/`. All 18 new tests and the
+existing `npm run check` passed; reproducible generated outputs were checked.
+This is not runtime integration, grading completion or a release.
+
+The user explicitly authorizes direct review and scoring of all related student
+learning records, with verified entry into the existing central evaluation.
+The current failed-operation audit covers 510 events; KZ 299/300 already map to
+formal evidence and one requires controlled adjudication. Preserve originals
+and avoid duplicate credit. Full coverage and all outstanding work are in
+`/Users/ylsuen/CF/reports/operations/analects-consolidation-20261004/HANDOFF.md`.
+Second-compaction state: `fresh_task_required`, serial continuation only.
+
 ## 2026-09-25 — Detailed learning capture candidate, not deployed
 
 The task-owned candidate preserves complete source operations and account ownership. Its shared capture wrapper now resumes both durable queues after persisted page return, online reconnect and focus without resetting the bounded automatic retry budget; the script cache version changed with it. Unknown and other-account originals are never reassigned. Existing scoring/content/completion contracts remain unchanged.

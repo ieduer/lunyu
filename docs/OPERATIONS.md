@@ -1,3 +1,13 @@
+## 2026-10-05 — Undeployed consolidation tooling
+
+The task-owned `scripts/consolidation/README.md` documents source-pinned,
+read-only candidate generation and focused tests. No publisher, runtime,
+source scoring contract, binding, student record or production version changed.
+The generated registry must not become a separately editable content authority.
+No candidate upload or production acceptance has occurred. Recovery is from the
+local `codex/analects-consolidation-20261004` branch; exact commit and remaining
+acceptance are recorded in the workspace handoff linked in that README.
+
 ## 2026-09-25 — Detailed learning capture candidate, not deployed
 
 The task-owned candidate preserves complete source operations and account ownership. Its shared capture wrapper now resumes both durable queues after persisted page return, online reconnect and focus without resetting the bounded automatic retry budget; the script cache version changed with it. Unknown and other-account originals are never reassigned. Existing scoring/content/completion contracts remain unchanged.
