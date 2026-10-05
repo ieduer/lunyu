@@ -73,7 +73,7 @@
         el('reading-next').disabled = true;
     }
     function route({ initial = false } = {}) {
-        if (!reader) return false;
+        if (!reader || (root.AnalectsModes && root.AnalectsModes.current !== 'read')) return false;
         const value = new URL(root.location.href).searchParams.get('chapter');
         if (value === null) {
             if (!initial) introduction();

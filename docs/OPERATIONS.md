@@ -1,3 +1,7 @@
+## 2026-10-05 — Origin-preserving Analects host candidate, not deployed
+
+A local three-source candidate connects the KZ reader, complete LY world and Fuzi dialogue through persistent source-origin frames. See `docs/ANALECTS_HOST_INTEGRATION.md` for exact boundary, tests, generated bridge, release order, rollback and remaining acceptance. No original answer/score/history, source API, identity authority or production resource was changed. Full four-site integration and all global review goals remain open.
+
 ## 2026-10-05 — Analects reading workspace candidate, not deployed
 
 The serial Analects consolidation now has a working reader navigation slice: exact legacy-ID/coordinate URLs, canonical chapter search, previous/next navigation, reload/back restoration and visible reading progress. All 541 historical IDs, 29 aliases, 512 displayed passages, corpus bytes, threshold163 and existing annotation-only completion remain unchanged. The display explicitly labels browser history and does not infer answer mastery or formal grades.

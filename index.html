@@ -24,7 +24,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <title>AI論語 - 與孔子對話學習《論語》</title>
-  <link rel="stylesheet" href="assets/css/style.css?v=20261005-reading-workspace" />
+  <link rel="stylesheet" href="assets/css/style.css?v=20261005-modes" />
   <script type="text/javascript">
     (function (c, l, a, r, i, t, y) {
       c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
@@ -55,6 +55,13 @@
         <button id="toggle-dark-btn" title="切換夜晚模式" class="ghibli-button icon-button" aria-label="切換深色/淺色模式">🌓</button>
       </header>
 
+      <nav id="analects-mode-nav" aria-label="論語學習模式">
+        <a data-analects-mode-link="read" href="?mode=read">研讀</a>
+        <a data-analects-mode-link="fuzi" href="?mode=fuzi">夫子對談</a>
+        <a data-analects-mode-link="battle" href="?mode=battle">義戰論語</a>
+        <button id="analects-login" type="button">登入</button>
+      </nav>
+      <div id="analects-modes" hidden></div>
       <section id="reading-workspace" aria-label="閱讀導航與進度" hidden>
         <div class="reading-overview">
           <div><span id="reading-progress-label">正在載入進度</span><progress id="reading-progress-meter" value="0" max="512" aria-label="本瀏覽器閱讀進度"></progress></div>
@@ -104,8 +111,9 @@
   <script src="https://my.bdfz.net/site-auth.js" data-site-key="kz" data-auto-pageview="false"></script>
   <script src="assets/js/learning-evidence.js?v=20260714-aplus-evidence-v1"></script>
   <script src="assets/js/learning-records.js?v=20260925-capture-recovery"></script>
-  <script src="assets/js/reading-workspace.js?v=20261005-reading-workspace"></script>
-  <script src="assets/js/app.js?v=20261005-reading-workspace"></script>
+  <script src="assets/js/analects-modes.js?v=20261005-modes"></script>
+  <script src="assets/js/reading-workspace.js?v=20261005-modes"></script>
+  <script src="assets/js/app.js?v=20261005-modes"></script>
 </body>
 
 </html>

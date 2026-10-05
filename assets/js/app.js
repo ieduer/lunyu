@@ -237,8 +237,15 @@ document.addEventListener("DOMContentLoaded", () => {
         window.KzLearningRecords.prepare().catch(() => {});
         document.getElementById('learning-record-retry')?.addEventListener('click', () => window.KzLearningRecords.retry().catch(() => {}));
     }
-    loadDialogues();
-    updateProgressDisplay();
+    let readerStarted = false;
+    const startReader = () => {
+        if (readerStarted || (window.AnalectsModes && window.AnalectsModes.current !== 'read')) return;
+        readerStarted = true;
+        loadDialogues();
+        updateProgressDisplay();
+    };
+    window.addEventListener('analects:mode', startReader);
+    startReader();
 });
 
 function initializeDOMElements() {
