@@ -1,3 +1,9 @@
+## 2026-10-05 — Shared Weibian notes candidate, not deployed
+
+The reader now has separate explicit reading and AI actions. Both reuse one source reveal and one existing KZ completion attempt per chapter/session. Reading alone never calls the AI provider. KZ fetches the existing immutable Weibian bundle anonymously, verifies its exact 871333 bytes and SHA256, and reconciles all541 historical IDs against the current corpus before showing1045 structured notes across512 chapters. Complete original KZ notes remain available during fetch failure; explicit retry is bounded. No content corpus is copied into public Git, no score/identity authority is added, and historical IDs/aliases/completion threshold remain unchanged.
+
+See `docs/ANALECTS_CONTENT_INTEGRATION.md` and the serial6 report for checks, exact content authority, limitations and rollback. This is an unpublished candidate; authenticated write/reload, full four-site authority, exams, trusted progress,293-day adoption and governed publication remain open.
+
 ## 2026-10-05 — Origin-preserving Analects host candidate, not deployed
 
 A local three-source candidate connects the KZ reader, complete LY world and Fuzi dialogue through persistent source-origin frames. See `docs/ANALECTS_HOST_INTEGRATION.md` for exact boundary, tests, generated bridge, release order, rollback and remaining acceptance. No original answer/score/history, source API, identity authority or production resource was changed. Full four-site integration and all global review goals remain open.

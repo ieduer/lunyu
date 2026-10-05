@@ -1121,6 +1121,14 @@ body.dark-mode #user-input-area .send-button:hover {
   /* Puts space between message and button */
 }
 /* Reading workspace: keep the established paper/ink palette and reader scroll area. */
+.weibian-terms { margin: .7rem 0; padding: .8rem; border: 1px solid var(--ghibli-border); border-radius: 6px; }
+.weibian-terms h3 { margin: 0 0 .5rem; }
+.weibian-terms details { border-top: 1px solid var(--ghibli-border); padding: .5rem 0; }
+.weibian-terms summary { cursor: pointer; min-height: 32px; }
+.weibian-terms p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.weibian-terms button[hidden] { display: none; }
+.weibian-terms :focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+body.dark-mode .weibian-terms, body.dark-mode .weibian-terms details { border-color: var(--ghibli-dark-border); }
 #reading-workspace { flex: 0 0 auto; padding: .7rem 1rem; background: var(--ghibli-header-bg); border-bottom: 1px solid var(--ghibli-border); }
 #reading-workspace[hidden], #reading-results[hidden], #reading-continue[hidden] { display: none; }
 .reading-overview, #reading-search-form, .reading-location { display: flex; align-items: center; gap: .7rem; }
