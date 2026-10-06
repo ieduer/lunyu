@@ -1,3 +1,9 @@
+## 2026-10-05 — Today and central progress candidate, not deployed
+
+KZ adds a read-only today mode over the accepted My daily-plan1.3.0 and central A+ conditions. Original task/chapter IDs and thresholds stay unchanged. Browser reading history is explicitly separate. Owner changes, stale responses, partial evidence and date changes fail closed without zeroes or writes. See `docs/ANALECTS_OVERVIEW.md` for exact source, tests, actual authenticated GET/reload acceptance and rollback.
+
+Full checks and desktop/mobile fixtures pass. The normal My bridge and candidate page's real central task/condition readback pass; score digest is unchanged and observed writes0. Build was blocked before execution by the runtime hygiene hook; no other chat was cleaned and no gate was bypassed. Full source-write/device/child compatibility and governed publication remain open. This is an unpublished continuation, not full-goal completion.
+
 ## 2026-10-05 — Shared Weibian notes candidate, not deployed
 
 The reader now has separate explicit reading and AI actions. Both reuse one source reveal and one existing KZ completion attempt per chapter/session. Reading alone never calls the AI provider. KZ fetches the existing immutable Weibian bundle anonymously, verifies its exact 871333 bytes and SHA256, and reconciles all541 historical IDs against the current corpus before showing1045 structured notes across512 chapters. Complete original KZ notes remain available during fetch failure; explicit retry is bounded. No content corpus is copied into public Git, no score/identity authority is added, and historical IDs/aliases/completion threshold remain unchanged.

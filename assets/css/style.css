@@ -1185,3 +1185,28 @@ body.dark-mode #analects-mode-nav { background: var(--ghibli-dark-header-bg); bo
   body[data-analects-mode="battle"] #container, body[data-analects-mode="fuzi"] #container { height: calc(100dvh - var(--footer-height)); min-height: 0; margin: 0 auto; padding: 0; width: 100%; }
   body[data-analects-mode="battle"] #main-content, body[data-analects-mode="fuzi"] #main-content { height: 100%; min-height: 0; overflow: hidden; }
 }
+
+/* Same-origin read-only overview; no child data travels through the bridge. */
+#analects-mode-nav { flex-wrap: wrap; }
+#analects-overview { flex: 1; min-height: 0; overflow-y: auto; padding: 1rem; background: var(--ghibli-dialogue-bg); backdrop-filter: blur(10px); }
+#analects-overview[hidden] { display: none; }
+#analects-overview h2 { font-size: 1.15rem; margin: 1rem 0 .5rem; }
+.analects-overview-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .8rem; }
+#analects-overview-refresh { width: auto; min-height: 44px; margin: 0; font: inherit; padding: .45rem .7rem; cursor: pointer; }
+.analects-overview-card { padding: .8rem; margin: .6rem 0; border: 1px solid var(--ghibli-border); border-radius: 6px; }
+.analects-overview-card h3 { margin: 0 0 .5rem; font-size: 1rem; }
+.analects-overview-card p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.analects-overview-note { font-size: .85rem; line-height: 1.5; }
+#analects-overview a { color: var(--ghibli-accent-blue-dark); display: inline-block; padding: .45rem 0; }
+#analects-overview :focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+body.dark-mode .analects-overview-card { border-color: var(--ghibli-dark-border); }
+body.dark-mode #analects-overview { background: var(--ghibli-dark-dialogue-bg); }
+body.dark-mode #analects-overview a { color: var(--ghibli-dark-subitem-text); }
+body[data-analects-mode="today"] #sidebar, body[data-analects-mode="today"] #reading-workspace,
+body[data-analects-mode="today"] #dialogue-box { display: none; }
+body[data-analects-mode="today"] #main-content { width: 100%; }
+@media (max-width: 768px) {
+  body[data-analects-mode="today"] { height: 100dvh; overflow: hidden; }
+  body[data-analects-mode="today"] #container { height: calc(100dvh - var(--footer-height)); min-height: 0; margin: 0 auto; padding: 0; width: 100%; }
+  body[data-analects-mode="today"] #main-content { height: 100%; min-height: 0; overflow: hidden; }
+}

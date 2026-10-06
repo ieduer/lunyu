@@ -7,13 +7,13 @@
     });
     const frames = new Map();
     const el = id => root.document.getElementById(id);
-    const modeFrom = url => ['read', ...Object.keys(sources)].includes(url.searchParams.get('mode')) ? url.searchParams.get('mode') : 'read';
+    const modeFrom = url => ['read', 'today', ...Object.keys(sources)].includes(url.searchParams.get('mode')) ? url.searchParams.get('mode') : 'read';
     let active = modeFrom(new URL(root.location.href));
     const modeUrl = mode => { const url = new URL(root.location.href); url.searchParams.set('mode', mode); return url; };
     const notify = (mode, entry) => entry.frame.contentWindow?.postMessage({ protocol, type: 'visibility', mode,
         visible: mode === active && !root.document.hidden }, sources[mode].origin);
     function select(mode, { history = true } = {}) {
-        if (mode !== 'read' && !sources[mode]) return;
+        if (!['read', 'today'].includes(mode) && !sources[mode]) return;
         active = mode;
         if (history && root.location.href !== modeUrl(mode).href) root.history.pushState(null, '', modeUrl(mode));
         root.document.body.dataset.analectsMode = mode;
@@ -21,7 +21,7 @@
             const selected = link.dataset.analectsModeLink === mode;
             if (selected) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
         }
-        if (mode !== 'read' && !frames.has(mode)) {
+        if (sources[mode] && !frames.has(mode)) {
             const panel = root.document.createElement('section'); panel.className = 'analects-mode-panel';
             panel.setAttribute('aria-label', sources[mode].title);
             const status = root.document.createElement('p'); status.className = 'analects-mode-status';
@@ -44,7 +44,8 @@
             }, 12000);
         }
         for (const [key, entry] of frames) { entry.panel.hidden = key !== mode; notify(key, entry); }
-        el('analects-modes').hidden = mode === 'read';
+        el('analects-modes').hidden = !sources[mode];
+        el('analects-overview').hidden = mode !== 'today';
         root.dispatchEvent(new CustomEvent('analects:mode', { detail: { mode } }));
     }
     function login() {

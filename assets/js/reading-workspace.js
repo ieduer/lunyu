@@ -37,7 +37,7 @@
     function refresh() {
         if (!reader) return;
         const summary = progressSummary(reader.chapters, reader.aliases, reader.getProgress());
-        el('reading-progress-label').textContent = `已讀 ${summary.count} / ${summary.total} 章句`;
+        el('reading-progress-label').textContent = `此瀏覽器曾讀 ${summary.count} / ${summary.total} 章句`;
         el('reading-progress-meter').max = summary.total;
         el('reading-progress-meter').value = summary.count;
         const next = el('reading-continue');
@@ -122,5 +122,10 @@
         refresh();
         return route({ initial: true });
     }
-    root.KzReadingWorkspace = Object.freeze({ initialize, refresh, selected, resolveChapter, searchChapters, progressSummary });
+    function openChapter(id) {
+        if (!reader || !reader.rows.some(row => String(row.id) === String(id))) return false;
+        reader.openChapter(Number(id), { updateHistory: false });
+        return true;
+    }
+    root.KzReadingWorkspace = Object.freeze({ initialize, refresh, selected, openChapter, resolveChapter, searchChapters, progressSummary });
 })(typeof window === 'undefined' ? globalThis : window);

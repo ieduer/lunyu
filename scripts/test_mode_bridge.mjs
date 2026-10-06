@@ -63,6 +63,13 @@ test('switches preserve frame objects and background frames cannot redirect logi
  f.events.get('message')(login);assert.equal(f.redirects.length,1);const target=new URL(f.redirects[0]);assert.equal(target.origin,'https://my.bdfz.net');assert.equal(new URL(target.searchParams.get('returnTo')).origin,'https://kz.bdfz.net');
 });
 
+test('today mode creates no child frame and preserves the full game when returning',()=>{
+ const f=hostFixture(),original=f.holder.children[0];
+ f.root.AnalectsModes.select('today');assert.equal(f.root.AnalectsModes.current,'today');
+ assert.equal(f.holder.children.length,1);assert.equal(original.hidden,true);assert.equal(f.holder.hidden,true);
+ f.root.AnalectsModes.select('battle');assert.equal(f.holder.children[0],original);assert.equal(original.hidden,false);
+});
+
 test('in-frame navigation re-establishes trust from an exact parent handshake without a ready loop',()=>{
  const f=fixture({referrer:'https://fuzi.bdfz.net/progress',mode:'fuzi'});
  assert.equal(f.root.AnalectsHostBridge,undefined);
