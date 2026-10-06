@@ -1,0 +1,24 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import vm from 'node:vm';
+import { webcrypto } from 'node:crypto';
+import assert from 'node:assert/strict';
+const cfRoot = process.argv[2];
+if (!cfRoot || !path.isAbsolute(cfRoot)) throw Error('absolute_workspace_root_required');
+const root = new URL('../../', import.meta.url);
+const context = vm.createContext({ crypto: webcrypto, TextDecoder, Uint8Array });
+vm.runInContext(readFileSync(new URL('assets/js/analects-content.js', root), 'utf8'), context);
+const api = context.AnalectsContent;
+const lock = JSON.parse(readFileSync(path.join(cfRoot, 'apps/lunyu-yizhu-android/content/public-content-lock.json')));
+assert.equal(api.release.sha256, lock.manifest.sha256);
+assert.equal(api.release.version, lock.manifest.contentVersion);
+assert.equal(api.release.size, lock.manifest.size);
+const bytes = readFileSync(path.join(cfRoot, 'apps/lunyu-yizhu-android/worker/public/content.json'));
+const rows = JSON.parse(readFileSync(new URL('data/dialogues.json', root)));
+const index = await api.verify(bytes, rows);
+assert.equal(index.size, 541);
+const chapters = new Set(index.values());
+assert.equal(chapters.size, 512);
+assert.equal([...chapters].reduce((n, c) => n + c.annotations.length, 0), 1045);
+console.log(JSON.stringify({ verified: true, legacyIds: index.size, passages: chapters.size, annotations: 1045,
+    sha256: api.release.sha256, sourceBytesChanged: false, productionChanged: false }));

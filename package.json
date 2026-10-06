@@ -9,7 +9,11 @@
     "check:learning-manifest": "node scripts/build_learning_manifest.mjs --check",
     "test:growth-evidence": "node scripts/test_growth_evidence_function.mjs",
     "test": "node scripts/test_learning_evidence.mjs && node scripts/test_source_contract.mjs && npm run test:growth-evidence && node scripts/test_progress_restore.mjs && node scripts/test_chapter_catalogue.mjs && node --test scripts/test_completion_rate_limit.mjs && node --test scripts/test_learning_records.mjs",
-    "check": "npm run check:learning-manifest && node --check assets/js/learning-evidence.js && node --check assets/js/app.js && node --check functions/api/learning/complete.js && node --check functions/api/learning/health.js && npm test"
+    "check": "npm run check:learning-manifest && node --check assets/js/learning-evidence.js && node --check assets/js/app.js && node --check assets/js/reading-workspace.js && node --check functions/api/learning/complete.js && node --check functions/api/learning/health.js && npm test && npm run test:reading-workspace && node --check assets/js/analects-modes.js && node --check assets/js/analects-frame-bridge.js && npm run test:mode-bridge && node --check assets/js/analects-content.js && npm run test:analects-content && node --check assets/js/analects-overview.js && npm run test:analects-overview",
+    "test:reading-workspace": "node --test scripts/test_reading_workspace.mjs",
+    "test:mode-bridge": "node --test scripts/test_mode_bridge.mjs",
+    "test:analects-content": "node --test scripts/test_analects_content.mjs",
+    "test:analects-overview": "node --test scripts/test_analects_overview.mjs"
   },
   "engines": {
     "node": "24.18.0"

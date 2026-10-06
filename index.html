@@ -24,7 +24,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <title>AI論語 - 與孔子對話學習《論語》</title>
-  <link rel="stylesheet" href="assets/css/style.css?v=20261003-dark-emphasis" />
+  <link rel="stylesheet" href="assets/css/style.css?v=20261005-overview" />
   <script type="text/javascript">
     (function (c, l, a, r, i, t, y) {
       c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
@@ -55,6 +55,42 @@
         <button id="toggle-dark-btn" title="切換夜晚模式" class="ghibli-button icon-button" aria-label="切換深色/淺色模式">🌓</button>
       </header>
 
+      <nav id="analects-mode-nav" aria-label="論語學習模式">
+        <a data-analects-mode-link="today" href="?mode=today">今日與進度</a>
+        <a data-analects-mode-link="read" href="?mode=read">研讀</a>
+        <a data-analects-mode-link="fuzi" href="?mode=fuzi">夫子對談</a>
+        <a data-analects-mode-link="battle" href="?mode=battle">義戰論語</a>
+        <button id="analects-login" type="button">登入</button>
+      </nav>
+      <div id="analects-modes" hidden></div>
+      <section id="analects-overview" aria-label="今日安排與核驗進度" hidden>
+        <div class="analects-overview-actions">
+          <button id="analects-overview-refresh" class="ghibli-button" type="button">重新讀取</button>
+          <a href="https://my.bdfz.net/#/progress">到 My 查看完整紀錄</a>
+        </div>
+        <p id="analects-overview-status" role="status" aria-live="polite"></p>
+        <div id="analects-overview-body"></div>
+      </section>
+      <section id="reading-workspace" aria-label="閱讀導航與進度" hidden>
+        <div class="reading-overview">
+          <div><span id="reading-progress-label">正在載入進度</span><progress id="reading-progress-meter" value="0" max="512" aria-label="本瀏覽器閱讀進度"></progress></div>
+          <a id="reading-continue" href="?chapter=1">繼續閱讀</a>
+        </div>
+        <p class="reading-note">此瀏覽器曾讀的章句，含曾同步內容；個人核驗紀錄請看「今日與進度」。</p>
+        <form id="reading-search-form" role="search">
+          <label class="reading-search-label" for="reading-search">找章句</label>
+          <input id="reading-search" type="search" placeholder="篇名、章句或原文，例如：學而、1.1" autocomplete="off" maxlength="120">
+          <button type="submit" class="ghibli-button">搜尋</button>
+        </form>
+        <p id="reading-search-status" role="status" aria-live="polite"></p>
+        <ul id="reading-results" hidden aria-label="章句搜尋結果"></ul>
+        <nav class="reading-location" aria-label="相鄰章句">
+          <button id="reading-previous" class="ghibli-button" type="button" disabled>上一章</button>
+          <span id="reading-current" tabindex="-1">選擇一章開始閱讀</span>
+          <button id="reading-next" class="ghibli-button" type="button" disabled>下一章</button>
+        </nav>
+      </section>
+
       <!-- 互動對話窗口 -->
       <section id="dialogue-box" class="ghibli-dialogue" role="main" aria-label="論語內容與 AI 對話區">
         <div id="messages" role="log" aria-live="polite" aria-label="對話內容">
@@ -64,8 +100,9 @@
         <p id="learning-record-status" role="status" aria-live="polite"></p>
         <button type="button" id="learning-record-retry">同步學習記錄</button>
         <div id="input-area">
+          <button id="btn-read-annotations" onclick="handleReadAnnotationsClick()" class="ghibli-button interaction-button" type="button" disabled>閱讀譯註</button>
           <button id="btn-yang" onclick="handleYangAnnotationClick()" class="ghibli-button interaction-button" disabled
-            aria-label="查看楊伯峻論語譯註並與 AI 對話">楊伯峻「論語譯註」</button>
+            aria-label="請 AI 解讀本章並對話">AI 解讀</button>
         </div>
         <!-- 用戶輸入區域 (預設隱藏) -->
         <div id="user-input-area" style="display:none;" class="ghibli-input-area">
@@ -84,7 +121,11 @@
   <script src="https://my.bdfz.net/site-auth.js" data-site-key="kz" data-auto-pageview="false"></script>
   <script src="assets/js/learning-evidence.js?v=20260714-aplus-evidence-v1"></script>
   <script src="assets/js/learning-records.js?v=20260925-capture-recovery"></script>
-  <script src="assets/js/app.js?v=20260714-aplus-evidence-v1"></script>
+  <script src="assets/js/analects-overview.js?v=20261005-overview"></script>
+  <script src="assets/js/analects-modes.js?v=20261005-overview"></script>
+  <script src="assets/js/analects-content.js?v=20261005-notes"></script>
+  <script src="assets/js/reading-workspace.js?v=20261005-overview"></script>
+  <script src="assets/js/app.js?v=20261005-notes"></script>
 </body>
 
 </html>

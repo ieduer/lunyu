@@ -9,12 +9,12 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const app = readFileSync(resolve(root, 'assets/js/app.js'), 'utf8');
 const html = readFileSync(resolve(root, 'index.html'), 'utf8');
 
-const displayChapter = app.match(/function displayChapter\(id\) \{([\s\S]*?)\n\}/)?.[1] || '';
-const revealAction = app.match(/function handleYangAnnotationClick\(\) \{([\s\S]*?)\n\}/)?.[1] || '';
+const displayChapter = app.match(/function displayChapter\(id, \{ updateHistory = true \} = \{\}\) \{([\s\S]*?)\n\}/)?.[1] || '';
+const revealAction = app.match(/function revealChapterAnnotations\(\) \{([\s\S]*?)\n\}/)?.[1] || '';
 
 assert.ok(displayChapter, 'displayChapter function must exist');
 assert.equal(/markAsRead|syncChapterCompletion|trackChapterProgress/.test(displayChapter), false, 'navigation/open must not complete learning');
-assert.ok(revealAction, 'Yang annotation learning action must exist');
+assert.ok(revealAction, 'Shared explicit annotation learning action must exist');
 assert.match(revealAction, /addMessage\(`\*\*譯文\*\*/);
 assert.match(revealAction, /syncCompletedChapter\(revealedChapter\)/);
 assert.match(revealAction, /\.then\(\(result\) =>/);

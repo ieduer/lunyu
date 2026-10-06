@@ -1,3 +1,44 @@
+## 2026-10-05 — Today and central progress candidate, not deployed
+
+KZ adds a read-only today mode over the accepted My daily-plan1.3.0 and central A+ conditions. Original task/chapter IDs and thresholds stay unchanged. Browser reading history is explicitly separate. Owner changes, stale responses, partial evidence and date changes fail closed without zeroes or writes. See `docs/ANALECTS_OVERVIEW.md` for exact source, tests, actual authenticated GET/reload acceptance and rollback.
+
+Full checks and desktop/mobile fixtures pass. The normal My bridge and candidate page's real central task/condition readback pass; score digest is unchanged and observed writes0. Build was blocked before execution by the runtime hygiene hook; no other chat was cleaned and no gate was bypassed. Full source-write/device/child compatibility and governed publication remain open. This is an unpublished continuation, not full-goal completion.
+
+## 2026-10-05 — Shared Weibian notes candidate, not deployed
+
+The reader now has separate explicit reading and AI actions. Both reuse one source reveal and one existing KZ completion attempt per chapter/session. Reading alone never calls the AI provider. KZ fetches the existing immutable Weibian bundle anonymously, verifies its exact 871333 bytes and SHA256, and reconciles all541 historical IDs against the current corpus before showing1045 structured notes across512 chapters. Complete original KZ notes remain available during fetch failure; explicit retry is bounded. No content corpus is copied into public Git, no score/identity authority is added, and historical IDs/aliases/completion threshold remain unchanged.
+
+See `docs/ANALECTS_CONTENT_INTEGRATION.md` and the serial6 report for checks, exact content authority, limitations and rollback. This is an unpublished candidate; authenticated write/reload, full four-site authority, exams, trusted progress,293-day adoption and governed publication remain open.
+
+## 2026-10-05 — Origin-preserving Analects host candidate, not deployed
+
+A local three-source candidate connects the KZ reader, complete LY world and Fuzi dialogue through persistent source-origin frames. See `docs/ANALECTS_HOST_INTEGRATION.md` for exact boundary, tests, generated bridge, release order, rollback and remaining acceptance. No original answer/score/history, source API, identity authority or production resource was changed. Full four-site integration and all global review goals remain open.
+
+## 2026-10-05 — Analects reading workspace candidate, not deployed
+
+The serial Analects consolidation now has a working reader navigation slice: exact legacy-ID/coordinate URLs, canonical chapter search, previous/next navigation, reload/back restoration and visible reading progress. All 541 historical IDs, 29 aliases, 512 displayed passages, corpus bytes, threshold163 and existing annotation-only completion remain unchanged. The display explicitly labels browser history and does not infer answer mastery or formal grades.
+
+Validation: pinned Node24.18.0 build and full `npm run check` passed, including five new route/search/history tests. Seven local browser scenarios passed at1440px/390px, with external requests blocked and synthetic local alias history; authenticated production acceptance has not been attempted. The historical source-contract test now recognizes the navigation options parameter and still rejects completion calls on chapter open. Local styles were corrected after screenshot inspection showed inherited full-width buttons compressing the search field.
+
+This is one incomplete slice of the authorized four-site integration. Fuzi dialogue, full LY game, Weibian/verified exam flow, cross-source authenticated progress and full293-day consumer adoption remain open. It is not a release candidate acceptance or a replacement for those modes. No notification, provider call, new grade, data migration or production change. Preserve the existing accepted deployment and all forward history. Authority/evidence: `/Users/ylsuen/CF/reports/operations/analects-consolidation-20261004/serial5/REPORT.md`.
+
+## 2026-10-05 — Analects consolidation foundation; not deployed
+
+Task `analects-consolidation-20261004` has a local, isolated candidate based on
+accepted KZ `69674ff161ff2272ab97f3aa3fda97a8c10a8fb4`. It adds the read-only
+541-to-512 reconciliation index, full daily-plan comparison and preservation
+review prerequisites in `scripts/consolidation/`. All 18 new tests and the
+existing `npm run check` passed; reproducible generated outputs were checked.
+This is not runtime integration, grading completion or a release.
+
+The user explicitly authorizes direct review and scoring of all related student
+learning records, with verified entry into the existing central evaluation.
+The current failed-operation audit covers 510 events; KZ 299/300 already map to
+formal evidence and one requires controlled adjudication. Preserve originals
+and avoid duplicate credit. Full coverage and all outstanding work are in
+`/Users/ylsuen/CF/reports/operations/analects-consolidation-20261004/HANDOFF.md`.
+Second-compaction state: `fresh_task_required`, serial continuation only.
+
 ## 2026-09-25 — Detailed learning capture candidate, not deployed
 
 The task-owned candidate preserves complete source operations and account ownership. Its shared capture wrapper now resumes both durable queues after persisted page return, online reconnect and focus without resetting the bounded automatic retry budget; the script cache version changed with it. Unknown and other-account originals are never reassigned. Existing scoring/content/completion contracts remain unchanged.

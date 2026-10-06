@@ -16,11 +16,12 @@ let learningRecordStatusEl = null;
 let learningManifest = null;
 let hydratedReadProgressCache = [];
 let displayCatalogue = null;
+let revealedAnnotations = null;
 const pendingCompletionAttempts = new Map();
 
 // ----- DOM 元素引用 -----
 let chapterMenuEl, messagesEl, inputAreaEl, userInputAreaEl, userInputEl,
-    sendInputBtnEl, btnYangEl, toggleMenuBtnEl, toggleDarkBtnEl,
+    sendInputBtnEl, btnYangEl, readAnnotationsBtnEl, toggleMenuBtnEl, toggleDarkBtnEl,
     sidebarEl, mainHeaderEl, bookmarkBtnEl;
 
 // ----- Constants -----
@@ -237,11 +238,19 @@ document.addEventListener("DOMContentLoaded", () => {
         window.KzLearningRecords.prepare().catch(() => {});
         document.getElementById('learning-record-retry')?.addEventListener('click', () => window.KzLearningRecords.retry().catch(() => {}));
     }
-    loadDialogues();
-    updateProgressDisplay();
+    let readerStarted = false;
+    const startReader = () => {
+        if (readerStarted || (window.AnalectsModes && window.AnalectsModes.current !== 'read')) return;
+        readerStarted = true;
+        loadDialogues();
+        updateProgressDisplay();
+    };
+    window.addEventListener('analects:mode', startReader);
+    startReader();
 });
 
 function initializeDOMElements() {
+    readAnnotationsBtnEl = document.getElementById('btn-read-annotations');
     chapterMenuEl = document.getElementById("chapter-menu");
     messagesEl = document.getElementById("messages");
     inputAreaEl = document.getElementById("input-area");
@@ -358,8 +367,21 @@ function loadDialogues() {
             allChapters = data;
             groupChapters();
             renderChapterMenu();
-            displayInitialRandomAnalect();
-            if (btnYangEl) btnYangEl.disabled = true;
+            const routed = window.KzReadingWorkspace?.initialize({
+                chapters: displayCatalogue.chapters, rows: allChapters,
+                aliases: displayCatalogue.displayIds, getProgress: getReadProgress,
+                openChapter: displayChapter,
+                showIntroduction: () => {
+                    currentAnalect = null;
+                    resetInteractionState();
+                    displayInitialRandomAnalect();
+                    if (btnYangEl) btnYangEl.disabled = true;
+                },
+            });
+            if (!routed) {
+                displayInitialRandomAnalect();
+                if (btnYangEl) btnYangEl.disabled = true;
+            }
             updateProgressDisplay();
             // 菜單渲染完成後，從用戶系統拉一次遠端進度並合併，失敗靜默降級
             hydrateReadProgressFromIdentity();
@@ -433,10 +455,11 @@ function renderSubChapterMenu(major, container) {
     if (!subChapters || subChapters.length === 0) return;
     const subMenuContainer = document.createElement("div"); subMenuContainer.className = "sub-menu-container";
     subChapters.forEach(item => {
-        const a = document.createElement("a"); a.href = "#"; a.textContent = `${item.major}.${item.minor}`;
+        const a = document.createElement("a"); a.href = `?chapter=${item.id}`; a.textContent = `${item.major}.${item.minor}`;
         a.classList.add('ghibli-button', 'sub-chapter-link');
         a.dataset.chapterId = String(item.id);
         a.onclick = (e) => {
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || (e.button && e.button !== 0)) return;
             e.preventDefault(); displayChapter(item.id);
             if (window.innerWidth <= 768 && chapterMenuEl && chapterMenuEl.style.display !== 'none') { toggleMenu(); }
         };
@@ -449,7 +472,7 @@ function renderSubChapterMenu(major, container) {
 
 
 // 顯示指定 ID 的論語內容到對話框
-function displayChapter(id) {
+function displayChapter(id, { updateHistory = true } = {}) {
     const chapter = allChapters.find(ch => ch.id == id);
     if (!chapter) {
         console.error("Chapter not found:", id);
@@ -469,32 +492,38 @@ function displayChapter(id) {
 
     // Enable the Yang button and show its area
     if (btnYangEl) btnYangEl.disabled = false;
+    if (readAnnotationsBtnEl) readAnnotationsBtnEl.disabled = false;
     if (inputAreaEl) inputAreaEl.style.display = 'flex';
 
     restoreCompletionRetry(chapter);
+    window.KzReadingWorkspace?.selected(chapter.id, { history: updateHistory });
 }
 
 // 重置對話狀態
 function resetInteractionState() {
+    revealedAnnotations = null;
     conversationHistory = []; currentInteractionType = null; isWaitingForAI = false; resetConversationSession();
     removeLoadingMessage();
     if (messagesEl) messagesEl.innerHTML = ""; // Always clear messages
     if (userInputAreaEl) userInputAreaEl.style.display = "none";
     if (userInputEl) userInputEl.value = "";
-    if (btnYangEl) btnYangEl.textContent = "楊伯峻「論語譯註」";
+    if (btnYangEl) btnYangEl.textContent = "AI 解讀";
     if (inputAreaEl) inputAreaEl.style.display = 'flex';
     if (btnYangEl) btnYangEl.disabled = !currentAnalect;
+    if (readAnnotationsBtnEl) readAnnotationsBtnEl.disabled = !currentAnalect;
     if (sendInputBtnEl) sendInputBtnEl.disabled = false;
 }
 
 // Enable/Disable Buttons
 function enableInteractionButtons() {
     if (currentAnalect && btnYangEl) btnYangEl.disabled = false;
+    if (currentAnalect && readAnnotationsBtnEl) readAnnotationsBtnEl.disabled = false;
     if (sendInputBtnEl) sendInputBtnEl.disabled = false;
     isWaitingForAI = false;
 }
 function disableInteractionButtons(permanently = false) {
     if (btnYangEl) btnYangEl.disabled = true;
+    if (readAnnotationsBtnEl) readAnnotationsBtnEl.disabled = true;
     if (sendInputBtnEl) sendInputBtnEl.disabled = true;
     if (!permanently) { isWaitingForAI = true; }
 }
@@ -673,10 +702,10 @@ const confuciusPersonaInstruction = "你是 AI论语的现代语文阅读导师�
 
 /* ========== 按鈕點擊處理 ========== */
 
-// Handle Yang Annotation Click
-function handleYangAnnotationClick() {
-    if (!currentAnalect || isWaitingForAI) return;
-
+// Reading and AI share the same explicit source reveal and completion action.
+function revealChapterAnnotations() {
+    if (!currentAnalect || isWaitingForAI) return null;
+    if (revealedAnnotations?.chapter === currentAnalect && revealedAnnotations.sessionKey === conversationSessionKey) return revealedAnnotations;
     // Clear history, set type, KEEP initial chapter message
     conversationHistory = []; currentInteractionType = 'yang';
     const firstMessage = messagesEl.querySelector('.message-container.chapter-display');
@@ -689,6 +718,8 @@ function handleYangAnnotationClick() {
     // 1. Add translation and annotations
     addMessage(`**譯文**\n${translation}`, 'confucius', false, { contentOrigin:'source_text', action:'translation.reveal' });
     addMessage(`**注釋**\n${annotations}`, 'confucius', false, { contentOrigin:'source_text', action:'annotations.reveal' });
+    revealedAnnotations = { chapter: currentAnalect, sessionKey: conversationSessionKey, translation, annotations };
+    appendWeibianTerms(currentAnalect);
 
     // 顯式查看譯文與注釋才是本產品的學習完成動作；選章、導航與自動隨機展示均不計完成。
     const revealedChapter = currentAnalect;
@@ -698,6 +729,42 @@ function handleYangAnnotationClick() {
             if (result?.status === 'partial') showCompletionRetry(revealedChapter, null);
         })
         .catch((error) => showCompletionRetry(revealedChapter, error));
+
+    return revealedAnnotations;
+}
+
+function appendWeibianTerms(chapter) {
+    const panel = document.createElement('section'); panel.className = 'weibian-terms';
+    panel.setAttribute('aria-label', '韋編逐詞註解');
+    const title = document.createElement('h3'); title.textContent = '按詞查註';
+    const status = document.createElement('p'); status.setAttribute('role', 'status');
+    const terms = document.createElement('div');
+    const retry = document.createElement('button'); retry.type = 'button'; retry.textContent = '重試載入詞語註解'; retry.hidden = true;
+    panel.append(title, status, terms, retry); messagesEl.append(panel);
+    const load = async () => {
+        retry.hidden = true; status.textContent = '正在載入韋編詞語註解…';
+        try {
+            const index = await window.AnalectsContent.load(allChapters);
+            if (!panel.isConnected) return;
+            window.AnalectsContent.renderTerms(document, terms, index.get(chapter.id));
+            status.textContent = '楊伯峻《論語譯注》，與韋編共用同版；完整註釋保留於上方。';
+        } catch {
+            if (!panel.isConnected) return;
+            status.textContent = '詞語註解暫未載入，可先閱讀上方完整譯註。'; retry.hidden = false;
+        }
+    };
+    retry.onclick = load;
+    load();
+}
+
+function handleReadAnnotationsClick() {
+    revealChapterAnnotations();
+}
+
+function handleYangAnnotationClick() {
+    const revealed = revealChapterAnnotations();
+    if (!revealed) return;
+    const { translation, annotations } = revealed;
 
     // 2. ADD specific loading message
     addMessage("Gemini正在和你一起分析這則內容⋯耐個心吧 🐶⋯", 'loading');
@@ -837,6 +904,7 @@ function updateProgressDisplay() {
     // 更新頁面標題顯示進度
     const baseTitle = "AI論語";
     document.title = readCount > 0 && total > 0 ? `${baseTitle} (已讀 ${readCount}/${total})` : baseTitle;
+    window.KzReadingWorkspace?.refresh();
 }
 
 // 更新目錄中已讀狀態
