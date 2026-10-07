@@ -1,3 +1,9 @@
+## 2026-10-07 — Original-browser bookmark export candidate
+
+The current local candidate starts from accepted69674ff and adds `/notebook-export.html` plus a footer link. It reads only this origin’s `lunyu_bookmarks` after an explicit click; preserves exact raw storage, duplicate/alias IDs and unbound ownership; previews locally; and downloads only after confirmation plus a fresh unchanged-source check. It makes no network/model/learning request and never mutates storage. The page uses handbook paper/ink, keyboard-accessible44px controls and full raw-text viewing. Original reader, account, recordings, content and all historical data remain unchanged.
+
+The export is consumed by the serial31 native notebook importer; both keep historical ownership unverified and never create grades. Three focused serialization/privacy checks pass; source-export/browser and production acceptance remain pending. Registered publisher/target/rollback rules remain in force, and no deployment has occurred for this candidate. Canonical dirty documents remain untouched. Older acceptance below remains dated history.
+
 ## 2026-09-25 — Detailed learning capture candidate, not deployed
 
 The task-owned candidate preserves complete source operations and account ownership. Its shared capture wrapper now resumes both durable queues after persisted page return, online reconnect and focus without resetting the bounded automatic retry budget; the script cache version changed with it. Unknown and other-account originals are never reassigned. Existing scoring/content/completion contracts remain unchanged.
