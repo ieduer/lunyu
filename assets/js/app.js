@@ -583,14 +583,29 @@ function removeLoadingMessage() {
 }
 
 // Format History for AI Helper
+// APIS payload contract 2026-10-15.v1 for kz.bdfz.net: at most 256 KiB of request text (UTF-8 JSON). The history
+// sent keeps the newest whole messages within KZ_HISTORY_BUDGET_BYTES (the latest one always) and tells the model
+// how many earlier messages were left out; no message is cut.
+const KZ_HISTORY_BUDGET_BYTES = 160 * 1024;
 function formatHistoryForAI(history) {
-    return history.map(msg => {
+    const lines = history.map(msg => {
         let roleName = msg.role;
         if (roleName === 'confucius' || roleName === 'ai') roleName = '孔子';
         else if (roleName === 'user') roleName = '用戶';
         else return null; // Exclude system, initial, loading messages
         return `${roleName}：\n${msg.content}`;
-    }).filter(Boolean).join('\n\n'); // Filter out nulls and join
+    }).filter(Boolean); // Filter out nulls
+    const encoder = new TextEncoder();
+    const kept = [];
+    let used = 0;
+    for (let i = lines.length - 1; i >= 0; i--) {
+        const bytes = encoder.encode(JSON.stringify(lines[i])).length + 4;
+        if (kept.length && used + bytes > KZ_HISTORY_BUDGET_BYTES) break;
+        kept.unshift(lines[i]);
+        used += bytes;
+    }
+    const omitted = lines.length - kept.length;
+    return (omitted ? `（更早的 ${omitted} 条对话因篇幅省略）\n\n` : '') + kept.join('\n\n');
 }
 
 
@@ -626,8 +641,11 @@ async function askGemini(prompt, callback, retryCount = 0, requestContext = lear
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: prompt })
     })
-        .then(response => {
-            if (!response.ok) throw Object.assign(new Error(`AI請求失敗 (${response.status})`), {status:response.status});
+        .then(async response => {
+            if (!response.ok) {
+                const body = await response.json().catch(() => ({}));
+                throw Object.assign(new Error(`AI請求失敗 (${response.status})`), { status: response.status, code: typeof body?.error_code === 'string' ? body.error_code : '', retryable: body?.retryable });
+            }
             return response.json();
         })
         .then(async data => {
@@ -644,8 +662,8 @@ async function askGemini(prompt, callback, retryCount = 0, requestContext = lear
             captureLearningOperation('ai.failure', { errorClass:error.name || 'Error', httpStatus:error.status || null, attemptNumber:retryCount + 1 }, { actor:'system', status:'failed', parentOperationId:attempt?.operation.operationId || '', contentOrigin:'transport_result' }, requestContext);
             if (requestContext.sessionKey !== conversationSessionKey) return;
 
-            // 重試機制
-            if (retryCount < MAX_RETRIES && !error.message.includes("429")) {
+            // 重試機制：只重試暫時性故障；被拒絕或過大的請求不原樣重送（APIS 2026-10-15）
+            if (retryCount < MAX_RETRIES && isTransientAiFailure(error)) {
                 console.log(`Retrying... attempt ${retryCount + 1}`);
                 setTimeout(() => {
                     askGemini(prompt, callback, retryCount + 1, requestContext);
@@ -659,12 +677,22 @@ async function askGemini(prompt, callback, retryCount = 0, requestContext = lear
             // 更友好的錯誤訊息
             let displayError = `唉，思緒略有阻塞，未能回應。`;
             if (error.message.includes("429")) displayError += " (似乎請求過於頻繁，請稍後再試)";
+            else if (error.code === 'PAYLOAD_TOO_LARGE' || error.status === 413) displayError += " (這次對話內容過長，請開啟新的對話再問)";
+            else if (error.code === 'UPSTREAM_OUTPUT_TOO_LARGE') displayError += " (回答異常過長，已停止自動重試，請稍後再問)";
             else if (error.message.includes("502") || error.message.includes("503")) displayError += " (後端服務暫時無法連接)";
             else if (error.message.includes("network") || error.message.includes("Failed to fetch")) displayError += " (網絡連接問題，請檢查網絡)";
             else displayError += ` (${error.message})`;
 
             callback(displayError, true);
         });
+}
+
+// Transient: network failure, unreadable reply, or a 5xx that APIS does not mark final. 4xx (413 and 429
+// included), PAYLOAD_TOO_LARGE, UPSTREAM_OUTPUT_TOO_LARGE (also as an older 503) and retryable:false never are.
+function isTransientAiFailure(error) {
+    if (error.code === 'PAYLOAD_TOO_LARGE' || error.code === 'UPSTREAM_OUTPUT_TOO_LARGE' || error.retryable === false) return false;
+    if (!error.status) return !error.message.includes("429");
+    return [500, 502, 503, 504].includes(error.status);
 }
 
 // AI 導師指令：避免角色扮演誘發文言腔，優先保證可讀性與語義準確。
