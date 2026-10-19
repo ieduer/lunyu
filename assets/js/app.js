@@ -636,15 +636,19 @@ async function askGemini(prompt, callback, retryCount = 0, requestContext = lear
         return;
     }
     if (requestContext.sessionKey !== conversationSessionKey) return;
+    // Bounded wait (APIS answers its own 21 s deadline first); the captured attempt id travels with the call so the
+    // gateway and ledger correlate the same logical request across its bounded attempts.
     return fetch(CLOUD_FLARE_WORKER_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        signal: AbortSignal.timeout(KZ_AI_TIMEOUT_MS),
+        headers: { "Content-Type": "application/json", "X-Request-ID": String(attempt.operation.operationId) },
         body: JSON.stringify({ prompt: prompt })
     })
         .then(async response => {
             if (!response.ok) {
                 const body = await response.json().catch(() => ({}));
-                throw Object.assign(new Error(`AI請求失敗 (${response.status})`), { status: response.status, code: typeof body?.error_code === 'string' ? body.error_code : '', retryable: body?.retryable });
+                throw Object.assign(new Error(`AI請求失敗 (${response.status})`), { status: response.status, code: typeof body?.error_code === 'string' ? body.error_code : '', retryable: body?.retryable,
+                    providerAttemptCount: Number.isSafeInteger(body?.provider_attempt_count) ? body.provider_attempt_count : null });
             }
             return response.json();
         })
@@ -679,6 +683,8 @@ async function askGemini(prompt, callback, retryCount = 0, requestContext = lear
             if (error.message.includes("429")) displayError += " (似乎請求過於頻繁，請稍後再試)";
             else if (error.code === 'PAYLOAD_TOO_LARGE' || error.status === 413) displayError += " (這次對話內容過長，請開啟新的對話再問)";
             else if (error.code === 'UPSTREAM_OUTPUT_TOO_LARGE') displayError += " (回答異常過長，已停止自動重試，請稍後再問)";
+            else if (error.name === 'TimeoutError' || error.name === 'AbortError') displayError += " (等待逾時，結果未確認；沒有自動重問，再問會重新呼叫 AI)";
+            else if (error.status >= 500 && error.providerAttemptCount !== 0) displayError += " (上游未確認結果；沒有自動重問，再問會重新呼叫 AI)";
             else if (error.message.includes("502") || error.message.includes("503")) displayError += " (後端服務暫時無法連接)";
             else if (error.message.includes("network") || error.message.includes("Failed to fetch")) displayError += " (網絡連接問題，請檢查網絡)";
             else displayError += ` (${error.message})`;
@@ -687,11 +693,14 @@ async function askGemini(prompt, callback, retryCount = 0, requestContext = lear
         });
 }
 
-// Transient: network failure, unreadable reply, or a 5xx that APIS does not mark final. 4xx (413 and 429
-// included), PAYLOAD_TOO_LARGE, UPSTREAM_OUTPUT_TOO_LARGE (also as an older 503) and retryable:false never are.
+// Transient (safe to retry automatically): a typed 5xx APIS refusal that proves zero provider dispatch
+// (provider_attempt_count 0) and is not marked final. A timeout, network failure, unreadable reply or a 5xx
+// without that proof leaves the first request's outcome unknown and is never resent automatically. 4xx (413
+// and 429 included), PAYLOAD_TOO_LARGE, UPSTREAM_OUTPUT_TOO_LARGE (also as an older 503) and retryable:false never are.
+const KZ_AI_TIMEOUT_MS = 30000;
 function isTransientAiFailure(error) {
     if (error.code === 'PAYLOAD_TOO_LARGE' || error.code === 'UPSTREAM_OUTPUT_TOO_LARGE' || error.retryable === false) return false;
-    if (!error.status) return !error.message.includes("429");
+    if (error.providerAttemptCount !== 0) return false;
     return [500, 502, 503, 504].includes(error.status);
 }
 

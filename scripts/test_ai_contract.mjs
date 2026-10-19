@@ -39,14 +39,15 @@ test('history: long conversations keep the newest whole messages within the budg
 function askContext(responses) {
   let fetches = 0;
   const reports = [];
+  const inits = [];
   const ctx = vm.createContext({
     console: { log() {}, warn() {} }, setTimeout: (fn) => { fn(); return 0; }, conversationSessionKey: 's', lastStudentOperationId: 'p', isWaitingForAI: false,
     learningContext: () => ({ sessionKey: 's' }), showLearningRecordState() {}, disableInteractionButtons() {}, enableInteractionButtons() {}, removeLoadingMessage() {},
-    captureLearningOperation: () => ({ operation: { operationId: 'a' }, saved: Promise.resolve() }), CLOUD_FLARE_WORKER_URL: 'https://example.invalid',
-    fetch: async () => { const r = responses[Math.min(fetches, responses.length - 1)]; fetches += 1; if (r instanceof Error) throw r; return r; },
+    captureLearningOperation: () => ({ operation: { operationId: 'a' }, saved: Promise.resolve() }), CLOUD_FLARE_WORKER_URL: 'https://example.invalid', AbortSignal, String, Number,
+    fetch: async (_url, init) => { inits.push(init); const r = responses[Math.min(fetches, responses.length - 1)]; fetches += 1; if (r instanceof Error) throw r; return r; },
   });
-  vm.runInContext(askSource, ctx);
-  return { ask: (prompt) => new Promise((resolve) => { ctx.askGemini(prompt, (text, isError) => { reports.push({ text, isError }); resolve(); }); }), fetches: () => fetches, reports };
+  vm.runInContext(askSource + '\nthis.KZ_AI_TIMEOUT_MS = KZ_AI_TIMEOUT_MS;', ctx);
+  return { ask: (prompt) => new Promise((resolve) => { ctx.askGemini(prompt, (text, isError) => { reports.push({ text, isError }); resolve(); }); }), fetches: () => fetches, reports, inits, ctx };
 }
 const json = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 
@@ -66,12 +67,36 @@ test('a refused or over-size request is sent once; the reason is shown', async (
   }
 });
 
-test('transient failures keep the two bounded retries', async () => {
-  const flaky = askContext([json(503, { error_code: 'DEADLINE_EXCEEDED' }), new TypeError('Failed to fetch'), json(200, { answer: '好' })]);
+test('typed zero-dispatch refusals keep the two bounded retries', async () => {
+  const flaky = askContext([json(503, { error_code: 'DEADLINE_EXCEEDED', provider_attempt_count: 0 }), json(502, { error_code: 'UPSTREAM_UNAVAILABLE', provider_attempt_count: 0 }), json(200, { answer: '好' })]);
   await flaky.ask('synthetic');
   assert.equal(flaky.fetches(), 3);
-  assert.deepEqual(flaky.reports, [{ text: '好', isError: false }]);
-  const down = askContext([json(502, { error_code: 'UPSTREAM_UNAVAILABLE' })]);
-  await down.ask('synthetic');
-  assert.equal(down.fetches(), 3);
+  assert.equal(flaky.reports[0].isError, false);
+  const exhausted = askContext([0, 1, 2].map(() => json(503, { error_code: 'DEADLINE_EXCEEDED', provider_attempt_count: 0 })));
+  await exhausted.ask('synthetic');
+  assert.equal(exhausted.fetches(), 3);
+  assert.equal(exhausted.reports[0].isError, true);
+});
+
+test('an unknown outcome is never resent automatically: network failure, timeout, or a 5xx without zero-dispatch proof', async () => {
+  for (const [first, pattern] of [
+    [new TypeError('Failed to fetch'), /網絡連接問題/],
+    [Object.assign(new Error('timed out'), { name: 'TimeoutError' }), /結果未確認/],
+    [json(503, { error_code: 'UPSTREAM_UNAVAILABLE', provider_attempt_count: 1 }), /上游未確認結果/],
+    [json(503, { error_code: 'UPSTREAM_UNAVAILABLE' }), /上游未確認結果/],
+  ]) {
+    const c = askContext([first, json(200, { answer: '不應送出' })]);
+    await c.ask('synthetic');
+    assert.equal(c.fetches(), 1, pattern.source);
+    assert.equal(c.reports[0].isError, true);
+    assert.match(c.reports[0].text, pattern);
+  }
+});
+
+test('every gateway call is bounded and carries the captured attempt id', async () => {
+  const c = askContext([json(200, { answer: '好' })]);
+  await c.ask('synthetic');
+  assert.equal(c.inits[0].headers['X-Request-ID'], 'a');
+  assert.ok(c.inits[0].signal instanceof AbortSignal);
+  assert.equal(c.ctx.KZ_AI_TIMEOUT_MS, 30000);
 });

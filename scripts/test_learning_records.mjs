@@ -32,7 +32,7 @@ test('provider request waits for durable attempt and never runs when persistence
   const askSource=app.slice(app.indexOf('async function askGemini('),app.indexOf('// AI 導師指令'));
   let resolveSaved,rejectSaved,fetches=0;
   const saved=new Promise((resolve,reject)=>{resolveSaved=resolve;rejectSaved=reject;});
-  const base={console,setTimeout,conversationSessionKey:'s',lastStudentOperationId:'parent',isWaitingForAI:false,
+  const base={AbortSignal,String,Number,console,setTimeout,conversationSessionKey:'s',lastStudentOperationId:'parent',isWaitingForAI:false,
     learningContext:()=>({sessionKey:'s'}),showLearningRecordState(){},disableInteractionButtons(){},enableInteractionButtons(){},removeLoadingMessage(){},
     captureLearningOperation:()=>({operation:{operationId:'attempt'},saved}),CLOUD_FLARE_WORKER_URL:'https://example.invalid',
     fetch:async()=>{fetches++;return {ok:true,json:async()=>({answer:'synthetic'})};}};
