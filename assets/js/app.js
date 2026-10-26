@@ -181,14 +181,57 @@ function learningContext() {
     return { captureScope: window.KzLearningRecords?.scope || null, sessionKey: conversationSessionKey, chapterId: currentAnalect?.id || 'not-selected', chapterTitle: currentAnalect?.title || '', manifestVersion: learningManifest ? `${learningManifest.manifestVersion}:${learningManifest.sourceSha256 || 'content-digest-unavailable'}` : 'source-version-unavailable', interactionType: currentInteractionType || '' };
 }
 
+// The content, version, time and operation id are fixed when the action happens; only the owner may resolve later.
+// At page load and right after a window focus the recorder is still being prepared, so a capture without an owner
+// waits for it (bounded) instead of storing a row no one owns. A scope other than the one this page last recorded
+// under (an account switch) is not adopted: that capture stays unattributed. The owner found is written back to the
+// context, so later captures sharing it (an ask and its reply, a completion request and its result) use it directly.
+let lastCaptureScope = null;
 function captureLearningOperation(action, content, options = {}, context = learningContext()) {
     const service = window.KzLearningRecords;
     if (!service || !context.sessionKey) return null;
-    const operation = service.build(action, content, context, options);
+    const fixed = { ...options, operationId: options.operationId || service.id(), occurredAt: options.occurredAt || new Date().toISOString() };
+    const operation = service.build(action, content, context, fixed);
+    let saved;
+    if (context.captureScope) {
+        // A late reply kept on its request's earlier owner does not count as this page's current owner.
+        if (context.captureScope === service.scope) lastCaptureScope = context.captureScope;
+        saved = service.record(operation);
+    } else {
+        const previous = lastCaptureScope;
+        // Captures waiting together share one wait and are recorded in the order they happened.
+        saved = sharedCaptureScope().then(scope => {
+            if (scope && (!previous || scope === previous)) context.captureScope ||= scope;
+            if (context.captureScope) lastCaptureScope = context.captureScope;
+            return service.record(context.captureScope ? service.build(action, content, context, fixed) : operation);
+        });
+    }
     // A rejection is visible through recorder state; never send raw content to console.
-    const saved = service.record(operation);
     saved.catch(() => {});
     return { operation, saved };
+}
+let captureScopeWait = null;
+function sharedCaptureScope() {
+    return captureScopeWait ||= readyCaptureScope().catch(() => null).finally(() => { captureScopeWait = null; });
+}
+// The recorder's scope exists only after prepare() has resolved; a focus event re-identifies the recorder. Wait for
+// it, bounded; a signed-out reader stays unattributed without a long wait.
+async function readyCaptureScope(timeoutMs = 4000) {
+    const service = window.KzLearningRecords;
+    if (!service) return null;
+    if (service.scope) return service.scope;
+    const deadline = Date.now() + timeoutMs;
+    while (Date.now() < deadline) {
+        try {
+            const remaining = Math.max(0, deadline - Date.now());
+            const recorder = await Promise.race([service.prepare(), new Promise(resolve => setTimeout(() => resolve(null), remaining))]);
+            return recorder?.scope || service.scope || null;
+        } catch (error) {
+            if (error?.code === 'LEARNING_LOGIN_REQUIRED') return null;
+            await new Promise(resolve => setTimeout(resolve, 250));
+        }
+    }
+    return service.scope || null;
 }
 
 function showLearningRecordState(state) {
@@ -565,8 +608,11 @@ function addMessage(messageText, sender = "system", isError = false, recordOptio
         const message = { captureScope:Object.prototype.hasOwnProperty.call(recordOptions,'captureScope')?recordOptions.captureScope:window.KzLearningRecords?.scope||null, id: recordOptions.operationId || window.KzLearningRecords?.id?.() || createOpaqueEventId(currentAnalect), role: sender, content: messageText, createdAt: recordOptions.occurredAt || new Date().toISOString() };
         conversationHistory.push(message);
         if (!recordOptions.alreadyRecorded) {
-            const captured = captureLearningOperation(sender === 'user' ? 'answer.submit' : recordOptions.action || 'assistant.reply', { text: messageText }, { operationId: message.id, occurredAt: message.createdAt, actor: sender === 'user' ? 'student' : recordOptions.contentOrigin === 'source_text' ? 'system' : 'assistant', status:'succeeded', parentOperationId: sender === 'user' ? lastLearningDraftId : lastStudentOperationId, contentOrigin: recordOptions.contentOrigin || (sender === 'user' ? 'student' : 'ai_reply') });
+            const recordContext = { ...learningContext(), captureScope: message.captureScope };
+            const captured = captureLearningOperation(sender === 'user' ? 'answer.submit' : recordOptions.action || 'assistant.reply', { text: messageText }, { operationId: message.id, occurredAt: message.createdAt, actor: sender === 'user' ? 'student' : recordOptions.contentOrigin === 'source_text' ? 'system' : 'assistant', status:'succeeded', parentOperationId: sender === 'user' ? lastLearningDraftId : lastStudentOperationId, contentOrigin: recordOptions.contentOrigin || (sender === 'user' ? 'student' : 'ai_reply') }, recordContext);
             if (sender === 'user' && captured) lastStudentOperationId = captured.operation.operationId;
+            // An owner resolved after the wait also owns this message in the conversation archive.
+            if (!message.captureScope && captured) captured.saved.then(() => { message.captureScope = recordContext.captureScope; }, () => {});
         }
         syncConversationArchive(sender === 'user' ? 'user-message' : 'assistant-message');
     }
