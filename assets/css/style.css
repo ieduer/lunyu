@@ -1,11 +1,6 @@
-/* 引入匯文明朝體 */
-@font-face {
-  font-family: 'HuWenMingChaoTi';
-  src: url('../fonts/HuWenMingChaoTi.woff2') format('woff2'),
-    url('../fonts/HuWenMingChaoTi.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-}
+/* 匯文明朝體（HuWenMingChao）不在這裡宣告：index.html 以不阻塞首繪的方式連 mx.bdfz.net 的共用分片樣式表
+   （https://mx.bdfz.net/fonts/huwen/v1/HuWenMingChao.4eeeeaf657.css），瀏覽器只抓畫面上用到的字。
+   不要再宣告 8 MB 的整檔 ../fonts/HuWenMingChaoTi.woff2（2026-11-12）。 */
 
 /* Global Variables & Reset */
 :root {
@@ -72,7 +67,7 @@ html {
 }
 
 body {
-  font-family: 'HuWenMingChaoTi', "Noto Serif TC", serif;
+  font-family: "HuWenMingChao", "Noto Serif TC", serif;
   color: var(--ghibli-text);
   margin: 0;
   padding: 0;
@@ -253,7 +248,7 @@ footer a:hover {
 
 /* --- Ghibli 風格按鈕 --- */
 .ghibli-button {
-  font-family: 'HuWenMingChaoTi', "Noto Serif TC", serif;
+  font-family: "HuWenMingChao", "Noto Serif TC", serif;
   border: none;
   border-radius: 10px;
   background-color: var(--ghibli-accent-blue);
