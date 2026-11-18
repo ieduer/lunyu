@@ -6,3 +6,15 @@ compatibility_date = "2025-03-23"
 binding = "GROWTH_EVIDENCE"
 service = "bdfz-user-center"
 entrypoint = "KzGrowthEvidence"
+
+# AI route (functions/api/ai.js, 2026-11-18): the shared gateway through a service binding, called with this site's own
+# caller credential (secret APIS_CALLER_TOKEN, set on the Pages project; never in this file).
+[[services]]
+binding = "APIS"
+service = "apis"
+
+# Per-client rate guard of the AI route: one-minute counters under hashed keys (functions/_shared/ai-rate-guard.js).
+# Shared namespace "ai-rate-guard"; keys are prefixed with the site.
+[[kv_namespaces]]
+binding = "AI_RATE_KV"
+id = "88ca57c8cb534d539b959e29617e6fa6"

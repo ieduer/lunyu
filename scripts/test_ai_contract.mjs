@@ -98,5 +98,11 @@ test('every gateway call is bounded and carries the captured attempt id', async 
   await c.ask('synthetic');
   assert.equal(c.inits[0].headers['X-Request-ID'], 'a');
   assert.ok(c.inits[0].signal instanceof AbortSignal);
-  assert.equal(c.ctx.KZ_AI_TIMEOUT_MS, 30000);
+  // 70 s: above the site function's 65 s wait for the gateway's 60 s credit lane (2026-11-18).
+  assert.equal(c.ctx.KZ_AI_TIMEOUT_MS, 70000);
+});
+
+test('the page asks the site\'s own AI route, never the gateway directly', () => {
+  assert.match(app, /const CLOUD_FLARE_WORKER_URL = "\/api\/ai";/);
+  assert.doesNotMatch(app, /https:\/\/(ai|apis)\.bdfz\.net/);
 });

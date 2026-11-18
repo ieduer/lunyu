@@ -1,4 +1,6 @@
-const CLOUD_FLARE_WORKER_URL = "https://ai.bdfz.net/";
+// Same-origin AI route (functions/api/ai.js, 2026-11-18): the site's own function calls the shared gateway as a verified caller,
+// so a question is answered by Claude first, then OpenAI, then Gemini. The browser no longer calls the gateway itself.
+const CLOUD_FLARE_WORKER_URL = "/api/ai";
 
 // ----- 狀態變數 -----
 let currentAnalect = null;
@@ -682,7 +684,7 @@ async function askGemini(prompt, callback, retryCount = 0, requestContext = lear
         return;
     }
     if (requestContext.sessionKey !== conversationSessionKey) return;
-    // Bounded wait (APIS answers its own 21 s deadline first); the captured attempt id travels with the call so the
+    // Bounded wait (the gateway answers a credit-lane request inside 60 s, the site function inside 65 s); the captured attempt id travels with the call so the
     // gateway and ledger correlate the same logical request across its bounded attempts.
     return fetch(CLOUD_FLARE_WORKER_URL, {
         method: "POST",
@@ -743,7 +745,7 @@ async function askGemini(prompt, callback, retryCount = 0, requestContext = lear
 // (provider_attempt_count 0) and is not marked final. A timeout, network failure, unreadable reply or a 5xx
 // without that proof leaves the first request's outcome unknown and is never resent automatically. 4xx (413
 // and 429 included), PAYLOAD_TOO_LARGE, UPSTREAM_OUTPUT_TOO_LARGE (also as an older 503) and retryable:false never are.
-const KZ_AI_TIMEOUT_MS = 30000;
+const KZ_AI_TIMEOUT_MS = 70000;
 function isTransientAiFailure(error) {
     if (error.code === 'PAYLOAD_TOO_LARGE' || error.code === 'UPSTREAM_OUTPUT_TOO_LARGE' || error.retryable === false) return false;
     if (error.providerAttemptCount !== 0) return false;
@@ -783,7 +785,7 @@ function handleYangAnnotationClick() {
         .catch((error) => showCompletionRetry(revealedChapter, error));
 
     // 2. ADD specific loading message
-    addMessage("Gemini正在和你一起分析這則內容⋯耐個心吧 🐶⋯", 'loading');
+    addMessage("AI 正在和你一起分析這則內容⋯耐個心吧 🐶⋯", 'loading');
 
     // 3. Build Prompt
     const prompt = `${confuciusPersonaInstruction}\n\n本章 (${currentAnalect.title}):\n原文：${currentAnalect.text}\n譯文：${translation}\n註疏：${annotations}\n\n请结合《论语》全文思想和历代注疏，用现代白话把这一章的意思和道理讲清楚、讲透彻，帮助读者真正读懂。`;
@@ -823,7 +825,7 @@ function handleUserInput() {
 
     // 2. ADD specific animal loading message
     const randomAnimal = animals[Math.floor(Math.random() * animals.length)];
-    addMessage(`Gemini正在和你一起分析這則內容⋯耐個心吧 ${randomAnimal}⋯`, 'loading');
+    addMessage(`AI 正在和你一起分析這則內容⋯耐個心吧 ${randomAnimal}⋯`, 'loading');
 
     // 3. Build Prompt
     const historyString = formatHistoryForAI(conversationHistory); // History now includes user/ai msgs
