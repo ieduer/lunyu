@@ -1,0 +1,92 @@
+{
+  "schema": "analects-corpus-edition-corrections-v1",
+  "edition": {
+    "title": "楊伯峻《論語譯注》",
+    "publisher": "中華書局",
+    "script": "Simplified, as published",
+    "printingsChecked": [
+      "9787101054194 (2006)",
+      "9787101070248 (2009, 繁體)",
+      "9787101127867 (2017, 简体字本)"
+    ],
+    "method": "Each reading compared with the scanned printings through the Internet Archive search-inside service (items lunyuyizhu0000yang, lunyuyizhu0000unse, lunyuyizhujianti0000yang); nothing downloaded.",
+    "checkedAt": "2026-11-21"
+  },
+  "baseSha256": "8c9ebc18d6c6f0c156cad89aaab89f6a413cab0f9b2fa2fa7b65ac2b0d4400b1",
+  "resultSha256": "8e207721797981c54b0facf33e38ccaa8c9c77d7b2e37514f2fbccc1a3d33357",
+  "unchangedByDesign": "IDs, order, titles, aliases and every other field are unchanged. Learning identities (resource keys, manifest version, item count, threshold) do not depend on text.",
+  "corrections": [
+    {
+      "id": 102,
+      "coordinate": "5.10",
+      "field": "text",
+      "before": "朽木不可雕也；粪土之墙",
+      "after": "朽木不可雕也，粪土之墙",
+      "note": "Comma after 雕也 in all three printings."
+    },
+    {
+      "id": 102,
+      "coordinate": "5.10",
+      "field": "text",
+      "before": "于予与何诛⑵”子曰⑶",
+      "after": "于予与何诛⑵？”子曰⑶",
+      "note": "Question mark after 何诛 (note 2) restored."
+    },
+    {
+      "id": 415,
+      "coordinate": "14.39",
+      "field": "text",
+      "before": "鄙哉，踁踁乎！",
+      "after": "鄙哉，硁硁乎！",
+      "note": "硁 (sound of the stone chime; same character as 13.20 硁硁然), not 踁."
+    },
+    {
+      "id": 415,
+      "coordinate": "14.39",
+      "field": "translation",
+      "before": "磬声踁踁的",
+      "after": "磬声硁硁的",
+      "note": "Same character in the translation."
+    },
+    {
+      "id": 484,
+      "coordinate": "17.8",
+      "field": "text",
+      "before": "好直不好学，共蔽也绞；",
+      "after": "好直不好学，其蔽也绞；",
+      "note": "其 as in the other five clauses."
+    },
+    {
+      "id": 484,
+      "coordinate": "17.8",
+      "field": "annotations",
+      "before": "⑹贼——管同",
+      "after": "⑸贼——管同",
+      "note": "Note number: the text marks 贼 with ⑸; the printed note is ⑸."
+    },
+    {
+      "id": 484,
+      "coordinate": "17.8",
+      "field": "annotations",
+      "before": "六宇。",
+      "after": "六字。",
+      "note": "字 not 宇."
+    },
+    {
+      "id": 509,
+      "coordinate": "18.7",
+      "field": "text",
+      "before": "以杖荷筱⑴。",
+      "after": "以杖荷蓧⑴。",
+      "note": "蓧 (diào, the weeding tool glossed 音掉 in note 1) not 筱 (xiǎo)."
+    },
+    {
+      "id": 509,
+      "coordinate": "18.7",
+      "field": "annotations",
+      "before": "⑴筱——音掉",
+      "after": "⑴蓧——音掉",
+      "note": "Same character as the note headword."
+    }
+  ]
+}

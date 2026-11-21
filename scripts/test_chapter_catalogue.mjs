@@ -116,10 +116,35 @@ function generate(rows, check = false) {
     return written;
 }
 
+// Every content change since the accepted catalogue is an entry in the edition-corrections ledger.
+// Reverting exactly those entries must give back the accepted bytes and content digest.
+function revertEditionCorrections(rows, ledger) {
+    const reverted = clone(rows);
+    for (const entry of ledger.corrections) {
+        const row = reverted[entry.id - 1];
+        assert.equal(row.id, entry.id);
+        assert.ok(row.title.endsWith(` ${entry.coordinate}`), `ledger coordinate ${entry.id}`);
+        assert.ok(['text', 'translation', 'annotations'].includes(entry.field));
+        assert.equal(row[entry.field].split(entry.after).length, 2, `ledger correction ${entry.id} ${entry.field} must occur once`);
+        assert.equal(row[entry.field].includes(entry.before), false);
+        row[entry.field] = row[entry.field].replace(entry.after, () => entry.before);
+    }
+    return reverted;
+}
+
 test('541 original IDs, content fields, resource coordinates and completion contract are unchanged', () => {
     assert.deepEqual(dialogues.map(row => row.id), Array.from({ length: 541 }, (_, i) => i + 1));
+    const ledger = JSON.parse(readFileSync(resolve(root, 'data/edition-corrections.json'), 'utf8'));
+    assert.equal(ledger.schema, 'analects-corpus-edition-corrections-v1');
+    assert.equal(ledger.baseSha256, '8c9ebc18d6c6f0c156cad89aaab89f6a413cab0f9b2fa2fa7b65ac2b0d4400b1');
+    assert.equal(ledger.resultSha256, hash(corpusText));
+    const accepted = revertEditionCorrections(dialogues, ledger);
+    assert.equal(hash(`${JSON.stringify(accepted, null, 2)}\n`), ledger.baseSha256);
     // Digests captured from the accepted progress-only source before catalogue edits.
-    assert.equal(hash(JSON.stringify(dialogues.map(({ id, text, translation, annotations }) => ({ id, text, translation, annotations })))), 'e03baf5e4075148dff5aea7fa40588bc46a6bd438a0b90e5cd064d8ae84a2034');
+    assert.equal(hash(JSON.stringify(accepted.map(({ id, text, translation, annotations }) => ({ id, text, translation, annotations })))), 'e03baf5e4075148dff5aea7fa40588bc46a6bd438a0b90e5cd064d8ae84a2034');
+    const changed = dialogues.flatMap((row, index) => ['title', 'text', 'translation', 'annotations', 'displayAliasOf']
+        .filter(field => row[field] !== accepted[index][field]).map(field => `${row.id}:${field}`));
+    assert.deepEqual([...new Set(changed)], [...new Set(ledger.corrections.map(entry => `${entry.id}:${entry.field}`))]);
     assert.equal(hash(JSON.stringify(manifest.items.map(({ resourceKey, chapterId, major, minor }) => ({ resourceKey, chapterId, major, minor })))), 'dbee999a39a48b560a1476d986e27efe9600f04259e29a3da6a4e09c6b6408fa');
     assert.equal(hash(JSON.stringify(manifest.completionContract)), 'a77130bd71e0f09b8ef91e3c0e5f8cac7008207b63f849224eb3d2c53cb4f9cf');
     assert.equal(manifest.manifestVersion, 'kz-79b9c5647108bc9b');
