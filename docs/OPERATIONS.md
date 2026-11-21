@@ -1,3 +1,10 @@
+## 2026-11-21 Corpus corrections through a ledger (lunyu-corpus-20261121)
+
+- `data/dialogues.json` is the shared corpus for ly.bdfz.net (`content/source-lock.json`), Weibian (`content/source-input-lock.json`) and, through Weibian's bundle, Fuzi. Change its content only together with `data/edition-corrections.json`: one entry per exact substring replacement in one text/translation/annotations field of one row, each checked against the printed edition. `scripts/test_chapter_catalogue.mjs` reverts the ledger and requires the previous accepted bytes (`baseSha256`) and the accepted content digest; the ledger's `resultSha256` must equal the corpus.
+- A content change moves `data/learning-manifest.json` `sourceSha256` only (run `npm run build:learning-manifest`); `manifestVersion`, resource keys, 541/163 and the UC handshake stay the same, so the UC manifest procedure does not apply. Learning captures record `kz-79b9c5647108bc9b:<corpus sha>` as their version.
+- For the next correction, extend the ledger against the current `baseSha256` (or start a new ledger whose base is the current corpus and list the old one in the consumers' `previous`), then release consumers in order: KZ, ly (sync + bank-refresh contexts + atlas), then Weibian (new bundle, device gates) and Fuzi.
+- Accepted 2026-11-21: source `0b1fcf5`, Pages `703dd696`, effective 04:45:16Z; rollback `63a8a6de` (`69ed09e`). Evidence `CF/_meta/reports/operations/lunyu-corpus-20261121/release/kz/`.
+
 ## 2026-11-18 AI answers through the gateway's credit lanes (sites-three-tier-20261118)
 
 This section supersedes earlier statements in this file about how the page reaches the AI gateway and how long it waits.

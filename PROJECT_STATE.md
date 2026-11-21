@@ -1,3 +1,12 @@
+## 2026-11-21 accepted: nine edition corrections in the shared corpus
+
+- Source `0b1fcf5` on `main`, Pages deployment `703dd696-0855-411a-b672-415c2fdadb60`, effective 2026-11-21T04:45:16Z through the guarded native Git build; rollback Pages `63a8a6de` (source `69ed09e`), learning data unaffected either way.
+- `data/dialogues.json` sha256 `8c9ebc18…` → `8e207721…`: 5.10 「雕也，」「何诛⑵？」; 14.39 「硁硁乎」 (text and translation); 17.8 「其蔽也绞」, note ⑸贼, 「六字」; 18.7 「蓧」 (text and note). Each reading was checked in the Zhonghua printings 2006 (ISBN 9787101054194), 2009 (9787101070248) and 2017 简体字本 (9787101127867). `data/edition-corrections.json` lists every change; reverting it gives back `8c9ebc18` (enforced by `scripts/test_chapter_catalogue.mjs`).
+- Unchanged: IDs, titles, aliases, learning manifest `kz-79b9c5647108bc9b` / 541 / 163 / key digest (UC handshake identical), Functions, configuration. The manifest's `sourceSha256` and the recorded `resourceVersion` of learning captures (`kz-79b9c5647108bc9b:<corpus sha>`) follow the new corpus.
+- Kept on purpose: 5.26 「轻字当删」, 16.1 「当作贫／当作寡」, 17.15 「当作患不得之」, 17.24 「流字衍文」, 20.1 「此五字衍文」 are Yang's own small-type remarks (例言 §3), printed in the text.
+- Consumers (change `20261121-kz-corpus-edition-corrections`, receipt `CF/_meta/reports/operations/shared_hub_changes/2026-11-21-other-shared-hub-kz-corpus-edition-corrections.json`): ly.bdfz.net adopted it (`4e5693f`, Pages `b81e3cac`); Weibian and Fuzi stay on `69674ff` until their own content release. Status `20261121-ly-kz-analects-corrections`. Report `CF/_meta/reports/operations/lunyu-corpus-20261121/REPORT.md`.
+- Open: UC rubric `kz-observed-annotation-recovery-v1` only accepts the old recorded version, so a KZ completion-sync failure recorded after this release needs a rubric revision to be recoverable (the journal row is kept).
+
 ## 2026-11-18 accepted: AI through the gateway's credit lanes
 
 - Source `69ed09e` on `main`, Pages deployment `63a8a6de-ad93-47d8-8671-36262824e08a`, effective 2026-11-18T10:29:11Z; rollback 3c03c0d1 (source 6f56a44).
